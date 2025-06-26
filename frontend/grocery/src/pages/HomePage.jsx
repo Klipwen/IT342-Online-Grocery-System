@@ -363,6 +363,73 @@ function HomePage() {
           </div>
         </section>
       </main>
+      {/* Footer */}
+      <footer style={{ backgroundColor: 'black', color: 'white', marginTop: '4rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '1rem' }}>Exclusive</h3>
+              <p style={{ color: '#d1d5db', marginBottom: '1rem' }}>Subscribe</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1rem' }}>Get 10% off your first order</p>
+              <div style={{ display: 'flex' }}>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    backgroundColor: '#1f2937',
+                    border: '1px solid #374151',
+                    borderRadius: '0.25rem 0 0 0.25rem',
+                    color: 'white',
+                    fontSize: '0.875rem'
+                  }}
+                />
+                <button style={{
+                  backgroundColor: '#ef4444',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '0 0.25rem 0.25rem 0',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}>
+                  →
+                </button>
+              </div>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '1rem' }}>Support</h3>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>111 Bijoy sarani, Dhaka,</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>DH 1515, Bangladesh.</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>exclusive@gmail.com</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem' }}>+88015-88888-9999</div>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '1rem' }}>Account</h3>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>My Account</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Login / Register</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Cart</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Wishlist</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem' }}>Shop</div>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '1rem' }}>Quick Link</h3>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Privacy Policy</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Terms Of Use</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem', marginBottom: '0.5rem' }}>FAQ</div>
+              <div style={{ color: '#d1d5db', fontSize: '0.875rem' }}>Contact</div>
+              <div style={{ marginTop: '1rem', color: '#d1d5db', fontSize: '0.875rem' }}>Download App</div>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <div style={{ backgroundColor: '#1f2937', padding: '0.5rem', borderRadius: '0.25rem' }}></div>
+                <div style={{ backgroundColor: '#1f2937', padding: '0.5rem', borderRadius: '0.25rem' }}></div>
+              </div>
+            </div>
+          </div>
+          <div style={{ borderTop: '1px solid #374151', marginTop: '2rem', paddingTop: '2rem', textAlign: 'center', color: '#9ca3af', fontSize: '0.875rem' }}>
+            © Copyright Rimel 2022. All right reserved
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
