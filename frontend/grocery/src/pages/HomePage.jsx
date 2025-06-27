@@ -127,15 +127,52 @@ function HomePage() {
           </div>
         </section>
 
+        {/* Explore Our Products Section */}
+        <section>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ width: '0.25rem', height: '2rem', backgroundColor: '#ef4444', borderRadius: '0.125rem' }}></div>
+            <span style={{ color: '#ef4444', fontWeight: '500' }}>Our Products</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
+            <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#1f2937', margin: '0' }}>Explore Our Products</h2>
+            <button style={{ 
+              backgroundColor: '#ef4444', 
+              color: 'white', 
+              padding: '0.5rem 1.5rem', 
+              border: 'none',
+              borderRadius: '0.25rem', 
+              cursor: 'pointer',
+              fontWeight: '500',
+              flexShrink: 0
+            }}>
+              View All Products
+            </button>
+          </div>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '1rem',
+            width: '100%'
+          }}>
+            {products.map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={() => handleAddToCart(product)}
+                onToggleWishlist={() => handleToggleWishlist(product)}
+                isWishlisted={wishlistCount > 0}
+              />
+            ))}
+          </div>
+        </section>
+
         {/* Browse By Category Section */}
         <section style={{ marginBottom: '3rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ width: '0.25rem', height: '2rem', backgroundColor: '#ef4444', borderRadius: '0.125rem' }}></div>
             <span style={{ color: '#ef4444', fontWeight: '500' }}>Categories</span>
           </div>
-          
           <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#1f2937', margin: '0 0 2rem 0' }}>Browse By Category</h2>
-
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
@@ -192,7 +229,6 @@ function HomePage() {
               </div>
             ))}
           </div>
-
           {/* Service Features */}
           <div style={{ 
             display: 'grid', 
@@ -258,47 +294,6 @@ function HomePage() {
                   {service.subtitle}
                 </p>
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Explore Our Products Section */}
-        <section>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ width: '0.25rem', height: '2rem', backgroundColor: '#ef4444', borderRadius: '0.125rem' }}></div>
-            <span style={{ color: '#ef4444', fontWeight: '500' }}>Our Products</span>
-          </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
-            <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#1f2937', margin: '0' }}>Explore Our Products</h2>
-            <button style={{ 
-              backgroundColor: '#ef4444', 
-              color: 'white', 
-              padding: '0.5rem 1.5rem', 
-              border: 'none',
-              borderRadius: '0.25rem', 
-              cursor: 'pointer',
-              fontWeight: '500',
-              flexShrink: 0
-            }}>
-              View All Products
-            </button>
-          </div>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '1rem',
-            width: '100%'
-          }}>
-            {products.map(product => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={() => handleAddToCart(product)}
-                onToggleWishlist={() => handleToggleWishlist(product)}
-                isWishlisted={wishlistCount > 0}
-              />
             ))}
           </div>
         </section>
