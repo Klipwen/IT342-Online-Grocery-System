@@ -1,213 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Search, ShoppingCart, Heart, User, Eye } from 'lucide-react';
 import Footer from '../components/Footer';
+import ProductCard from '../components/ProductCard';
 
 function HomePage() {
   const [cartCount, setCartCount] = useState(2);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [products, setProducts] = useState([]);
 
-  const productData = {
-    name: "Ligo Easy Open Can Sardines in Tomato Sauce 155g",
-    originalPrice: "₱55.00",
-    salePrice: "₱42.50",
-    pieces: "6 pcs",
-    discount: "-5%",
-    image: "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?w=200&h=200&fit=crop&crop=center"
-  };
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/products')
+      .then(response => setProducts(response.data))
+      .catch(error => console.error('Error fetching products:', error));
+  }, []);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (product) => {
     setCartCount(cartCount + 1);
   };
 
-  const handleToggleWishlist = () => {
+  const handleToggleWishlist = (product) => {
     setWishlistCount(wishlistCount > 0 ? 0 : 1);
   };
-
-  const ProductCard = ({ product, showSale = true }) => (
-    <div style={{ 
-      backgroundColor: 'white', 
-      borderRadius: '0.5rem', 
-      boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', 
-      border: '1px solid #e5e7eb',
-      transition: 'box-shadow 0.2s',
-      overflow: 'hidden',
-      height: 'fit-content'
-    }}>
-      <div style={{ position: 'relative', padding: '1rem' }}>
-        {showSale && (
-          <div style={{ 
-            position: 'absolute', 
-            top: '0.5rem', 
-            left: '0.5rem', 
-            backgroundColor: '#ef4444', 
-            color: 'white', 
-            fontSize: '0.75rem', 
-            padding: '0.25rem 0.5rem', 
-            borderRadius: '0.25rem',
-            zIndex: 10
-          }}>
-            {product.discount}
-          </div>
-        )}
-        <div style={{ 
-          position: 'absolute', 
-          top: '0.5rem', 
-          right: '0.5rem', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '0.25rem',
-          zIndex: 10
-        }}>
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleWishlist();
-            }}
-            style={{ 
-              padding: '0.25rem', 
-              backgroundColor: 'white', 
-              border: '1px solid #e5e7eb',
-              borderRadius: '50%', 
-              boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Heart style={{ 
-              width: '1rem', 
-              height: '1rem', 
-              color: wishlistCount > 0 ? '#ef4444' : '#9ca3af',
-              fill: wishlistCount > 0 ? '#ef4444' : 'none'
-            }} />
-          </button>
-          <button style={{ 
-            padding: '0.25rem', 
-            backgroundColor: 'white', 
-            border: '1px solid #e5e7eb',
-            borderRadius: '50%', 
-            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', 
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Eye style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} />
-          </button>
-        </div>
-        
-        {/* Product Image */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          marginBottom: '1rem',
-          paddingTop: '1rem'
-        }}>
-          <div style={{
-            width: '6rem',
-            height: '6rem',
-            background: 'linear-gradient(to bottom, #16a34a, #166534)',
-            borderRadius: '0.25rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ color: 'white', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.125rem' }}>MEGA</div>
-              <div style={{ fontSize: '0.625rem' }}>SARDINES</div>
-            </div>
-            <div style={{
-              position: 'absolute',
-              top: '0.25rem',
-              right: '0.25rem',
-              width: '1.5rem',
-              height: '1.5rem',
-              backgroundColor: '#3b82f6',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <div style={{ width: '1rem', height: '0.75rem', backgroundColor: 'white', borderRadius: '0.125rem' }}></div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Product Info */}
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ 
-            color: '#ef4444', 
-            fontSize: '0.875rem', 
-            margin: '0 0 0.5rem 0',
-            fontWeight: '500'
-          }}>
-            {product.pieces}
-          </p>
-          
-          <h3 style={{ 
-            fontSize: '0.875rem', 
-            color: '#1f2937', 
-            margin: '0 0 0.75rem 0',
-            lineHeight: '1.4', 
-            minHeight: '2.8rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center'
-          }}>
-            {product.name}
-          </h3>
-          
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            gap: '0.5rem', 
-            marginBottom: '0.75rem' 
-          }}>
-            <span style={{ 
-              color: '#ef4444', 
-              fontWeight: '600',
-              fontSize: '0.875rem'
-            }}>
-              {product.salePrice}
-            </span>
-            <span style={{ 
-              color: '#9ca3af', 
-              fontSize: '0.75rem', 
-              textDecoration: 'line-through' 
-            }}>
-              {product.originalPrice}
-            </span>
-          </div>
-          
-          <button 
-            onClick={handleAddToCart}
-            style={{ 
-              width: '100%', 
-              backgroundColor: '#ef4444', 
-              color: 'white', 
-              padding: '0.5rem 1rem', 
-              border: 'none',
-              borderRadius: '0.25rem', 
-              fontSize: '0.875rem', 
-              fontWeight: '500', 
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
-          >
-            Add To Cart
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
@@ -232,13 +46,13 @@ function HomePage() {
                 <input
                   type="text"
                   placeholder="What are you looking for?"
-                  style={{
-                    paddingLeft: '1rem',
-                    paddingRight: '2.5rem',
-                    paddingTop: '0.5rem',
+                  style={{ 
+                    paddingLeft: '1rem', 
+                    paddingRight: '2.5rem', 
+                    paddingTop: '0.5rem', 
                     paddingBottom: '0.5rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.5rem',
+                    border: '1px solid #d1d5db', 
+                    borderRadius: '0.5rem', 
                     width: '200px',
                     outline: 'none',
                     fontSize: '0.875rem'
@@ -248,19 +62,19 @@ function HomePage() {
               </div>
               <div style={{ position: 'relative' }}>
                 <ShoppingCart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-                <span style={{
-                  position: 'absolute',
+                    <span style={{ 
+                      position: 'absolute', 
                   top: '-0.5rem',
                   right: '-0.5rem',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  fontSize: '0.75rem',
-                  borderRadius: '50%',
+                      backgroundColor: '#ef4444', 
+                      color: 'white', 
+                      fontSize: '0.75rem', 
+                      borderRadius: '50%', 
                   width: '1.25rem',
                   height: '1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
                 }}>{cartCount}</span>
               </div>
               <Heart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
@@ -301,8 +115,14 @@ function HomePage() {
             gap: '1rem',
             width: '100%'
           }}>
-            {[...Array(8)].map((_, index) => (
-              <ProductCard key={index} product={productData} />
+            {products.map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={() => handleAddToCart(product)}
+                onToggleWishlist={() => handleToggleWishlist(product)}
+                isWishlisted={wishlistCount > 0}
+              />
             ))}
           </div>
         </section>
@@ -471,8 +291,14 @@ function HomePage() {
             gap: '1rem',
             width: '100%'
           }}>
-            {[...Array(4)].map((_, index) => (
-              <ProductCard key={index} product={productData} />
+            {products.map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={() => handleAddToCart(product)}
+                onToggleWishlist={() => handleToggleWishlist(product)}
+                isWishlisted={wishlistCount > 0}
+              />
             ))}
           </div>
         </section>
