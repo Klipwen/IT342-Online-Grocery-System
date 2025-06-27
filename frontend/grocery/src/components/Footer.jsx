@@ -1,4 +1,8 @@
 import React from 'react';
+import facebookIcon from '../assets/icon_facebook.png';
+import twitterIcon from '../assets/icon_twitter.png';
+import instagramIcon from '../assets/icon_instagram.png';
+import tiktokIcon from '../assets/icon_tiktok.png';
 
 function Footer() {
   return (
@@ -32,10 +36,66 @@ function Footer() {
           <div>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '1rem' }}>Follow Us</h3>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-              <a href="#" title="Facebook" style={{ fontSize: '2rem', color: 'white', textDecoration: 'none' }}>📘</a>
-              <a href="#" title="Twitter" style={{ fontSize: '2rem', color: 'white', textDecoration: 'none' }}>🐦</a>
-              <a href="#" title="Instagram" style={{ fontSize: '2rem', color: 'white', textDecoration: 'none' }}>📸</a>
-              <a href="#" title="TikTok" style={{ fontSize: '2rem', color: 'white', textDecoration: 'none' }}>🎵</a>
+              <a href="#" title="Facebook" style={{ display: 'block' }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
+                  border: '2px solid #e5e7eb'
+                }}>
+                  <img src={facebookIcon} alt="Facebook" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
+                </div>
+              </a>
+              <a href="#" title="Twitter" style={{ display: 'block' }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
+                  border: '2px solid #e5e7eb'
+                }}>
+                  <img src={twitterIcon} alt="Twitter" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
+                </div>
+              </a>
+              <a href="#" title="Instagram" style={{ display: 'block' }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
+                  border: '2px solid #e5e7eb'
+                }}>
+                  <img src={instagramIcon} alt="Instagram" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
+                </div>
+              </a>
+              <a href="#" title="TikTok" style={{ display: 'block' }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
+                  border: '2px solid #e5e7eb'
+                }}>
+                  <img src={tiktokIcon} alt="TikTok" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
+                </div>
+              </a>
             </div>
           </div>
         </div>
