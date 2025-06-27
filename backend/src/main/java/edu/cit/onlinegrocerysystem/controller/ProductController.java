@@ -1,43 +1,44 @@
 package edu.cit.onlinegrocerysystem.controller;
 
 import edu.cit.onlinegrocerysystem.model.Product;
-import edu.cit.onlinegrocerysystem.service.ProductService;
+import edu.cit.onlinegrocerysystem.repository.ProductRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "*")
 public class ProductController {
-    private final ProductService service;
 
-    public ProductController(ProductService service) {
-        this.service = service;
+    private final ProductRepository productRepository;
+
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @GetMapping
-    public List<Product> getAll() {
-        return service.getAll();
-    }
-
-    @GetMapping("/{id}")
-    public Product getById(@PathVariable Long id) {
-        return service.getById(id);
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
     @PostMapping
-    public Product save(@RequestBody Product product) {
-        return service.save(product);
+    public Product createProduct(@RequestBody Product product) {
+        return productRepository.save(product);
     }
 
     @PutMapping("/{id}")
-    public Product update(@PathVariable Long id, @RequestBody Product product) {
-        return service.update(id, product);
+    public Product updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    product.setName(updatedProduct.getName());
+                    product.setPrice(updatedProduct.getPrice());
+                    return productRepository.save(product);
+                })
+                .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public void deleteProduct(@PathVariable Long id) {
+        productRepository.deleteById(id);
     }
 }
