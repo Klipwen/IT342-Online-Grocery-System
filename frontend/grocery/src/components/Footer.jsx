@@ -35,66 +35,18 @@ function Footer() {
           {/* Follow Us */}
           <div>
             <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '1rem' }}>Follow Us</h3>
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-              <a href="#" title="Facebook" style={{ display: 'block' }}>
-                <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '50%',
-                  background: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
-                  border: '2px solid #e5e7eb'
-                }}>
-                  <img src={facebookIcon} alt="Facebook" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
-                </div>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <img src={facebookIcon} alt="Facebook" style={{ width: '2rem', height: '2rem' }} />
               </a>
-              <a href="#" title="Twitter" style={{ display: 'block' }}>
-                <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '50%',
-                  background: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
-                  border: '2px solid #e5e7eb'
-                }}>
-                  <img src={twitterIcon} alt="Twitter" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
-                </div>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <img src={twitterIcon} alt="Twitter" style={{ width: '2rem', height: '2rem' }} />
               </a>
-              <a href="#" title="Instagram" style={{ display: 'block' }}>
-                <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '50%',
-                  background: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
-                  border: '2px solid #e5e7eb'
-                }}>
-                  <img src={instagramIcon} alt="Instagram" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
-                </div>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <img src={instagramIcon} alt="Instagram" style={{ width: '2rem', height: '2rem' }} />
               </a>
-              <a href="#" title="TikTok" style={{ display: 'block' }}>
-                <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '50%',
-                  background: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
-                  border: '2px solid #e5e7eb'
-                }}>
-                  <img src={tiktokIcon} alt="TikTok" style={{ width: '1.5rem', height: '1.5rem', display: 'block' }} />
-                </div>
+              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer">
+                <img src={tiktokIcon} alt="TikTok" style={{ width: '2rem', height: '2rem' }} />
               </a>
             </div>
           </div>
