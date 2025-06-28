@@ -157,37 +157,11 @@ const ProductPage = () => {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
             {/* Product Image */}
             <div style={{ flex: 1, minWidth: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{
-                width: '256px',
-                height: '256px',
-                background: 'linear-gradient(to bottom, #16a34a, #166534)',
-                borderRadius: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{ color: 'white', textAlign: 'center' }}>
-                  <div style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>MEGA</div>
-                  <div style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>SARDINES</div>
-                  <div style={{ fontSize: '0.875rem' }}>NET WEIGHT 155 g (5.5 oz)</div>
-                </div>
-                <div style={{
-                  position: 'absolute',
-                  top: '1rem',
-                  right: '1rem',
-                  width: '3rem',
-                  height: '3rem',
-                  backgroundColor: '#3b82f6',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <div style={{ width: '2rem', height: '1.5rem', backgroundColor: 'white', borderRadius: '0.25rem' }}></div>
-                </div>
-              </div>
+              {product.image ? (
+                <img src={product.image} alt={product.name} style={{ width: '256px', height: '256px', objectFit: 'contain', borderRadius: '0.5rem', background: '#fff', border: '1px solid #e5e7eb' }} />
+              ) : (
+                <div style={{ width: '256px', height: '256px', background: '#e5e7eb', borderRadius: '0.5rem' }} />
+              )}
             </div>
 
             {/* Product Info */}
@@ -199,6 +173,10 @@ const ProductPage = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span style={{ color: '#4b5563', fontSize: '1.125rem' }}>{product.price}</span>
                   <span style={{ color: '#9ca3af', textDecoration: 'line-through' }}>{product.originalPrice}</span>
+                </div>
+                <div style={{ marginTop: '0.5rem', color: '#6b7280', fontSize: '0.95rem' }}>
+                  <div><strong>Category:</strong> {product.category}</div>
+                  <div><strong>Available Quantity:</strong> {product.quantity}</div>
                 </div>
               </div>
 
