@@ -17,6 +17,9 @@ public class Product {
     private Double salePrice;
     private Double originalPrice;
     private String discount;
+    private boolean bestSelling;
+    private String variants; // e.g., "red,green"
+    private String sizes; // e.g., "S,L"
 
     public Product() {
     }
@@ -104,5 +107,29 @@ public class Product {
 
     public void setDiscount(String discount) {
         this.discount = discount;
+    }
+
+    public boolean isBestSelling() {
+        return bestSelling;
+    }
+
+    public void setBestSelling(boolean bestSelling) {
+        this.bestSelling = bestSelling;
+    }
+
+    public String getVariants() {
+        return variants;
+    }
+
+    public void setVariants(String variants) {
+        this.variants = variants;
+    }
+
+    public String getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(String sizes) {
+        this.sizes = sizes;
     }
 }
