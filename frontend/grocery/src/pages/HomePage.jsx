@@ -115,7 +115,7 @@ function HomePage() {
             gap: '1rem',
             width: '100%'
           }}>
-            {products.map(product => (
+            {products.filter(product => product.bestSelling).map(product => (
               <ProductCard
                 key={product.id}
                 product={product}

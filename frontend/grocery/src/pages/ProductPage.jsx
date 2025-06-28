@@ -1,12 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, ShoppingCart, User, Search, Menu, Star, Minus, Plus } from 'lucide-react';
 import Footer from '../components/Footer';
+import axios from 'axios';
 
 const ProductPage = () => {
-  const [selectedVariant, setSelectedVariant] = useState('green');
-  const [selectedSize, setSelectedSize] = useState('L');
-  const [quantity, setQuantity] = useState(2);
+  const [product, setProduct] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    // For now, fetch the first product as an example
+    axios.get('http://localhost:8080/api/products')
+      .then(response => {
+        if (response.data.length > 0) {
+          setProduct(response.data[0]);
+          // Set defaults if available
+          const variants = response.data[0].variants ? response.data[0].variants.split(',') : [];
+          const sizes = response.data[0].sizes ? response.data[0].sizes.split(',') : [];
+          setSelectedVariant(variants[0] || '');
+          setSelectedSize(sizes[0] || '');
+        }
+      })
+      .catch(error => console.error('Error fetching product:', error));
+  }, []);
+
+  if (!product) return <div>Loading...</div>;
+
+  const variants = product.variants ? product.variants.split(',') : [];
+  const sizes = product.sizes ? product.sizes.split(',') : [];
 
   const relatedProducts = [
     {
@@ -171,11 +194,11 @@ const ProductPage = () => {
             <div style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
-                  Ligo Easy Open Can Sardines In Tomato Sauce 155g
+                  {product.name}
                 </h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ color: '#4b5563', fontSize: '1.125rem' }}>₱142.50</span>
-                  <span style={{ color: '#9ca3af', textDecoration: 'line-through' }}>₱180.00</span>
+                  <span style={{ color: '#4b5563', fontSize: '1.125rem' }}>{product.price}</span>
+                  <span style={{ color: '#9ca3af', textDecoration: 'line-through' }}>{product.originalPrice}</span>
                 </div>
               </div>
 
@@ -183,28 +206,20 @@ const ProductPage = () => {
               <div>
                 <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem', display: 'block' }}>Variants:</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button
-                    onClick={() => setSelectedVariant('green')}
-                    style={{
-                      width: '1.5rem',
-                      height: '1.5rem',
-                      borderRadius: '50%',
-                      border: selectedVariant === 'green' ? '2px solid #1f2937' : '2px solid #d1d5db',
-                      backgroundColor: '#16a34a',
-                      cursor: 'pointer'
-                    }}
-                  />
-                  <button
-                    onClick={() => setSelectedVariant('blue')}
-                    style={{
-                      width: '1.5rem',
-                      height: '1.5rem',
-                      borderRadius: '50%',
-                      border: selectedVariant === 'blue' ? '2px solid #1f2937' : '2px solid #d1d5db',
-                      backgroundColor: '#3b82f6',
-                      cursor: 'pointer'
-                    }}
-                  />
+                  {variants.map((variant, idx) => (
+                    <button
+                      key={variant}
+                      onClick={() => setSelectedVariant(variant)}
+                      style={{
+                        width: '1.5rem',
+                        height: '1.5rem',
+                        borderRadius: '50%',
+                        border: selectedVariant === variant ? '2px solid #1f2937' : '2px solid #d1d5db',
+                        backgroundColor: variant.trim(), // assumes color name or code
+                        cursor: 'pointer'
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
 
@@ -212,40 +227,29 @@ const ProductPage = () => {
               <div>
                 <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem', display: 'block' }}>Size:</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button
-                    onClick={() => setSelectedSize('M')}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '0.25rem',
-                      border: selectedSize === 'M' ? '2px solid #ef4444' : '2px solid #d1d5db',
-                      backgroundColor: selectedSize === 'M' ? '#ef4444' : 'white',
-                      color: selectedSize === 'M' ? 'white' : '#374151',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    M
-                  </button>
-                  <button
-                    onClick={() => setSelectedSize('L')}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      fontSize: '0.875rem',
-                      borderRadius: '0.25rem',
-                      border: selectedSize === 'L' ? '2px solid #ef4444' : '2px solid #d1d5db',
-                      backgroundColor: selectedSize === 'L' ? '#ef4444' : 'white',
-                      color: selectedSize === 'L' ? 'white' : '#374151',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    L
-                  </button>
+                  {sizes.map((size, idx) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        fontSize: '0.875rem',
+                        borderRadius: '0.25rem',
+                        border: selectedSize === size ? '2px solid #ef4444' : '2px solid #d1d5db',
+                        backgroundColor: selectedSize === size ? '#ef4444' : 'white',
+                        color: selectedSize === size ? 'white' : '#374151',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {size}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {/* Price and Actions */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ef4444' }}>₱285.00</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ef4444' }}>{product.price}</div>
                 <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #d1d5db', borderRadius: '0.25rem' }}>
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
