@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const categories = [
   'Pantry Essentials',
@@ -51,10 +50,32 @@ const initialFormState = {
   sizes: ''
 };
 
-const ProductForm = () => {
+const ProductForm = ({ product, isEdit = false, onNavigate }) => {
   const [form, setForm] = useState(initialFormState);
   const [imagePreview, setImagePreview] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [currentImage, setCurrentImage] = useState('');
+
+  // Load product data when editing
+  useEffect(() => {
+    if (isEdit && product) {
+      setForm({
+        name: product.name || '',
+        price: product.price || '',
+        category: product.category || '',
+        quantity: product.quantity || '',
+        image: product.image || '',
+        salePrice: product.salePrice || '',
+        originalPrice: product.originalPrice || '',
+        discount: product.discount || '',
+        bestSelling: product.bestSelling || false,
+        variants: product.variants || '',
+        sizes: product.sizes || ''
+      });
+      setCurrentImage(product.image || '');
+      setImagePreview(product.image || '');
+    }
+  }, [product, isEdit]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -67,30 +88,75 @@ const ProductForm = () => {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
     setImagePreview(URL.createObjectURL(file));
     setUploading(true);
+    
     const formData = new FormData();
     formData.append('file', file);
+    
     try {
-      const res = await axios.post('http://localhost:8080/api/admin/products/upload-image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const response = await fetch('http://localhost:8080/api/admin/products/upload-image', {
+        method: 'POST',
+        body: formData
       });
-      setForm(prev => ({ ...prev, image: res.data }));
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      const imageUrl = await response.text();
+      setForm(prev => ({ ...prev, image: imageUrl }));
     } catch (err) {
       alert('Image upload failed');
+      setImagePreview(currentImage); // Revert to current image on error
     }
     setUploading(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      await axios.post('http://localhost:8080/api/products', form);
-      alert('Product added successfully!');
-      setForm(initialFormState);
-      setImagePreview('');
+      if (isEdit) {
+        const response = await fetch(`http://localhost:8080/api/admin/products/${product.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Update failed');
+        }
+        
+        alert('Product updated successfully!');
+      } else {
+        const response = await fetch('http://localhost:8080/api/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Add failed');
+        }
+        
+        alert('Product added successfully!');
+        setForm(initialFormState);
+        setImagePreview('');
+      }
+      
+      // Navigate back to add product page
+      if (onNavigate) {
+        onNavigate();
+      }
     } catch (err) {
-      alert('Failed to add product');
+      alert(isEdit ? 'Failed to update product' : 'Failed to add product');
+      console.error('Error:', err);
     }
   };
 
@@ -110,7 +176,14 @@ const ProductForm = () => {
       <input type="file" accept="image/*" onChange={handleImageChange} style={inputStyle} />
       {uploading && <div style={{ color: '#ef4444', fontSize: '0.95rem' }}>Uploading...</div>}
       {imagePreview && (
-        <img src={imagePreview} alt="Preview" style={{ maxWidth: 120, margin: '0.5rem 0', borderRadius: 8 }} />
+        <div style={{ margin: '0.5rem 0' }}>
+          <img src={imagePreview} alt="Preview" style={{ maxWidth: 120, borderRadius: 8, marginBottom: '0.5rem' }} />
+          {isEdit && currentImage && form.image !== currentImage && (
+            <div style={{ fontSize: '0.9rem', color: '#059669', marginTop: '0.25rem' }}>
+              ✓ New image will replace the current one
+            </div>
+          )}
+        </div>
       )}
 
       <div style={sectionTitleStyle}>Pricing & Stock</div>
@@ -136,7 +209,42 @@ const ProductForm = () => {
       <label style={labelStyle}>Sizes (comma separated)</label>
       <input name="sizes" value={form.sizes} onChange={handleChange} placeholder="e.g. S,M,L" style={inputStyle} />
 
-      <button type="submit" style={{ background: '#ef4444', color: 'white', padding: '0.9rem', border: 'none', borderRadius: '0.375rem', fontWeight: 'bold', fontSize: '1.1rem', marginTop: '1.5rem', cursor: 'pointer', boxShadow: '0 1px 3px 0 rgb(239 68 68 / 0.15)' }}>Add Product</button>
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+        <button 
+          type="submit" 
+          style={{ 
+            background: '#ef4444', 
+            color: 'white', 
+            padding: '0.9rem', 
+            border: 'none', 
+            borderRadius: '0.375rem', 
+            fontWeight: 'bold', 
+            fontSize: '1.1rem', 
+            cursor: 'pointer', 
+            boxShadow: '0 1px 3px 0 rgb(239 68 68 / 0.15)',
+            flex: 1
+          }}
+        >
+          {isEdit ? 'Update Product' : 'Add Product'}
+        </button>
+        <button 
+          type="button" 
+          onClick={onNavigate}
+          style={{ 
+            background: '#6b7280', 
+            color: 'white', 
+            padding: '0.9rem', 
+            border: 'none', 
+            borderRadius: '0.375rem', 
+            fontWeight: 'bold', 
+            fontSize: '1.1rem', 
+            cursor: 'pointer',
+            flex: 1
+          }}
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 };
