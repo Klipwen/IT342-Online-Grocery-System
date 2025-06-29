@@ -1,8 +1,8 @@
 import './styles/App.css';    
-import HomePage from './pages/HomePage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
-  return <HomePage />;
+  return <RegisterPage />;
 }
 
 export default App;
