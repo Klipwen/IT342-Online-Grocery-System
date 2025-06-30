@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProductForm from '../../components/admin/ProductForm';
+import { getApiBaseUrl } from '../../config/api';
 
 const EditProductPage = ({ productId, onNavigate }) => {
   const [product, setProduct] = useState(null);
@@ -9,8 +10,8 @@ const EditProductPage = ({ productId, onNavigate }) => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        // Since we don't have axios installed, we'll use fetch
-        const response = await fetch(`http://localhost:8080/api/admin/products/${productId}`);
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/admin/products/${productId}`);
         if (!response.ok) {
           throw new Error('Product not found');
         }
@@ -68,7 +69,7 @@ const EditProductPage = ({ productId, onNavigate }) => {
             cursor: 'pointer'
           }}
         >
-          Back to Add Product
+          Back to Dashboard
         </button>
       </div>
     );
