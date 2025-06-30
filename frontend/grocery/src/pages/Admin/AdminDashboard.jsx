@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminProductTable from '../../components/admin/AdminProductTable';
 import AdminHeader from '../../components/admin/AdminHeader';
+import { getApiBaseUrl } from '../../config/api';
 
 const AdminDashboard = ({ onNavigate }) => {
   const [products, setProducts] = useState([]);
@@ -29,7 +30,8 @@ const AdminDashboard = ({ onNavigate }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/products');
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/api/products`);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -49,7 +51,8 @@ const AdminDashboard = ({ onNavigate }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/products/${productId}`, {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/api/admin/products/${productId}`, {
         method: 'DELETE'
       });
 

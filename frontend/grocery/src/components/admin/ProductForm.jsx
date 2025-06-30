@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getApiBaseUrl } from '../../config/api';
 
 const categories = [
   'Pantry Essentials',
@@ -96,7 +97,8 @@ const ProductForm = ({ product, isEdit = false, onNavigate }) => {
     formData.append('file', file);
     
     try {
-      const response = await fetch('http://localhost:8080/api/admin/products/upload-image', {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/api/admin/products/upload-image`, {
         method: 'POST',
         body: formData
       });
@@ -118,8 +120,10 @@ const ProductForm = ({ product, isEdit = false, onNavigate }) => {
     e.preventDefault();
     
     try {
+      const apiBaseUrl = getApiBaseUrl();
+      
       if (isEdit) {
-        const response = await fetch(`http://localhost:8080/api/admin/products/${product.id}`, {
+        const response = await fetch(`${apiBaseUrl}/api/admin/products/${product.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -133,7 +137,7 @@ const ProductForm = ({ product, isEdit = false, onNavigate }) => {
         
         alert('Product updated successfully!');
       } else {
-        const response = await fetch('http://localhost:8080/api/products', {
+        const response = await fetch(`${apiBaseUrl}/api/products`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
