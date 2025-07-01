@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import AdminProductTable from '../../components/admin/AdminProductTable';
 import AdminHeader from '../../components/admin/AdminHeader';
 import { getApiBaseUrl } from '../../config/api';
-import Header from '../../components/Header';
+import { ShoppingCart } from 'lucide-react';
+import AdminUserPage from './AdminUserPage';
 
 const AdminDashboard = ({ onNavigate }) => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,7 @@ const AdminDashboard = ({ onNavigate }) => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showUserPage, setShowUserPage] = useState(false);
 
   const categories = [
     'all',
@@ -89,6 +91,10 @@ const AdminDashboard = ({ onNavigate }) => {
     return matchesSearch && matchesCategory;
   });
 
+  if (showUserPage) {
+    return <AdminUserPage onBack={() => setShowUserPage(false)} />;
+  }
+
   if (loading) {
     return (
       <div style={{ 
@@ -136,7 +142,37 @@ const AdminDashboard = ({ onNavigate }) => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
-      <Header />
+      {/* Admin Dashboard Header Card */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '2rem auto 2.5rem auto',
+        background: 'white',
+        padding: '2rem 2.5rem',
+        borderRadius: '0.75rem',
+        boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.07)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '2rem',
+        flexWrap: 'wrap'
+      }}>
+        {/* Logo (match customer header) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '220px', cursor: 'pointer' }} onClick={() => window.location.href = '/'}>
+          <div style={{ backgroundColor: '#ef4444', padding: '0.5rem', borderRadius: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShoppingCart style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+          </div>
+          <span style={{ fontWeight: 'bold', fontSize: '1.125rem', color: '#1f2937' }}>Online Grocery</span>
+        </div>
+        {/* AdminHeader content */}
+        <div style={{ flex: 1, minWidth: '320px' }}>
+          <AdminHeader 
+            title="Admin Dashboard" 
+            subtitle={`${filteredProducts.length} products found`}
+            onAddProduct={handleAddProduct}
+            onViewUsers={() => setShowUserPage(true)}
+          />
+        </div>
+      </div>
       <div style={{ 
         maxWidth: '1200px', 
         margin: '2rem auto', 
@@ -145,12 +181,6 @@ const AdminDashboard = ({ onNavigate }) => {
         borderRadius: '0.5rem', 
         boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' 
       }}>
-        <AdminHeader 
-          title="Admin Dashboard" 
-          subtitle={`${filteredProducts.length} products found`}
-          onAddProduct={handleAddProduct}
-        />
-
         {/* Search and Filter Controls */}
         <div style={{ 
           display: 'flex', 

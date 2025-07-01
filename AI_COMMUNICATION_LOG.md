@@ -47,6 +47,31 @@
 - Team: After pulling, verify header navigation and category dropdown work as expected.
 - AI: Use this as the latest context for navigation and category logic.
 
+## Recent Updates
+
+### Admin User Management (CRUD)
+- Added a new admin user page that displays all users (ID, Name, Email) in a table, excluding passwords.
+- Added a Users button to the admin dashboard header for easy navigation to the user list.
+- User list page now includes:
+  - Back button to return to the dashboard
+  - Add User form (create)
+  - Edit and Delete actions for each user (update/delete)
+  - Confirmation required before deleting a user
+  - Search input and button to filter users by name or email
+- All UI matches the admin dashboard style for consistency.
+
+### Backend
+- Added `/api/auth/users` GET endpoint to return all users (excluding passwords).
+- (Pending) Backend endpoints for POST, PUT, DELETE for users are needed for full CRUD.
+
+### Other Improvements
+- Cart state is now persistent using localStorage.
+- Cart, product, and navigation UI/UX improved for both customer and admin sides.
+
+---
+**For future changes:**
+- See this log for a summary of all major AI-assisted updates and features.
+
 ---
 
 *Add new entries below this line for each new update or important note.* 
