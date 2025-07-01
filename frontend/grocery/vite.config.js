@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5174, // Change this for each developer if needed
+    port: 5173, // Change this for each developer if needed
     host: true,
     proxy: {
       '/api': {

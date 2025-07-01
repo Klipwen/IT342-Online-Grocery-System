@@ -14,7 +14,7 @@ const LoginPage = () => {
     setError('');
     try {
       // Replace with your backend login endpoint
-      const response = await fetch('http://localhost:8081/api/auth/login', {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, rememberMe })
@@ -22,8 +22,15 @@ const LoginPage = () => {
       if (!response.ok) {
         throw new Error('Invalid email or password');
       }
-      // Handle successful login (e.g., save token, redirect)
-      alert('Login successful!');
+      const data = await response.json();
+      // Store user info (including role) in localStorage
+      localStorage.setItem('user', JSON.stringify(data));
+      // Redirect based on role
+      if (data.role === 'admin') {
+        window.location.href = '/?route=admin';
+      } else {
+        window.location.href = '/?route=home';
+      }
     } catch (err) {
       setError(err.message);
     }

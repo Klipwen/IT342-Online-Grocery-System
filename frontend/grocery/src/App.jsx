@@ -5,7 +5,10 @@ import AddProductPage from './pages/Admin/AddProductPage';
 import EditProductPage from './pages/Admin/EditProductPage';
 import RegisterPage from './pages/RegisterPage'; // Ricablanca's page
 import LoginPage from './pages/LoginPage'; // If you have a login page
+import ProtectedRoute from './components/ProtectedRoute';
 import { getCurrentEnvironment, getCurrentDeveloper, setEnvironment, setDeveloper } from './config/api';
+import HomePage from './pages/HomePage';
+import ProductPage from './pages/ProductPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -21,6 +24,7 @@ function App() {
     const env = urlParams.get('env');
     const dev = urlParams.get('dev');
     const route = urlParams.get('route');
+    const productIdParam = urlParams.get('id');
 
     if (route === 'register') {
       setCurrentPage('register');
@@ -30,23 +34,22 @@ function App() {
       setCurrentPage('login');
       return;
     }
-
-    if (editId) {
-      setCurrentPage('edit');
-      setProductId(editId);
-    } else if (page === 'add') {
-      setCurrentPage('add');
-      setProductId(null);
-    } else {
-      setCurrentPage('dashboard');
-      setProductId(null);
+    if (route === 'admin') {
+      setCurrentPage('admin');
+      return;
+    }
+    if (route === 'home') {
+      setCurrentPage('home');
+      return;
+    }
+    if (route === 'product' && productIdParam) {
+      setProductId(productIdParam);
+      setCurrentPage('product');
+      return;
     }
 
-    if (env) setCurrentEnv(env);
-    else setCurrentEnv(getCurrentEnvironment());
-
-    if (dev) setCurrentDev(dev);
-    else setCurrentDev(getCurrentDeveloper());
+    // If no route is specified, redirect to login
+    window.location.href = '/?route=login';
   }, []);
 
   const navigateToDashboard = () => {
@@ -114,7 +117,7 @@ function App() {
           style={{ marginLeft: '5px', padding: '2px' }}
         >
           <option value="juen">Juen (8080)</option>
-          <option value="ricablanca">Ricablanca (8081)</option>
+          <option value="ricablanca">Ricablanca (8080)</option>
           <option value="vestil">Vestil (8082)</option>
         </select>
       </div>
@@ -137,6 +140,14 @@ function App() {
   if (currentPage === 'login') {
     return <LoginPage />;
   }
+  if (currentPage === 'admin') {
+    return (
+      <>
+        <EnvironmentSwitcher />
+        <AdminDashboard onNavigate={dashboardNavigation} />
+      </>
+    );
+  }
   if (currentPage === 'edit' && productId) {
     return (
       <>
@@ -152,6 +163,12 @@ function App() {
         <AddProductPage onNavigate={navigateToDashboard} />
       </>
     );
+  }
+  if (currentPage === 'home') {
+    return <HomePage />;
+  }
+  if (currentPage === 'product' && productId) {
+    return <ProductPage productId={productId} />;
   }
   return (
     <>
