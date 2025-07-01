@@ -1,0 +1,188 @@
+/* ContactPage.css */
+
+.contact-page {
+  font-family: 'Segoe UI', sans-serif;
+  color: #000;
+  background-color: #fff;
+}
+
+/* Header styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5%;
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.logo-section {
+  padding-left: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-section img {
+  height: 32px;
+  margin-right: 10px;
+}
+
+.logo-section span {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.nav-links a {
+  margin: 0 12px;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-icons input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 20px 5%;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Contact Container */
+.contact-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 5%;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+/* Contact Info Cards */
+.contact-info {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-card {
+  background-color: #f6f6f6;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.03);
+}
+
+.info-card i {
+  font-size: 20px;
+  background-color: #db4444;
+  color: #fff;
+  padding: 10px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.info-card h4 {
+  margin: 10px 0 5px;
+}
+
+.info-card p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Contact Form */
+.contact-form {
+  flex: 2;
+  min-width: 400px;
+}
+
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.contact-form button {
+  align-self: flex-end;
+  background-color: #db4444;
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.contact-form button:hover {
+  background-color: #b93737;
+}
+
+/* Footer */
+.footer {
+  background-color: #111;
+  color: white;
+  padding: 50px 5%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.footer-section h4 {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.footer-section p,
+.footer-section small {
+  font-size: 14px;
+  margin: 6px 0;
+  color: #ccc;
+}
+
+.footer-section .qr {
+  width: 80px;
+  margin: 10px 0;
+}
+
+.footer-section .store-buttons img {
+  height: 30px;
+  margin-right: 10px;
+  cursor: pointer;
+}
