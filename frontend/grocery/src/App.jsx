@@ -49,7 +49,7 @@ function App() {
     }
 
     // If no route is specified, redirect to login
-    window.location.href = '/?route=login';
+    // window.location.href = '/?route=login';
   }, []);
 
   const navigateToDashboard = () => {
@@ -170,12 +170,8 @@ function App() {
   if (currentPage === 'product' && productId) {
     return <ProductPage productId={productId} />;
   }
-  return (
-    <>
-      <EnvironmentSwitcher />
-      <AdminDashboard onNavigate={dashboardNavigation} />
-    </>
-  );
+  // Default: show HomePage
+  return <HomePage />;
 }
 
 export default App;
