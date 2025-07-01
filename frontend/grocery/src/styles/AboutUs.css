@@ -1,0 +1,184 @@
+/* Reset margin and padding */
+body,
+.about-page {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-section img {
+  width: 30px;
+}
+
+.nav-links a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-icons input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 10px 40px;
+  font-size: 14px;
+  color: #888;
+}
+
+/* About Main */
+.about-main {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px;
+  gap: 40px;
+  padding: 100px;
+}
+
+.about-text {
+  flex: 1;
+}
+
+.about-text h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.about-image {
+  flex: 1;
+}
+
+.about-image img {
+  width: 100%;
+  border-radius: 10px;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Stats */
+.about-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 30px 40px;
+  background-color: #f8f8f8;
+  margin-top: 20px;
+}
+
+.stat-box {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 150px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.stat-box h3 {
+  margin-bottom: 5px;
+  color: #d32f2f;
+}
+
+.stat-box.active {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+/* Team Section */
+.about-team {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  padding: 40px 20px 20px;
+}
+
+.team-member {
+  text-align: center;
+}
+
+.team-member img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.team-member h4 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.team-member p {
+  font-size: 14px;
+  color: #777;
+  margin-top: 5px;
+}
+
+/* Footer */
+.footer {
+  background-color: #111;
+  color: #fff;
+  padding: 40px 20px 30px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+  max-width: 1200px;         /* Set a fixed content width */
+  margin: 0 auto;            /* Center horizontally */
+  padding: 0 20px;           /* Optional: inner spacing */
+}
+
+.footer-section h4 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.footer-section p,
+.footer-section small {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.qr {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.store-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.store-icon {
+  height: 40px;
+}

@@ -1,0 +1,161 @@
+.checkout-page {
+  font-family: Arial, sans-serif;
+  /* padding:; */
+  background-color: #fff;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.logo-section {
+  padding-left: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-section img {
+  height: 32px;
+  margin-right: 10px;
+}
+
+.nav-links a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #222;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breadcrumb {
+    padding-left: 70px;
+  font-size: 13px;
+  margin: 20px 0;
+}
+
+.checkout-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 100px;
+  gap: 30px;
+}
+
+.billing-details {
+  flex: 2;
+}
+
+.billing-details form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.billing-details input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.save-info {
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.order-summary {
+  flex: 1;
+  padding-top: 50px;
+}
+
+.summary-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: #fff;
+}
+
+.product-summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.product-summary img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.product-summary .price {
+  font-weight: bold;
+  color: #e63946;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.summary-line.total {
+  font-weight: bold;
+}
+
+.summary-shipping {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.summary-shipping label {
+  display: block;
+  margin-top: 4px;
+}
+
+.payment-method label {
+  display: block;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.place-order-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #e63946;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 20px;
+  background: #111;
+  color: #fff;
+  margin-top: 60px;
+}
+
+.footer-section h4 {
+  margin-bottom: 10px;
+}
+
+.footer-section p,
+.footer-section small {
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.store-buttons img {
+  height: 24px;
+  margin-right: 8px;
+}

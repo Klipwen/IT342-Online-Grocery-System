@@ -1,0 +1,110 @@
+.error-page {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-section img {
+  width: 40px;
+}
+
+.nav-links a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-icons input {
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+}
+
+.breadcrumb {
+  padding: 1rem 2rem;
+  font-size: 14px;
+  color: #666;
+}
+
+.error-content {
+  flex: 1;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.error-content h1 {
+  font-size: 56px;
+  margin-bottom: 1rem;
+}
+
+.error-content p {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.back-home-btn {
+  background-color: #db4444;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.footer {
+  background: #111;
+  color: white;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 3rem 2rem;
+}
+
+.footer-section {
+  flex: 1 1 180px;
+  margin: 1rem;
+}
+
+.footer-section h4 {
+  margin-bottom: 1rem;
+  font-size: 16px;
+}
+
+.footer-section p, .footer-section small {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.footer .qr {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.store-buttons img {
+  width: 100px;
+  margin: 5px 5px 0 0;
+}
