@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Heart, ShoppingCart, User, Search, Menu, Star, Minus, Plus } from 'lucide-react';
 import Footer from '../components/Footer';
 import axios from 'axios';
+import ProductCard from '../components/ProductCard';
+import Header from '../components/Header';
 
 const ProductPage = () => {
   const [product, setProduct] = useState(null);
@@ -9,19 +11,26 @@ const ProductPage = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    // For now, fetch the first product as an example
-    axios.get('http://localhost:8080/api/products')
+    // Get product id from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    if (!productId) return;
+    axios.get(`http://localhost:8080/api/products/${productId}`)
       .then(response => {
-        if (response.data.length > 0) {
-          setProduct(response.data[0]);
-          // Set defaults if available
-          const variants = response.data[0].variants ? response.data[0].variants.split(',') : [];
-          const sizes = response.data[0].sizes ? response.data[0].sizes.split(',') : [];
-          setSelectedVariant(variants[0] || '');
-          setSelectedSize(sizes[0] || '');
-        }
+        setProduct(response.data);
+        const variants = response.data.variants ? response.data.variants.split(',') : [];
+        const sizes = response.data.sizes ? response.data.sizes.split(',') : [];
+        setSelectedVariant(variants[0] || '');
+        setSelectedSize(sizes[0] || '');
+        // Fetch related products in the same category
+        axios.get('http://localhost:8080/api/products')
+          .then(res => {
+            const related = res.data.filter(p => p.category === response.data.category && p.id !== response.data.id);
+            setRelatedProducts(related);
+          });
       })
       .catch(error => console.error('Error fetching product:', error));
   }, []);
@@ -31,107 +40,10 @@ const ProductPage = () => {
   const variants = product.variants ? product.variants.split(',') : [];
   const sizes = product.sizes ? product.sizes.split(',') : [];
 
-  const relatedProducts = [
-    {
-      id: 1,
-      name: "Ligo Easy Open Can Sardines In Tomato Sauce 155g",
-      price: "₱42.50",
-      originalPrice: "₱50.00",
-      discount: "-20%",
-      inStock: 6,
-      image: "/api/placeholder/120/120"
-    },
-    {
-      id: 2,
-      name: "Ligo Easy Open Can Sardines In Tomato Sauce 155g",
-      price: "₱42.50",
-      originalPrice: "₱50.00",
-      discount: "-15%",
-      inStock: 0,
-      image: "/api/placeholder/120/120"
-    },
-    {
-      id: 3,
-      name: "Ligo Easy Open Can Sardines In Tomato Sauce 155g",
-      price: "₱42.50",
-      originalPrice: "₱50.00",
-      discount: "-30%",
-      inStock: 5,
-      image: "/api/placeholder/120/120"
-    },
-    {
-      id: 4,
-      name: "Ligo Easy Open Can Sardines In Tomato Sauce 155g",
-      price: "₱42.50",
-      originalPrice: "₱50.00",
-      discount: "-5%",
-      inStock: 0,
-      image: "/api/placeholder/120/120"
-    }
-  ];
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ backgroundColor: '#ef4444', padding: '0.5rem', borderRadius: '0.25rem' }}>
-                <ShoppingCart style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
-              </div>
-              <span style={{ fontWeight: 'bold', fontSize: '1.125rem' }}>Online Grocery</span>
-            </div>
-            
-            <nav style={{ display: 'flex', gap: '2rem' }}>
-              <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }}>Category</a>
-              <a href="#" style={{ color: '#1f2937', fontWeight: '500', textDecoration: 'none' }}>Home</a>
-              <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }}>Contact</a>
-              <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }}>About</a>
-            </nav>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  placeholder="What are you looking for?"
-                  style={{
-                    paddingLeft: '1rem',
-                    paddingRight: '2.5rem',
-                    paddingTop: '0.5rem',
-                    paddingBottom: '0.5rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.5rem',
-                    width: '200px',
-                    outline: 'none',
-                    fontSize: '0.875rem'
-                  }}
-                />
-                <Search style={{ position: 'absolute', right: '0.75rem', top: '0.625rem', width: '1.25rem', height: '1.25rem', color: '#9ca3af' }} />
-              </div>
-              <div style={{ position: 'relative' }}>
-                <ShoppingCart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-                <span style={{
-                  position: 'absolute',
-                  top: '-0.5rem',
-                  right: '-0.5rem',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  fontSize: '0.75rem',
-                  borderRadius: '50%',
-                  width: '1.25rem',
-                  height: '1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>3</span>
-              </div>
-              <Heart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-              <User style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header cartCount={0} />
 
       {/* Breadcrumb */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 1rem 0 1rem' }}>
@@ -276,92 +188,36 @@ const ProductPage = () => {
           {/* Related Products */}
           <div style={{ marginTop: '3rem' }}>
             <div style={{
-              backgroundColor: '#ef4444',
-              color: 'white',
-              padding: '0.5rem 1.5rem',
-              borderRadius: '0.5rem 0.5rem 0 0',
-              display: 'inline-block',
-              fontWeight: '500'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '1rem',
             }}>
-              Related Products
+              <div style={{
+                width: '0.25rem',
+                height: '1.5rem',
+                backgroundColor: '#ef4444',
+                borderRadius: '0.125rem',
+              }}></div>
+              <span style={{ color: '#ef4444', fontWeight: '600', fontSize: '1.1rem' }}>Related Products</span>
             </div>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '1rem',
-              marginTop: '1rem'
+              gap: '1.5rem',
+              marginTop: '1rem',
             }}>
-              {relatedProducts.map((product) => (
-                <div key={product.id} style={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.5rem',
-                  padding: '1rem',
-                  boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-                  position: 'relative'
-                }}>
-                  {product.discount && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '0.5rem',
-                      left: '0.5rem',
-                      backgroundColor: '#ef4444',
-                      color: 'white',
-                      fontSize: '0.75rem',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '0.25rem'
-                    }}>
-                      {product.discount}
-                    </span>
-                  )}
-                  <div style={{
-                    width: '80px',
-                    height: '80px',
-                    background: 'linear-gradient(to bottom, #16a34a, #166534)',
-                    borderRadius: '0.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1rem auto'
-                  }}>
-                    <div style={{ color: 'white', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.875rem', fontWeight: 'bold' }}>MEGA</div>
-                      <div style={{ fontSize: '0.75rem' }}>SARDINES</div>
-                    </div>
-                  </div>
-                  <h3 style={{
-                    fontSize: '1rem',
-                    fontWeight: '500',
-                    color: '#1f2937',
-                    marginBottom: '0.5rem',
-                    textAlign: 'center'
-                  }}>
-                    {product.name}
-                  </h3>
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#ef4444', fontWeight: '600', fontSize: '0.875rem' }}>{product.price}</span>
-                    <span style={{ color: '#9ca3af', fontSize: '0.75rem', textDecoration: 'line-through' }}>{product.originalPrice}</span>
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', textAlign: 'center' }}>
-                    {product.inStock > 0 ? `${product.inStock} pcs` : 'Out of stock'}
-                  </div>
-                  <button
-                    disabled={product.inStock === 0}
-                    style={{
-                      width: '100%',
-                      backgroundColor: product.inStock > 0 ? '#ef4444' : '#e5e7eb',
-                      color: product.inStock > 0 ? 'white' : '#9ca3af',
-                      padding: '0.5rem 1rem',
-                      border: 'none',
-                      borderRadius: '0.25rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      cursor: product.inStock > 0 ? 'pointer' : 'not-allowed'
-                    }}
-                  >
-                    Add To Cart
-                  </button>
-                </div>
+              {relatedProducts.map((related) => (
+                <ProductCard
+                  key={related.id}
+                  product={related}
+                  onAddToCart={() => {}}
+                  onToggleWishlist={() => {}}
+                  isWishlisted={false}
+                  onClick={() => {
+                    window.location.href = `/?route=product&id=${related.id}`;
+                  }}
+                />
               ))}
             </div>
           </div>

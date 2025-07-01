@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Search, ShoppingCart, Heart, User, Eye } from 'lucide-react';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
+import Header from '../components/Header';
 
 function HomePage() {
   const [cartCount, setCartCount] = useState(2);
@@ -26,63 +27,7 @@ function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ backgroundColor: '#ef4444', padding: '0.5rem', borderRadius: '0.25rem' }}>
-                <ShoppingCart style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
-              </div>
-              <span style={{ fontWeight: 'bold', fontSize: '1.125rem' }}>Online Grocery</span>
-            </div>
-            <nav style={{ display: 'flex', gap: '2rem' }}>
-              <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }}>Category</a>
-              <a href="#" style={{ color: '#1f2937', fontWeight: '500', textDecoration: 'none' }}>Home</a>
-              <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }}>Contact</a>
-              <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }}>About</a>
-            </nav>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  placeholder="What are you looking for?"
-                  style={{ 
-                    paddingLeft: '1rem', 
-                    paddingRight: '2.5rem', 
-                    paddingTop: '0.5rem', 
-                    paddingBottom: '0.5rem',
-                    border: '1px solid #d1d5db', 
-                    borderRadius: '0.5rem', 
-                    width: '200px',
-                    outline: 'none',
-                    fontSize: '0.875rem'
-                  }}
-                />
-                <Search style={{ position: 'absolute', right: '0.75rem', top: '0.625rem', width: '1.25rem', height: '1.25rem', color: '#9ca3af' }} />
-              </div>
-              <div style={{ position: 'relative' }}>
-                <ShoppingCart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-                    <span style={{ 
-                      position: 'absolute', 
-                  top: '-0.5rem',
-                  right: '-0.5rem',
-                      backgroundColor: '#ef4444', 
-                      color: 'white', 
-                      fontSize: '0.75rem', 
-                      borderRadius: '50%', 
-                  width: '1.25rem',
-                  height: '1.25rem',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center' 
-                }}>{cartCount}</span>
-              </div>
-              <Heart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-              <User style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header cartCount={cartCount} />
 
       {/* Main Content */}
       <main style={{ width: '100%', padding: '2rem 1rem', boxSizing: 'border-box' }}>
@@ -122,6 +67,9 @@ function HomePage() {
                 onAddToCart={() => handleAddToCart(product)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
+                onClick={() => {
+                  window.location.href = `/?route=product&id=${product.id}`;
+                }}
               />
             ))}
           </div>
@@ -161,6 +109,9 @@ function HomePage() {
                 onAddToCart={() => handleAddToCart(product)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
+                onClick={() => {
+                  window.location.href = `/?route=product&id=${product.id}`;
+                }}
               />
             ))}
           </div>

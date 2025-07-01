@@ -6,23 +6,27 @@ import { Heart, Eye } from 'lucide-react';
 //   // Add more mappings as you add more sample images
 // };
 
-const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted }) => {
+const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onClick }) => {
   return (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '0.75rem',
-      boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.08)',
-      border: '1px solid #f3f4f6',
-      padding: '1.25rem 1.25rem 1.5rem 1.25rem',
-      position: 'relative',
-      width: '100%',
-      maxWidth: '320px',
-      margin: '0 auto',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      minHeight: '420px',
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '0.75rem',
+        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.08)',
+        border: '1px solid #f3f4f6',
+        padding: '1.25rem 1.25rem 1.5rem 1.25rem',
+        position: 'relative',
+        width: '100%',
+        maxWidth: '320px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        minHeight: '420px',
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
       {/* Discount Badge */}
       {product.discount && (
         <div style={{

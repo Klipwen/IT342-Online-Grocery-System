@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminProductTable from '../../components/admin/AdminProductTable';
 import AdminHeader from '../../components/admin/AdminHeader';
 import { getApiBaseUrl } from '../../config/api';
+import Header from '../../components/Header';
 
 const AdminDashboard = ({ onNavigate }) => {
   const [products, setProducts] = useState([]);
@@ -134,116 +135,119 @@ const AdminDashboard = ({ onNavigate }) => {
   }
 
   return (
-    <div style={{ 
-      maxWidth: '1200px', 
-      margin: '2rem auto', 
-      background: 'white', 
-      padding: '2rem', 
-      borderRadius: '0.5rem', 
-      boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' 
-    }}>
-      <AdminHeader 
-        title="Admin Dashboard" 
-        subtitle={`${filteredProducts.length} products found`}
-        onAddProduct={handleAddProduct}
-      />
-
-      {/* Search and Filter Controls */}
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+      <Header />
       <div style={{ 
-        display: 'flex', 
-        gap: '1rem', 
-        marginBottom: '2rem', 
-        flexWrap: 'wrap',
-        alignItems: 'center'
+        maxWidth: '1200px', 
+        margin: '2rem auto', 
+        background: 'white', 
+        padding: '2rem', 
+        borderRadius: '0.5rem', 
+        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' 
       }}>
-        <div style={{ flex: 1, minWidth: '200px' }}>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.75rem 1rem',
-              border: '1px solid #d1d5db',
-              borderRadius: '0.375rem',
-              fontSize: '1rem',
-              outline: 'none'
-            }}
-          />
-        </div>
-        <div style={{ minWidth: '150px' }}>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.75rem 1rem',
-              border: '1px solid #d1d5db',
-              borderRadius: '0.375rem',
-              fontSize: '1rem',
-              outline: 'none',
-              background: 'white'
-            }}
-          >
-            {categories.map(cat => (
-              <option key={cat} value={cat}>
-                {cat === 'all' ? 'All Categories' : cat}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button
-          onClick={fetchProducts}
-          style={{
-            background: '#3b82f6',
-            color: 'white',
-            padding: '0.75rem 1rem',
-            border: 'none',
-            borderRadius: '0.375rem',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}
-        >
-          Refresh
-        </button>
-      </div>
+        <AdminHeader 
+          title="Admin Dashboard" 
+          subtitle={`${filteredProducts.length} products found`}
+          onAddProduct={handleAddProduct}
+        />
 
-      {/* Products Table */}
-      <AdminProductTable 
-        products={filteredProducts}
-        onEdit={handleEditProduct}
-        onDelete={handleDeleteProduct}
-      />
-
-      {/* Empty State */}
-      {filteredProducts.length === 0 && (
+        {/* Search and Filter Controls */}
         <div style={{ 
-          textAlign: 'center', 
-          padding: '3rem', 
-          color: '#6b7280' 
+          display: 'flex', 
+          gap: '1rem', 
+          marginBottom: '2rem', 
+          flexWrap: 'wrap',
+          alignItems: 'center'
         }}>
-          <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
-            {searchTerm || selectedCategory !== 'all' ? 'No products found' : 'No products yet'}
-          </div>
-          {!searchTerm && selectedCategory === 'all' && (
-            <button
-              onClick={handleAddProduct}
+          <div style={{ flex: 1, minWidth: '200px' }}>
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={{
-                background: '#ef4444',
-                color: 'white',
-                padding: '0.75rem 1.5rem',
-                border: 'none',
+                width: '100%',
+                padding: '0.75rem 1rem',
+                border: '1px solid #d1d5db',
                 borderRadius: '0.375rem',
-                cursor: 'pointer',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                outline: 'none'
+              }}
+            />
+          </div>
+          <div style={{ minWidth: '150px' }}>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '0.375rem',
+                fontSize: '1rem',
+                outline: 'none',
+                background: 'white'
               }}
             >
-              Add Your First Product
-            </button>
-          )}
+              {categories.map(cat => (
+                <option key={cat} value={cat}>
+                  {cat === 'all' ? 'All Categories' : cat}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={fetchProducts}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              padding: '0.75rem 1rem',
+              border: 'none',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+              fontSize: '1rem'
+            }}
+          >
+            Refresh
+          </button>
         </div>
-      )}
+
+        {/* Products Table */}
+        <AdminProductTable 
+          products={filteredProducts}
+          onEdit={handleEditProduct}
+          onDelete={handleDeleteProduct}
+        />
+
+        {/* Empty State */}
+        {filteredProducts.length === 0 && (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem', 
+            color: '#6b7280' 
+          }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+              {searchTerm || selectedCategory !== 'all' ? 'No products found' : 'No products yet'}
+            </div>
+            {!searchTerm && selectedCategory === 'all' && (
+              <button
+                onClick={handleAddProduct}
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  padding: '0.75rem 1.5rem',
+                  border: 'none',
+                  borderRadius: '0.375rem',
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                Add Your First Product
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
