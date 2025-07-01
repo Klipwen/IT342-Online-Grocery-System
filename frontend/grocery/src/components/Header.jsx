@@ -109,7 +109,7 @@ const Header = ({
               />
               <Search style={{ position: 'absolute', right: '0.75rem', top: '0.625rem', width: '1.25rem', height: '1.25rem', color: '#9ca3af' }} />
             </div>
-            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={onCartClick}>
+            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => window.location.href = '/?route=cart'}>
               <ShoppingCart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563' }} />
               <span style={{
                 position: 'absolute',

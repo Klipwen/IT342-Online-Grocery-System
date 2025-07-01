@@ -9,6 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { getCurrentEnvironment, getCurrentDeveloper, setEnvironment, setDeveloper } from './config/api';
 import HomePage from './pages/HomePage';
 import ProductPage from './pages/ProductPage';
+import CartPage from './pages/CartPage';
+import sardinesImg from './assets/sardines_product.png';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -16,6 +18,10 @@ function App() {
   const [currentEnv, setCurrentEnv] = useState('dev');
   const [currentDev, setCurrentDev] = useState('juen');
   const [user, setUser] = useState(null); // Add user state for login
+  const [cart, setCart] = useState(() => {
+    const stored = localStorage.getItem('cart');
+    return stored ? JSON.parse(stored) : [];
+  });
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -47,10 +53,18 @@ function App() {
       setCurrentPage('product');
       return;
     }
+    if (route === 'cart') {
+      setCurrentPage('cart');
+      return;
+    }
 
     // If no route is specified, redirect to login
     // window.location.href = '/?route=login';
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const navigateToDashboard = () => {
     setCurrentPage('dashboard');
@@ -165,13 +179,16 @@ function App() {
     );
   }
   if (currentPage === 'home') {
-    return <HomePage />;
+    return <HomePage cart={cart} setCart={setCart} />;
   }
   if (currentPage === 'product' && productId) {
-    return <ProductPage productId={productId} />;
+    return <ProductPage cart={cart} setCart={setCart} />;
   }
-  // Default: show HomePage
-  return <HomePage />;
+  if (currentPage === 'cart') {
+    return <CartPage cart={cart} setCart={setCart} />;
+  }
+  // Default: page
+  return <HomePage cart={cart} setCart={setCart} />;
 }
 
 export default App;

@@ -6,7 +6,7 @@ import { Heart, Eye } from 'lucide-react';
 //   // Add more mappings as you add more sample images
 // };
 
-const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onClick }) => {
+const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onClick, isInCart }) => {
   return (
     <div
       onClick={onClick}
@@ -193,21 +193,25 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
       </div>
       {/* Add To Cart Button */}
       <button
-        onClick={onAddToCart}
+        onClick={e => {
+          e.stopPropagation();
+          if (!isInCart) onAddToCart();
+        }}
+        disabled={isInCart}
         style={{
           width: '100%',
-          backgroundColor: '#ef4444',
+          backgroundColor: isInCart ? '#9ca3af' : '#ef4444',
           color: 'white',
           padding: '0.75rem 0',
           border: 'none',
           borderRadius: '0.375rem',
           fontSize: '1.1rem',
           fontWeight: '600',
-          cursor: 'pointer',
+          cursor: isInCart ? 'not-allowed' : 'pointer',
           marginTop: 'auto',
         }}
       >
-        Add To Cart
+        {isInCart ? 'Added' : 'Add To Cart'}
       </button>
     </div>
   );

@@ -5,8 +5,7 @@ import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
 
-function HomePage() {
-  const [cartCount, setCartCount] = useState(2);
+function HomePage({ cart, setCart }) {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [products, setProducts] = useState([]);
 
@@ -17,7 +16,16 @@ function HomePage() {
   }, []);
 
   const handleAddToCart = (product) => {
-    setCartCount(cartCount + 1);
+    setCart(prevCart => {
+      const existing = prevCart.find(item => item.id === product.id);
+      if (existing) {
+        return prevCart.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      } else {
+        return [...prevCart, { ...product, quantity: 1 }];
+      }
+    });
   };
 
   const handleToggleWishlist = (product) => {
@@ -27,7 +35,7 @@ function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
       {/* Header */}
-      <Header cartCount={cartCount} />
+      <Header cartCount={cart.length} />
 
       {/* Main Content */}
       <main style={{ width: '100%', padding: '2rem 1rem', boxSizing: 'border-box' }}>
@@ -67,6 +75,7 @@ function HomePage() {
                 onAddToCart={() => handleAddToCart(product)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
+                isInCart={!!cart.find(item => item.id === product.id)}
                 onClick={() => {
                   window.location.href = `/?route=product&id=${product.id}`;
                 }}
@@ -109,6 +118,7 @@ function HomePage() {
                 onAddToCart={() => handleAddToCart(product)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
+                isInCart={!!cart.find(item => item.id === product.id)}
                 onClick={() => {
                   window.location.href = `/?route=product&id=${product.id}`;
                 }}

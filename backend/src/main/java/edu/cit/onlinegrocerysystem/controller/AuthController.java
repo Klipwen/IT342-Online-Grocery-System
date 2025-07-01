@@ -23,4 +23,16 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully");
     }
-} 
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(
+                userRepository.findAll().stream().map(user -> {
+                    java.util.Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("id", user.getId());
+                    map.put("name", user.getName());
+                    map.put("email", user.getEmail());
+                    return map;
+                }).toList());
+    }
+}

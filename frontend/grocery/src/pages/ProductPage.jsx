@@ -5,7 +5,7 @@ import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
 
-const ProductPage = () => {
+const ProductPage = ({ cart, setCart }) => {
   const [product, setProduct] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
@@ -40,10 +40,31 @@ const ProductPage = () => {
   const variants = product.variants ? product.variants.split(',') : [];
   const sizes = product.sizes ? product.sizes.split(',') : [];
 
+  const handleAddToCart = (productToAdd, qty = 1) => {
+    setCart(prevCart => {
+      const existing = prevCart.find(item => item.id === productToAdd.id);
+      if (existing) {
+        return prevCart.map(item =>
+          item.id === productToAdd.id ? { ...item, quantity: item.quantity + qty } : item
+        );
+      } else {
+        return [
+          ...prevCart,
+          {
+            ...productToAdd,
+            quantity: qty,
+            selectedVariant: selectedVariant || undefined,
+            selectedSize: selectedSize || undefined,
+          },
+        ];
+      }
+    });
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
       {/* Header */}
-      <Header cartCount={0} />
+      <Header cartCount={cart.length} />
 
       {/* Breadcrumb */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 1rem 0 1rem' }}>
@@ -155,18 +176,22 @@ const ProductPage = () => {
                     <Plus style={{ width: '1rem', height: '1rem' }} />
                   </button>
                 </div>
-                <button style={{
-                  flex: 1,
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '0.5rem',
-                  border: 'none',
-                  fontWeight: '500',
-                  fontSize: '1rem',
-                  cursor: 'pointer'
-                }}>
-                  Add To Cart
+                <button
+                  onClick={() => handleAddToCart(product, quantity)}
+                  disabled={!!cart.find(item => item.id === product.id)}
+                  style={{
+                    flex: 1,
+                    backgroundColor: !!cart.find(item => item.id === product.id) ? '#9ca3af' : '#ef4444',
+                    color: 'white',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.5rem',
+                    border: 'none',
+                    fontWeight: '500',
+                    fontSize: '1rem',
+                    cursor: !!cart.find(item => item.id === product.id) ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {!!cart.find(item => item.id === product.id) ? 'Added' : 'Add To Cart'}
                 </button>
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
@@ -211,9 +236,10 @@ const ProductPage = () => {
                 <ProductCard
                   key={related.id}
                   product={related}
-                  onAddToCart={() => {}}
+                  onAddToCart={() => handleAddToCart(related, 1)}
                   onToggleWishlist={() => {}}
                   isWishlisted={false}
+                  isInCart={!!cart.find(item => item.id === related.id)}
                   onClick={() => {
                     window.location.href = `/?route=product&id=${related.id}`;
                   }}
