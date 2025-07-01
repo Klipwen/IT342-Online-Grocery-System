@@ -87,6 +87,12 @@ const LoginPage = () => {
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, textAlign: 'center', padding: '1rem 0', background: 'transparent', zIndex: 100 }}>
+        Don't have an account?{' '}
+        <button type="button" style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }} onClick={onSwitchToRegister}>
+          Sign up
+        </button>
+      </div>
     </div>
   );
 };

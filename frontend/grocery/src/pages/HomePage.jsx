@@ -4,7 +4,7 @@ import { Search, ShoppingCart, Heart, User, Eye } from 'lucide-react';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 
-function HomePage() {
+function HomePage({ onLogout }) {
   const [cartCount, setCartCount] = useState(2);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [products, setProducts] = useState([]);
@@ -24,7 +24,25 @@ function HomePage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden', position: 'relative' }}>
+      <button
+        onClick={onLogout}
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          background: '#ef4444',
+          color: 'white',
+          border: 'none',
+          borderRadius: '0.375rem',
+          padding: '0.5rem 1rem',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          zIndex: 1000
+        }}
+      >
+        Logout
+      </button>
       {/* Header */}
       <header style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem' }}>
