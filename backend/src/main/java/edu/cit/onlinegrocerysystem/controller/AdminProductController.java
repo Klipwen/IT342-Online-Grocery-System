@@ -33,7 +33,7 @@ public class AdminProductController {
             String filename = System.currentTimeMillis() + "_" + originalFilename;
             Path filePath = uploadPath.resolve(filename);
             file.transferTo(filePath.toFile());
-            String fileUrl = "http://localhost:8081/uploads/" + filename;
+            String fileUrl = "http://localhost:8080/uploads/" + filename;
             return ResponseEntity.ok(fileUrl);
         } catch (Exception e) {
             e.printStackTrace();

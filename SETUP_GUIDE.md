@@ -270,4 +270,69 @@ curl http://localhost/phpmyadmin
 
 ---
 
+## ⚠️ IMPORTANT: Configuration Checklist Before Running the Project
+
+Before running the Online Grocery System backend and frontend, **every team member must check and update the following settings** to avoid common errors (such as images not displaying, connection refused, or 404 errors):
+
+### 1. **Port Assignments**
+- **Backend Port:**
+  - Open `backend/src/main/resources/application.properties` (or `application-shared.properties` if using shared DB).
+  - Set `server.port` to your assigned port (e.g., `8080`, `8081`, `8082`, etc.).
+  - Example:
+    ```properties
+    server.port=8080
+    ```
+- **Frontend API URLs:**
+  - Open `frontend/grocery/src/config/api.js` and ensure the backend URLs use the correct port for your environment.
+  - Example:
+    ```js
+    backend: 'http://localhost:8080',
+    ```
+
+### 2. **Static Resource Paths (Image Uploads)**
+- **Backend Static Resource Config:**
+  - In `backend/src/main/resources/application.properties`, update the static locations to match your actual user path:
+    ```properties
+    spring.web.resources.static-locations=classpath:/static/,file:./uploads/,file:C:/Users/<YOUR_USERNAME>/Desktop/Programming/IT342-Online-Grocery-System/backend/uploads
+    ```
+  - Replace `<YOUR_USERNAME>` with your actual Windows username and adjust the path if your folder structure is different.
+- **Custom StaticResourceConfig.java:**
+  - If you have a custom config (e.g., `StaticResourceConfig.java`), update the absolute path to match your machine:
+    ```java
+    registry.addResourceHandler("/uploads/**")
+        .addResourceLocations(
+            "file:C:/Users/<YOUR_USERNAME>/Desktop/Programming/IT342-Online-Grocery-System/backend/uploads/",
+            "file:./uploads/");
+    ```
+
+### 3. **Database Connection**
+- Make sure your `spring.datasource.url`, `username`, and `password` in `application.properties` match your local MySQL setup.
+
+### 4. **Spring Security (if enabled)**
+- Ensure `/uploads/**` is permitted in your `SecurityConfig.java` so images can be accessed without authentication.
+
+### 5. **After Pulling or Switching Branches**
+- **Always check the above settings** after pulling updates or switching branches, as configs may be overwritten.
+- If you see errors like `ERR_CONNECTION_REFUSED`, `404 Not Found` for images, or images not displaying, double-check your port and path settings.
+
+### 6. **Common Issues & Solutions**
+- **Images not displaying:**
+  - Check that the image files exist in the correct `backend/uploads` folder.
+  - Make sure the backend is running and serving the correct static locations.
+  - Ensure the image URLs in the database use the correct port (delete and re-add products if needed).
+- **Connection refused:**
+  - Make sure the backend is running on the port your frontend expects.
+- **404 for images:**
+  - Check the static resource paths and file existence.
+
+### 7. **Restart Required**
+- After changing any config or code, **restart your backend** for changes to take effect.
+- Restart the frontend if you change API URLs or environment variables.
+
+---
+
+**Following this checklist will help you avoid the most common setup and runtime errors!**
+
+---
+
 **🎉 You're all set!** The project should now run on any PC with the required software installed. 
