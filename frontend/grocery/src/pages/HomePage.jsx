@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
 
-function HomePage({ cart, setCart }) {
+function HomePage({ cart, setCart, onAddToCart }) {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [products, setProducts] = useState([]);
 
@@ -14,19 +14,6 @@ function HomePage({ cart, setCart }) {
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
-
-  const handleAddToCart = (product) => {
-    setCart(prevCart => {
-      const existing = prevCart.find(item => item.id === product.id);
-      if (existing) {
-        return prevCart.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      } else {
-        return [...prevCart, { ...product, quantity: 1 }];
-      }
-    });
-  };
 
   const handleToggleWishlist = (product) => {
     setWishlistCount(wishlistCount > 0 ? 0 : 1);
@@ -72,7 +59,7 @@ function HomePage({ cart, setCart }) {
               <ProductCard
                 key={product.id}
                 product={product}
-                onAddToCart={() => handleAddToCart(product)}
+                onAddToCart={() => onAddToCart(product.id, 1)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
                 isInCart={!!cart.find(item => item.id === product.id)}
@@ -115,7 +102,7 @@ function HomePage({ cart, setCart }) {
               <ProductCard
                 key={product.id}
                 product={product}
-                onAddToCart={() => handleAddToCart(product)}
+                onAddToCart={() => onAddToCart(product.id, 1)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
                 isInCart={!!cart.find(item => item.id === product.id)}

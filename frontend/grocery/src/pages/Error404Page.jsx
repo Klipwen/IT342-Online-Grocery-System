@@ -2,7 +2,7 @@ import React from "react";
 import cartIcon from "../assets/grocery_shopping_cart.png";
 import "../styles/Error404.css";
 
-const Error404 = () => {
+const Error404Page = () => {
   return (
     <div className="error-page">
       {/* Header */}
@@ -77,4 +77,4 @@ const Error404 = () => {
   );
 };
 
-export default Error404;
+export default Error404Page;

@@ -5,7 +5,7 @@ import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
 
-const ProductPage = ({ cart, setCart }) => {
+const ProductPage = ({ cart, setCart, onAddToCart }) => {
   const [product, setProduct] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
@@ -39,27 +39,6 @@ const ProductPage = ({ cart, setCart }) => {
 
   const variants = product.variants ? product.variants.split(',') : [];
   const sizes = product.sizes ? product.sizes.split(',') : [];
-
-  const handleAddToCart = (productToAdd, qty = 1) => {
-    setCart(prevCart => {
-      const existing = prevCart.find(item => item.id === productToAdd.id);
-      if (existing) {
-        return prevCart.map(item =>
-          item.id === productToAdd.id ? { ...item, quantity: item.quantity + qty } : item
-        );
-      } else {
-        return [
-          ...prevCart,
-          {
-            ...productToAdd,
-            quantity: qty,
-            selectedVariant: selectedVariant || undefined,
-            selectedSize: selectedSize || undefined,
-          },
-        ];
-      }
-    });
-  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
@@ -177,7 +156,7 @@ const ProductPage = ({ cart, setCart }) => {
                   </button>
                 </div>
                 <button
-                  onClick={() => handleAddToCart(product, quantity)}
+                  onClick={() => onAddToCart(product.id, quantity)}
                   disabled={!!cart.find(item => item.id === product.id)}
                   style={{
                     flex: 1,
@@ -236,7 +215,7 @@ const ProductPage = ({ cart, setCart }) => {
                 <ProductCard
                   key={related.id}
                   product={related}
-                  onAddToCart={() => handleAddToCart(related, 1)}
+                  onAddToCart={() => onAddToCart(related.id, 1)}
                   onToggleWishlist={() => {}}
                   isWishlisted={false}
                   isInCart={!!cart.find(item => item.id === related.id)}
