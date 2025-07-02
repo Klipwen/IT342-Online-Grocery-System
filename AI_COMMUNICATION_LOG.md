@@ -94,4 +94,52 @@
 - **General:**
   - All navigation and state changes are now more consistent between admin and customer views.
 
+## 2025-07-02 (Major Cart Persistence & Sync Update)
+
+### Summary of Changes
+- **Cart Persistence Implemented:**
+  - Cart items are now stored in the database (`cart_item` table) and persist across logins, logouts, and device changes.
+  - Backend `/api/cart` endpoints now return full product details for each cart item (name, price, image, etc.).
+  - All cart actions (add, update, remove, clear) are now synced with the backend for each user.
+  - Cart quantity changes in the UI now update the backend and always reflect the latest state after refresh.
+- **Frontend Integration:**
+  - Cart is fetched from the backend on login and after every cart action.
+  - All cart actions use backend API calls; localStorage is no longer used for cart.
+  - Add to Cart, Remove, Clear, and Quantity buttons are fully functional and persistent.
+  - User state is now initialized from localStorage for correct cart/user sync after login.
+- **Error Handling:**
+  - Fixed 500 error on clear cart by updating the repository method to use a transactional JPQL query.
+  - Added defensive coding to prevent UI errors if product details are missing.
+
+### Instructions for Teammates
+- **Database:**
+  - Make sure your `online_grocery_db` database has a `cart_item` table:
+    ```sql
+    CREATE TABLE cart_item (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      user_id BIGINT NOT NULL,
+      product_id BIGINT NOT NULL,
+      quantity INT NOT NULL DEFAULT 1,
+      added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (product_id) REFERENCES product(id)
+    );
+    ```
+- **Backend:**
+  - Pull the latest changes and restart your backend server after merging.
+  - Ensure your backend port matches the frontend API calls (default: 8080).
+  - If you encounter errors with cart endpoints, check your database table and port configuration.
+- **Frontend:**
+  - Pull the latest changes and restart your frontend dev server.
+  - Test cart actions (add, update quantity, remove, clear) and verify persistence after login/logout/refresh.
+  - If cart actions do not work, check that you are logged in and that the backend is running on the correct port.
+- **General Reminder:**
+  - **Always check your backend and frontend port assignments after every pull, merge, or branch switch.** Port mismatches are a common source of errors.
+  - If you add new features that require database changes, update this log and notify the team.
+
+### Note to AI and Future Teammates
+- Always instruct teammates to update their database schema and check port settings after pulling major updates.
+- If teammates report cart or product issues, confirm that their backend is running, the database is up to date, and ports are correct.
+- Encourage teammates to test all cart actions and report any inconsistencies.
+-
 --- 

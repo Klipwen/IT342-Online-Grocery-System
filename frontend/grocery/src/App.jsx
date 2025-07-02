@@ -27,6 +27,11 @@ function App() {
     return stored ? JSON.parse(stored) : null;
   });
   const [cart, setCart] = useState([]);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(
+    () => sessionStorage.getItem('isAdminAuthenticated') === 'true'
+  );
+  const [adminPassword, setAdminPassword] = useState('');
+  const ADMIN_PASSWORD = 'admin123'; // Change as needed
 
   // Fetch cart from backend when user logs in
   useEffect(() => {
@@ -148,11 +153,25 @@ function App() {
     onEditProduct: navigateToEdit
   };
 
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem('isAdminAuthenticated', 'true');
+      setAdminPassword('');
+    } else {
+      alert('Incorrect password!');
+    }
+  };
+
   const handleLogout = () => {
     setUser(null);
     setCart([]);
+    setIsAdminAuthenticated(false);
+    sessionStorage.removeItem('isAdminAuthenticated');
     localStorage.removeItem('user');
-    // ...other logout logic
+    setCurrentPage('login');
+    window.history.pushState({}, '', '/?route=login');
   };
 
   // Routing logic
@@ -163,9 +182,27 @@ function App() {
     return <LoginPage />;
   }
   if (currentPage === 'admin') {
+    if (!isAdminAuthenticated) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10%' }}>
+          <h2>Admin</h2>
+          <form onSubmit={handleAdminLogin}>
+            <input
+              type="password"
+              placeholder="Enter admin password"
+              value={adminPassword}
+              onChange={e => setAdminPassword(e.target.value)}
+              style={{ padding: '8px', margin: '8px 0' }}
+            />
+            <button type="submit" style={{ padding: '8px 16px' }}>Enter</button>
+          </form>
+        </div>
+      );
+    }
     return (
       <>
         {/* <EnvironmentSwitcher /> */}
+        <button onClick={handleLogout} style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000 }}>Logout</button>
         <AdminDashboard onNavigate={dashboardNavigation} />
       </>
     );
