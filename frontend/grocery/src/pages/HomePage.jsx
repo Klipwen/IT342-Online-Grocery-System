@@ -32,8 +32,13 @@ function HomePage({ cart, setCart }) {
     setWishlistCount(wishlistCount > 0 ? 0 : 1);
   };
 
+  const onLogout = () => {
+    localStorage.clear();
+    window.location.href = '/login'; // Redirect to login page
+  };
+
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden', position: 'relative' }}>
       {/* Header */}
       <Header cartCount={cart.length} />
 
