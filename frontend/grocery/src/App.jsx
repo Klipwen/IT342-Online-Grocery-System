@@ -59,7 +59,7 @@ function App() {
     }
 
     // If no route is specified, redirect to login
-    // window.location.href = '/?route=login';
+    window.location.href = '/?route=login';
   }, []);
 
   useEffect(() => {
@@ -67,9 +67,9 @@ function App() {
   }, [cart]);
 
   const navigateToDashboard = () => {
-    setCurrentPage('dashboard');
+    setCurrentPage('admin');
     setProductId(null);
-    window.history.pushState({}, '', '/');
+    window.history.pushState({}, '', '/?route=admin');
   };
 
   const navigateToAdd = () => {

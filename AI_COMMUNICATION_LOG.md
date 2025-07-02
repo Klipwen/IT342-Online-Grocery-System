@@ -74,4 +74,24 @@
 
 ---
 
-*Add new entries below this line for each new update or important note.* 
+*Add new entries below this line for each new update or important note.*
+
+## 2025-07-02 (AI-assisted Updates)
+- **Login & Register Navigation:**
+  - Login page now shows "Don't have an account? Sign up" with a link to the register page.
+  - Register page now shows "Already have an account? Login" with a link to the login page.
+- **Login Functionality:**
+  - Implemented backend `/api/auth/login` endpoint for user authentication (plain text password, returns user info and role).
+  - Login page now works: users are redirected based on their role after successful login.
+- **Logout Feature:**
+  - Added a Logout button to the header (visible on Home and other pages with the header).
+  - Clicking Logout removes the user from localStorage and redirects to the login page.
+- **Default Routing:**
+  - Visiting the site with no route now redirects to the login page by default.
+- **Admin Dashboard Navigation:**
+  - After editing and saving a product, the app now returns to the admin dashboard (not the homepage).
+  - Fixed navigation logic in App.jsx to ensure correct routing after admin actions.
+- **General:**
+  - All navigation and state changes are now more consistent between admin and customer views.
+
+--- 

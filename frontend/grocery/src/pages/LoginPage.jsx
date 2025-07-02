@@ -93,6 +93,12 @@ const LoginPage = () => {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <span>Don't have an account? </span>
+          <a href="/?route=register" style={{ color: '#ef4444', textDecoration: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+            Sign up
+          </a>
+        </div>
       </form>
     </div>
   );

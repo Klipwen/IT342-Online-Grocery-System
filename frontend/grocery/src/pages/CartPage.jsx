@@ -24,6 +24,24 @@ function CartPage({ cart, setCart }) {
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', display: 'flex', flexDirection: 'column' }}>
       <Header cartCount={cart.length} />
+      <div style={{ maxWidth: '1200px', margin: '2rem auto 0 auto', width: '100%' }}>
+        <button
+          onClick={() => window.history.back()}
+          style={{
+            background: '#ef4444',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.375rem',
+            padding: '0.5rem 1.25rem',
+            fontWeight: 600,
+            fontSize: '1rem',
+            cursor: 'pointer',
+            marginBottom: '1.5rem'
+          }}
+        >
+          ← Back
+        </button>
+      </div>
       <div style={{ maxWidth: '1200px', margin: '2rem auto', flex: 1, width: '100%' }}>
         <div style={{ fontSize: '0.95rem', color: '#6b7280', marginBottom: '1.5rem' }}>
           Home <span style={{ margin: '0 0.5rem' }}>/</span> Cart

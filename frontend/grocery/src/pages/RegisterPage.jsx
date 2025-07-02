@@ -107,6 +107,12 @@ const RegisterPage = () => {
         >
           {loading ? 'Registering...' : 'Register'}
         </button>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <span>Already have an account? </span>
+          <a href="/?route=login" style={{ color: '#ef4444', textDecoration: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+            Login
+          </a>
+        </div>
       </form>
     </div>
   );

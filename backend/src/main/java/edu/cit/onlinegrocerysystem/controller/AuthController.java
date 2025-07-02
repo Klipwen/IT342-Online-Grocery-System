@@ -35,4 +35,18 @@ public class AuthController {
                     return map;
                 }).toList());
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+        if (user == null || !user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity.status(401).body("Invalid email or password");
+        }
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("id", user.getId());
+        map.put("name", user.getName());
+        map.put("email", user.getEmail());
+        map.put("role", "user"); // or user.getRole() if you add a role field
+        return ResponseEntity.ok(map);
+    }
 }

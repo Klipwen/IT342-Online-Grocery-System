@@ -128,6 +128,24 @@ const Header = ({
             </div>
             <Heart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={onWishlistClick} />
             <User style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={onUserClick} />
+            <button
+              onClick={() => {
+                localStorage.removeItem('user');
+                window.location.href = '/?route=login';
+              }}
+              style={{
+                backgroundColor: '#ef4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.375rem',
+                padding: '0.5rem 1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                marginLeft: '0.5rem'
+              }}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
