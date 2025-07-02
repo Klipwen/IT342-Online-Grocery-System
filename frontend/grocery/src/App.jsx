@@ -13,6 +13,7 @@ import CartPage from './pages/CartPage';
 import sardinesImg from './assets/sardines_product.png';
 import AboutUs from './pages/Admin/AboutUs';
 import Error404 from './pages/Error404';
+import ProductsPage from './pages/ProductsPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -65,6 +66,10 @@ function App() {
     }
     if (route === 'error404') {
       setCurrentPage('error404');
+      return;
+    }
+    if (route === 'products') {
+      setCurrentPage('products');
       return;
     }
 
@@ -202,6 +207,9 @@ function App() {
   }
   if (currentPage === 'error404') {
     return <Error404 />;
+  }
+  if (currentPage === 'products') {
+    return <ProductsPage cart={cart} setCart={setCart} />;
   }
   // Default: page
   return <Error404 />;

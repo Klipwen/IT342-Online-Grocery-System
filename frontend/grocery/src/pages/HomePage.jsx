@@ -92,16 +92,19 @@ function HomePage({ cart, setCart }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
             <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#1f2937', margin: '0' }}>Explore Our Products</h2>
-            <button style={{ 
-              backgroundColor: '#ef4444', 
-              color: 'white', 
-              padding: '0.5rem 1.5rem', 
-              border: 'none',
-              borderRadius: '0.25rem', 
-              cursor: 'pointer',
-              fontWeight: '500',
-              flexShrink: 0
-            }}>
+            <button
+              style={{
+                backgroundColor: '#ef4444',
+                color: 'white',
+                padding: '0.5rem 1.5rem',
+                border: 'none',
+                borderRadius: '0.25rem',
+                cursor: 'pointer',
+                fontWeight: '500',
+                flexShrink: 0
+              }}
+              onClick={() => { window.location.href = '/?route=products'; }}
+            >
               View All Products
             </button>
           </div>
