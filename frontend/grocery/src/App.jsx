@@ -14,6 +14,7 @@ import sardinesImg from './assets/sardines_product.png';
 import AboutUsPage from './pages/AboutUsPage';
 import Error404Page from './pages/Error404Page';
 import AdminUserPage from './pages/Admin/AdminUserPage';
+import ProductsPage from './pages/ProductsPage';
 import { fetchCart, addOrUpdateCartItem, removeCartItem, clearCart } from './utils/cartApi';
 
 function App() {
@@ -84,6 +85,10 @@ function App() {
       setCurrentPage('users');
       return;
     }
+    if (route === 'products') {
+      setCurrentPage('products');
+      return;
+    }
 
     // If no route is specified, redirect to login
     window.location.href = '/?route=login';
@@ -150,54 +155,6 @@ function App() {
     // ...other logout logic
   };
 
-  // const EnvironmentSwitcher = () => (
-  //   <div style={{
-  //     position: 'fixed',
-  //     top: '10px',
-  //     right: '10px',
-  //     background: 'white',
-  //     padding: '10px',
-  //     borderRadius: '8px',
-  //     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-  //     zIndex: 1000,
-  //     fontSize: '12px'
-  //   }}>
-  //     <div style={{ marginBottom: '8px' }}>
-  //       <strong>Environment:</strong>
-  //       <select 
-  //         value={currentEnv} 
-  //         onChange={(e) => handleEnvironmentChange(e.target.value)}
-  //         style={{ marginLeft: '5px', padding: '2px' }}
-  //       >
-  //         <option value="dev">Individual DB</option>
-  //         <option value="shared">Shared DB</option>
-  //         <option value="prod">Production</option>
-  //       </select>
-  //     </div>
-  //     <div>
-  //       <strong>Developer:</strong>
-  //       <select 
-  //         value={currentDev} 
-  //         onChange={(e) => handleDeveloperChange(e.target.value)}
-  //         style={{ marginLeft: '5px', padding: '2px' }}
-  //       >
-  //         <option value="juen">Juen (8080)</option>
-  //         <option value="ricablanca">Ricablanca (8080)</option>
-  //         <option value="vestil">Vestil (8082)</option>
-  //       </select>
-  //     </div>
-  //     <div style={{ 
-  //       marginTop: '5px', 
-  //       padding: '3px 6px', 
-  //       background: currentEnv === 'shared' ? '#dcfce7' : '#fef3c7',
-  //       borderRadius: '3px',
-  //       fontSize: '10px'
-  //     }}>
-  //       {currentEnv === 'shared' ? '✅ Shared Products' : '🔧 Individual DB'}
-  //     </div>
-  //   </div>
-  // );
-
   // Routing logic
   if (currentPage === 'register') {
     return <RegisterPage />;
@@ -246,6 +203,9 @@ function App() {
   }
   if (currentPage === 'users') {
     return <AdminUserPage onBack={navigateToDashboard} />;
+  }
+  if (currentPage === 'products') {
+    return <ProductsPage cart={cart} setCart={setCart} />;
   }
   // Default: page
   return <Error404Page />;

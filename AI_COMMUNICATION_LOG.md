@@ -76,7 +76,7 @@
 
 *Add new entries below this line for each new update or important note.*
 
-## 2025-07-02 (AI-assisted Updates)
+## 2025-07-02 
 - **Login & Register Navigation:**
   - Login page now shows "Don't have an account? Sign up" with a link to the register page.
   - Register page now shows "Already have an account? Login" with a link to the login page.
