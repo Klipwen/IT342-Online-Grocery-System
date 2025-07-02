@@ -49,4 +49,39 @@ public class AuthController {
         map.put("role", "user"); // or user.getRole() if you add a role field
         return ResponseEntity.ok(map);
     }
+
+    @PostMapping("/users")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
+        userRepository.save(user);
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
+        User existing = userRepository.findById(id).orElse(null);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (user.getName() != null)
+            existing.setName(user.getName());
+        if (user.getEmail() != null)
+            existing.setEmail(user.getEmail());
+        if (user.getPassword() != null && !user.getPassword().isEmpty())
+            existing.setPassword(user.getPassword());
+        userRepository.save(existing);
+        return ResponseEntity.ok(existing);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        User existing = userRepository.findById(id).orElse(null);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("User deleted");
+    }
 }
