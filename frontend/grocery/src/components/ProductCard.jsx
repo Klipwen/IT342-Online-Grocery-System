@@ -9,7 +9,6 @@ import { Heart, Eye } from 'lucide-react';
 const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onClick, isInCart }) => {
   return (
     <div
-      onClick={onClick}
       style={{
         backgroundColor: 'white',
         borderRadius: '0.75rem',
@@ -24,7 +23,6 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
         flexDirection: 'column',
         alignItems: 'center',
         minHeight: '420px',
-        cursor: onClick ? 'pointer' : 'default',
       }}
     >
       {/* Discount Badge */}
@@ -93,23 +91,27 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
           <Eye style={{ width: '1.25rem', height: '1.25rem', color: '#9ca3af' }} />
         </button>
       </div>
-      {/* Product Image */}
-      <div style={{
-        background: 'white',
-        borderRadius: '1rem',
-        padding: '1.25rem',
-        marginTop: '2.5rem',
-        marginBottom: '1.25rem',
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.04)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '120px',
-        minWidth: '120px',
-        maxWidth: '160px',
-        maxHeight: '160px',
-        position: 'relative',
-      }}>
+      {/* Product Image (clickable for navigation) */}
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '1rem',
+          padding: '1.25rem',
+          marginTop: '2.5rem',
+          marginBottom: '1.25rem',
+          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.04)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '120px',
+          minWidth: '120px',
+          maxWidth: '160px',
+          maxHeight: '160px',
+          position: 'relative',
+          cursor: onClick ? 'pointer' : 'default',
+        }}
+        onClick={onClick}
+      >
         {product.image && (
           <img
             src={product.image}
@@ -142,18 +144,22 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
           </span>
         )}
       </div>
-      {/* Product Name */}
-      <div style={{
-        textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: '1.1rem',
-        margin: '1.5rem 0 0.5rem 0',
-        color: '#111827',
-        minHeight: '2.5rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      {/* Product Name (clickable for navigation) */}
+      <div
+        style={{
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '1.1rem',
+          margin: '1.5rem 0 0.5rem 0',
+          color: '#111827',
+          minHeight: '2.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: onClick ? 'pointer' : 'default',
+        }}
+        onClick={onClick}
+      >
         {product.name}
       </div>
       {/* Price Section */}
