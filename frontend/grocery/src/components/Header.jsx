@@ -84,7 +84,7 @@ const Header = ({
                 </div>
               )}
             </div>
-            <a href="#" style={{ color: '#1f2937', fontWeight: '500', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/'; }}>Home</a>
+            <a href="#" style={{ color: '#1f2937', fontWeight: '500', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/?route=home'; }}>Home</a>
             <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/?route=contact'; }}>Contact</a>
             <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/?route=aboutus'; }}>About</a>
           </nav>

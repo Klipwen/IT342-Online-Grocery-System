@@ -11,6 +11,8 @@ import HomePage from './pages/HomePage';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
 import sardinesImg from './assets/sardines_product.png';
+import AboutUs from './pages/Admin/AboutUs';
+import Error404 from './pages/Error404';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -55,6 +57,14 @@ function App() {
     }
     if (route === 'cart') {
       setCurrentPage('cart');
+      return;
+    }
+    if (route === 'aboutus') {
+      setCurrentPage('aboutus');
+      return;
+    }
+    if (route === 'error404') {
+      setCurrentPage('error404');
       return;
     }
 
@@ -187,8 +197,14 @@ function App() {
   if (currentPage === 'cart') {
     return <CartPage cart={cart} setCart={setCart} />;
   }
+  if (currentPage === 'aboutus') {
+    return <AboutUs />;
+  }
+  if (currentPage === 'error404') {
+    return <Error404 />;
+  }
   // Default: page
-  return <HomePage cart={cart} setCart={setCart} />;
+  return <Error404 />;
 }
 
 export default App;
