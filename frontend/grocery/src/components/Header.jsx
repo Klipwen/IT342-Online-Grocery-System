@@ -22,6 +22,21 @@ const Header = ({
   onUserClick = () => {},
 }) => {
   const [showCategories, setShowCategories] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ name: '' });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleEdit = () => {
+    setEditing(true);
+  };
+
+  const handleCancel = () => {
+    setEditing(false);
+  };
 
   return (
     <header style={{ backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
@@ -127,7 +142,7 @@ const Header = ({
               }}>{cartCount}</span>
             </div>
             <Heart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={onWishlistClick} />
-            <User style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={onUserClick} />
+            <User style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={() => window.location.href = '/?route=profile'} />
             <button
               onClick={() => {
                 localStorage.removeItem('user');
