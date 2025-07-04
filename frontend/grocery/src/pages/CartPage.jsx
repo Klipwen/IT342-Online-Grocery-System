@@ -135,7 +135,8 @@ function CartPage({ cart, setCart, onRemoveFromCart, onClearCart, user }) {
               <span>Total:</span>
               <span>₱{total.toFixed(2)}</span>
             </div>
-            <button style={{ width: '100%', background: '#ef4444', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '0.5rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer' }}>
+            <button style={{ width: '100%', background: '#ef4444', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '0.5rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer' }}
+              onClick={() => window.location.href = '/?route=checkout'}>
               Process to checkout
             </button>
           </div>
