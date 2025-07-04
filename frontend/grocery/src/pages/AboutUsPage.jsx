@@ -54,7 +54,7 @@ const AboutUsPage = ({ cart = [] }) => {
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               <div style={{ flex: '1 1 220px', background: '#fff', borderRadius: 8, padding: 24, textAlign: 'center', boxShadow: '0 2px 8px #0001', minWidth: 200 }}>
                 <img src={team1} alt="Tom Cruise" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginBottom: 12 }} />
-                <div style={{ fontWeight: 700 }}>Will Smith</div>
+                <div style={{ fontWeight: 700 }}>Ross Mikhail A. Vestil</div>
                 <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Founder & CEO</div>
                 <div>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>💼</span>
