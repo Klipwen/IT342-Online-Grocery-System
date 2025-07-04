@@ -88,7 +88,7 @@ const Header = ({
                         transition: 'background 0.2s',
                       }}
                       onClick={() => {
-                        window.location.href = `/?route=category&name=${encodeURIComponent(cat)}`;
+                        window.location.href = `/?route=products&category=${encodeURIComponent(cat)}`;
                         setShowCategories(false);
                       }}
                       onMouseDown={e => e.preventDefault()}

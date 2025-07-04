@@ -3,7 +3,7 @@ import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const ProductsPage = ({ cart, setCart }) => {
+const ProductsPage = ({ cart, setCart, selectedCategory }) => {
   const [products, setProducts] = useState([]);
   const [wishlistCount, setWishlistCount] = useState(0);
 
@@ -31,10 +31,26 @@ const ProductsPage = ({ cart, setCart }) => {
     setWishlistCount(wishlistCount > 0 ? 0 : 1);
   };
 
+  // Filter products by selectedCategory if set
+  const filteredProducts = selectedCategory
+    ? products.filter(product => product.category && product.category.toLowerCase() === selectedCategory.toLowerCase())
+    : products;
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
       <Header cartCount={cart.length} />
       <div style={{ maxWidth: '1200px', margin: '2rem auto 0 auto', width: '100%' }}>
+        {selectedCategory && (
+          <div style={{ marginBottom: 24 }}>
+            <span style={{ fontWeight: 600, color: '#ef4444' }}>Category: {selectedCategory}</span>
+            <button
+              style={{ marginLeft: 16, background: '#eee', border: 'none', borderRadius: 4, padding: '4px 12px', cursor: 'pointer' }}
+              onClick={() => { window.location.href = '/?route=products'; }}
+            >
+              Clear Filter
+            </button>
+          </div>
+        )}
         <button
           onClick={() => window.history.back()}
           style={{
@@ -52,7 +68,7 @@ const ProductsPage = ({ cart, setCart }) => {
           ← Back
         </button>
         <h2 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', marginBottom: '2rem', textAlign: 'center' }}>
-          All Products
+          {selectedCategory ? `${selectedCategory} Products` : 'All Products'}
         </h2>
         <div style={{
           display: 'grid',
@@ -60,12 +76,12 @@ const ProductsPage = ({ cart, setCart }) => {
           gap: '1rem',
           width: '100%'
         }}>
-          {products.length === 0 ? (
+          {filteredProducts.length === 0 ? (
             <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#9ca3af', fontSize: '1.1rem' }}>
               No products found.
             </div>
           ) : (
-            products.map(product => (
+            filteredProducts.map(product => (
               <ProductCard
                 key={product.id}
                 product={product}
