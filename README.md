@@ -4,7 +4,7 @@ An online grocery system built with Spring Boot (backend) and React (frontend). 
 
 ## Figma UI/Prototype
 
-Figma Design Link: [Figma @blissfuljuan](https://www.figma.com/@blissfuljuan)
+Figma Design Link: https://www.figma.com/design/o7IdFkxEQHkAdb3RZ0YUS8/Online-Grocery-System?node-id=1-3&t=pS0g8RJtBHtGnCLv-1
 
 *Please ensure you have access to the Figma file. If not, request access from the owner or provide a direct file link.*
 
