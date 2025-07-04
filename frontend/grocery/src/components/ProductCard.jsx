@@ -29,7 +29,7 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
     >
       {/* Discount Badge */}
       {product.discount && (
-        <div style={{
+        <div className={styles.discountBadge} style={{
           position: 'absolute',
           top: '1rem',
           left: '1rem',

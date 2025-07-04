@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
+import styles from '../styles/UserProfile.module.css';
 
 const UserProfile = ({ user }) => {
   // Mock user for demonstration; replace with real user prop/data as needed
   const currentUser = user || {
-    firstName: 'Md',
-    lastName: 'Rimel',
+    name: 'Md Rimel',
     email: 'rimel1111@gmail.com',
     address: 'Kingston, 5236, United State',
   };
 
   const [form, setForm] = useState({
-    firstName: currentUser.firstName,
-    lastName: currentUser.lastName,
+    name: currentUser.name,
     email: currentUser.email,
     address: currentUser.address,
     currentPassword: '',
@@ -19,6 +18,7 @@ const UserProfile = ({ user }) => {
     confirmPassword: '',
   });
   const [editMode, setEditMode] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,8 +28,7 @@ const UserProfile = ({ user }) => {
   const handleCancel = () => {
     setEditMode(false);
     setForm({
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
+      name: currentUser.name,
       email: currentUser.email,
       address: currentUser.address,
       currentPassword: '',
@@ -41,6 +40,8 @@ const UserProfile = ({ user }) => {
     e.preventDefault();
     // Save logic here
     setEditMode(false);
+    setSuccess('Profile updated successfully!');
+    setTimeout(() => setSuccess(''), 2000);
   };
 
   return (
@@ -59,32 +60,21 @@ const UserProfile = ({ user }) => {
         <div style={{ fontWeight: 600, marginBottom: 8, color: '#222' }}>My WishList</div>
       </div>
       {/* Main Card */}
-      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '2.5rem 2.5rem 2rem 2.5rem', minWidth: 480, maxWidth: 540 }}>
+      <div className={styles.profileCard} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '2.5rem 2.5rem 2rem 2.5rem', minWidth: 480, maxWidth: 540 }}>
         <div style={{ color: '#ef4444', fontWeight: 600, fontSize: 20, marginBottom: 24 }}>Edit Your Profile</div>
+        {success && <div className={styles.successMsg}>{success}</div>}
         <form onSubmit={handleSave}>
-          <div style={{ display: 'flex', gap: 24, marginBottom: 18 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 500, marginBottom: 6 }}>First Name</div>
-              <input
-                type="text"
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-                disabled={!editMode}
-                style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 500, marginBottom: 6 }}>Last Name</div>
-              <input
-                type="text"
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                disabled={!editMode}
-                style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
-              />
-            </div>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontWeight: 500, marginBottom: 6 }}>Name</div>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              disabled={!editMode}
+              className={styles.input}
+              style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
+            />
           </div>
           <div style={{ display: 'flex', gap: 24, marginBottom: 18 }}>
             <div style={{ flex: 1 }}>
@@ -95,6 +85,7 @@ const UserProfile = ({ user }) => {
                 value={form.email}
                 onChange={handleChange}
                 disabled={!editMode}
+                className={styles.input}
                 style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
               />
             </div>
@@ -106,6 +97,7 @@ const UserProfile = ({ user }) => {
                 value={form.address}
                 onChange={handleChange}
                 disabled={!editMode}
+                className={styles.input}
                 style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
               />
             </div>
@@ -119,6 +111,7 @@ const UserProfile = ({ user }) => {
               onChange={handleChange}
               disabled={!editMode}
               placeholder="Current Password"
+              className={styles.input}
               style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 12 }}
             />
             <input
@@ -128,6 +121,7 @@ const UserProfile = ({ user }) => {
               onChange={handleChange}
               disabled={!editMode}
               placeholder="New Password"
+              className={styles.input}
               style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 12 }}
             />
             <input
@@ -137,6 +131,7 @@ const UserProfile = ({ user }) => {
               onChange={handleChange}
               disabled={!editMode}
               placeholder="Confirm New Password"
+              className={styles.input}
               style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
             />
           </div>
@@ -144,7 +139,7 @@ const UserProfile = ({ user }) => {
             {editMode ? (
               <>
                 <button type="button" onClick={handleCancel} style={{ background: 'none', color: '#222', border: 'none', fontWeight: 500, fontSize: 16, marginRight: 8, cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Save Changes</button>
+                <button type="submit" className={styles.saveBtn}>Save Changes</button>
               </>
             ) : (
               <button type="button" onClick={handleEdit} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Edit Profile</button>

@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Search, ShoppingCart, Heart, User, Eye } from 'lucide-react';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
+import catStyles from '../styles/CategoryCard.module.css';
 
-function HomePage({ cart, setCart, onAddToCart }) {
+function HomePage({ cart, setCart, onAddToCart, user }) {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [toast, setToast] = useState('');
+  const cartIconRef = useRef(null);
+  // Ripple effect state for category cards
+  const [ripple, setRipple] = useState({});
+  const rippleTimeouts = useRef({});
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/products')
@@ -25,10 +31,49 @@ function HomePage({ cart, setCart, onAddToCart }) {
     window.location.href = '/login'; // Redirect to login page
   };
 
+  const handleAddToCart = (productId, quantity) => {
+    if (typeof onAddToCart === 'function') {
+      onAddToCart(productId, quantity)
+        .then(() => {
+          const product = products.find(p => p.id === productId);
+          setToast(`${product?.name || 'Product'} added to cart!`);
+          if (cartIconRef.current) {
+            cartIconRef.current.classList.remove('cart-bounce');
+            void cartIconRef.current.offsetWidth;
+            cartIconRef.current.classList.add('cart-bounce');
+          }
+          setTimeout(() => setToast(''), 1800);
+        })
+        .catch(() => {
+          setToast('Please log in to add to cart.');
+          setTimeout(() => setToast(''), 1800);
+        });
+    } else {
+      setToast('Please log in to add to cart.');
+      setTimeout(() => setToast(''), 1800);
+    }
+  };
+
+  const handleCategoryClick = (category, index, e) => {
+    // Ripple effect logic
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    setRipple(r => ({ ...r, [index]: { x, y, size } }));
+    clearTimeout(rippleTimeouts.current[index]);
+    rippleTimeouts.current[index] = setTimeout(() => {
+      setRipple(r => ({ ...r, [index]: null }));
+    }, 500);
+    // Navigate to products page with category filter
+    window.location.href = `/?route=products&category=${encodeURIComponent(category.name)}`;
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden', position: 'relative' }}>
       {/* Header */}
-      <Header cartCount={cart.length} searchValue={searchTerm} onSearch={setSearchTerm} />
+      <Header cartCount={cart.length} ref={cartIconRef} searchValue={searchTerm} onSearch={setSearchTerm} />
 
       {/* Main Content */}
       <main style={{ width: '100%', padding: '2rem 1rem', boxSizing: 'border-box' }}>
@@ -47,7 +92,7 @@ function HomePage({ cart, setCart, onAddToCart }) {
               <ProductCard
                 key={product.id}
                 product={product}
-                onAddToCart={() => onAddToCart(product.id, 1)}
+                onAddToCart={() => handleAddToCart(product.id, 1)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
                 isInCart={!!cart.find(item => item.id === product.id)}
@@ -74,7 +119,7 @@ function HomePage({ cart, setCart, onAddToCart }) {
               <ProductCard
                 key={product.id}
                 product={product}
-                onAddToCart={() => onAddToCart(product.id, 1)}
+                onAddToCart={() => handleAddToCart(product.id, 1)}
                 onToggleWishlist={() => handleToggleWishlist(product)}
                 isWishlisted={wishlistCount > 0}
                 isInCart={!!cart.find(item => item.id === product.id)}
@@ -100,42 +145,44 @@ function HomePage({ cart, setCart, onAddToCart }) {
             marginBottom: '3rem'
           }}>
             {[
-              { name: 'Pantry Essentials', icon: '📋' },
-              { name: 'Breakfast World', icon: '🍞' },
-              { name: 'Wines & Liquors', icon: '🍷' },
-              { name: 'Personal Grooming', icon: '🧴', active: true },
-              { name: 'Snacks & Sweets', icon: '🍪' },
-              { name: 'Health & Beauty', icon: '💊' }
+              { name: 'Pantry Essentials', icon: '📋', color: '#ef4444' },
+              { name: 'Breakfast World', icon: '🍞', color: '#f59e42' },
+              { name: 'Wines & Liquors', icon: '🍷', color: '#a855f7' },
+              { name: 'Personal Grooming', icon: '🧴', color: '#0ea5e9' },
+              { name: 'Snacks & Sweets', icon: '🍪', color: '#fbbf24' },
+              { name: 'Health & Beauty', icon: '💊', color: '#ec4899' }
             ].map((category, index) => (
               <div
                 key={index}
-                style={{
-                  backgroundColor: category.active ? '#ef4444' : 'white',
-                  border: `1px solid ${category.active ? '#ef4444' : '#e5e7eb'}`,
-                  borderRadius: '0.5rem',
-                  padding: '2rem 1rem',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)'
-                }}
-                onMouseOver={(e) => {
-                  if (!category.active) {
-                    e.target.style.backgroundColor = '#f9fafb';
-                    e.target.style.borderColor = '#ef4444';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (!category.active) {
-                    e.target.style.backgroundColor = 'white';
-                    e.target.style.borderColor = '#e5e7eb';
-                  }
-                }}
+                className={catStyles.categoryCard + (category.active ? ' ' + catStyles.active : '')}
+                tabIndex={0}
+                onClick={e => handleCategoryClick(category, index, e)}
+                style={{ position: 'relative', overflow: 'hidden' }}
               >
+                {/* Ripple effect */}
+                {ripple[index] && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: ripple[index].x,
+                      top: ripple[index].y,
+                      width: ripple[index].size,
+                      height: ripple[index].size,
+                      background: 'rgba(239,68,68,0.18)',
+                      borderRadius: '50%',
+                      pointerEvents: 'none',
+                      transform: 'scale(0)',
+                      animation: 'rippleAnim 0.5s linear',
+                      zIndex: 2
+                    }}
+                  />
+                )}
                 <div style={{ 
                   fontSize: '2rem', 
                   marginBottom: '1rem',
-                  filter: category.active ? 'brightness(0) invert(1)' : 'none'
+                  color: category.color,
+                  filter: category.active ? 'brightness(0) invert(1)' : 'none',
+                  transition: 'transform 0.18s cubic-bezier(.34,1.56,.64,1)'
                 }}>
                   {category.icon}
                 </div>
@@ -219,6 +266,9 @@ function HomePage({ cart, setCart, onAddToCart }) {
         </section>
       </main>
       <Footer />
+      {toast && (
+        <div className="cart-toast">{toast}</div>
+      )}
     </div>
   );
 }

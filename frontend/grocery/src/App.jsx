@@ -258,7 +258,7 @@ function App() {
     );
   }
   if (currentPage === 'home') {
-    return <HomePage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} />;
+    return <HomePage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} user={user} />;
   }
   if (currentPage === 'product' && productId) {
     return <ProductPage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} />;
@@ -278,7 +278,7 @@ function App() {
   if (currentPage === 'products') {
     const urlParams = new URLSearchParams(window.location.search);
     const selectedCategory = urlParams.get('category');
-    return <ProductsPage key={routeKey} cart={cart} setCart={setCart} selectedCategory={selectedCategory} />;
+    return <ProductsPage key={routeKey} cart={cart} setCart={setCart} selectedCategory={selectedCategory} onAddToCart={handleAddToCart} user={user} />;
   }
   if (currentPage === 'checkout') {
     return <CheckoutPage />;
