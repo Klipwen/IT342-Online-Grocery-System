@@ -17,6 +17,7 @@ import AdminUserPage from './pages/Admin/AdminUserPage';
 import ProductsPage from './pages/ProductsPage';
 import { fetchCart, addOrUpdateCartItem, removeCartItem, clearCart } from './utils/cartApi';
 import CheckoutPage from './pages/CheckoutPage';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -97,6 +98,10 @@ function App() {
     }
     if (route === 'checkout') {
       setCurrentPage('checkout');
+      return;
+    }
+    if (route === 'profile') {
+      setCurrentPage('profile');
       return;
     }
 
@@ -251,6 +256,9 @@ function App() {
   }
   if (currentPage === 'checkout') {
     return <CheckoutPage />;
+  }
+  if (currentPage === 'profile') {
+    return <UserProfilePage user={user} />;
   }
   // Default: page
   return <Error404Page />;

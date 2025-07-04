@@ -9,13 +9,17 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPrompt, setShowPrompt] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setShowPrompt(false);
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setShowPrompt(true);
+      setTimeout(() => setShowPrompt(false), 2500);
       return;
     }
     setLoading(true);
@@ -27,93 +31,113 @@ const RegisterPage = () => {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.message || 'Registration failed');
+        setError(data.message || 'Registration failed');
+        setShowPrompt(true);
+        setLoading(false);
+        setTimeout(() => setShowPrompt(false), 2500);
+        return;
       }
-      setSuccess('Registration successful! You can now log in.');
+      setSuccess('Successfully Registered. You can now log in.');
+      setError('');
+      setShowPrompt(true);
+      setLoading(false);
+      setTimeout(() => setShowPrompt(false), 1500);
       setName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err.message);
+      setError('Registration failed');
+      setShowPrompt(true);
+      setTimeout(() => setShowPrompt(false), 2500);
     }
     setLoading(false);
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' }}>
-      <form onSubmit={handleSubmit} style={{ background: 'white', padding: '2.5rem', borderRadius: '0.75rem', boxShadow: '0 1px 6px 0 rgb(0 0 0 / 0.08)', width: '100%', maxWidth: 400 }}>
-        <h2 style={{ marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.5rem', color: '#ef4444', textAlign: 'center' }}>Register</h2>
-        {error && <div style={{ color: '#ef4444', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
-        {success && <div style={{ color: '#059669', marginBottom: '1rem', textAlign: 'center' }}>{success}</div>}
-        <div style={{ marginBottom: '1.25rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#374151', fontWeight: 500 }}>Name</label>
+    <div style={{ minHeight: '100vh', background: '#f6f7fb', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      {showPrompt && (success || error) && (
+        <div style={{
+          position: 'absolute',
+          top: 32,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1000,
+          background: success ? '#4ade80' : '#ef4444',
+          color: '#fff',
+          padding: '1rem 2rem 1rem 1.5rem',
+          borderRadius: 10,
+          boxShadow: '0 4px 16px 0 rgba(0,0,0,0.13)',
+          fontWeight: 600,
+          fontSize: 16,
+          display: 'flex',
+          alignItems: 'center',
+          minWidth: 260,
+          gap: 12
+        }}>
+          <span style={{ fontSize: 22, display: 'flex', alignItems: 'center' }}>{success ? '✔️' : '❌'}</span>
+          <span>{success || error}</span>
+        </div>
+      )}
+      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.07)', padding: '2.5rem 2.5rem 2rem 2.5rem', maxWidth: 400, width: '100%', border: '1px solid #ececec', textAlign: 'center' }}>
+        <div style={{ color: '#888', fontWeight: 500, fontSize: 18, marginBottom: 8 }}>Please enter your details</div>
+        <div style={{ fontWeight: 700, fontSize: 32, marginBottom: 28, color: '#222', lineHeight: 1.2 }}>
+          Create your account
+        </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           <input
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
             required
-            placeholder="Enter your name"
-            style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '1rem', background: '#f9fafb' }}
+            placeholder="Full Name"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
           />
-        </div>
-        <div style={{ marginBottom: '1.25rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#374151', fontWeight: 500 }}>Email</label>
           <input
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
-            placeholder="Enter your email"
-            style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '1rem', background: '#f9fafb' }}
+            placeholder="Email address"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
           />
-        </div>
-        <div style={{ marginBottom: '1.25rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#374151', fontWeight: 500 }}>Password</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              placeholder="Enter your password"
-              style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '1rem', background: '#f9fafb' }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '0.95rem' }}
-              tabIndex={-1}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </button>
-          </div>
-        </div>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#374151', fontWeight: 500 }}>Confirm Password</label>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            placeholder="Password"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
+          />
           <input
             type={showPassword ? 'text' : 'password'}
             value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
             required
-            placeholder="Confirm your password"
-            style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', fontSize: '1rem', background: '#f9fafb' }}
+            placeholder="Confirm Password"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 500, fontSize: '1rem', marginBottom: 18, cursor: 'pointer', alignSelf: 'flex-end', marginRight: 20 }}
+            tabIndex={-1}
+          >
+            {showPassword ? 'Hide Passwords' : 'Show Passwords'}
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', background: '#ef4444', color: 'white', padding: '1rem', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.1rem', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 1px 3px 0 rgb(239 68 68 / 0.10)', textAlign: 'center' }}
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+        <div style={{ textAlign: 'center', color: '#888', fontSize: '1rem', marginTop: 10 }}>
+          Already have an account?{' '}
+          <a href="/?route=login" style={{ color: '#ef4444', textDecoration: 'underline', fontWeight: 500 }}>Login</a>
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: '100%', background: '#ef4444', color: 'white', padding: '0.9rem', border: 'none', borderRadius: '0.375rem', fontWeight: 'bold', fontSize: '1.1rem', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 1px 3px 0 rgb(239 68 68 / 0.15)' }}
-        >
-          {loading ? 'Registering...' : 'Register'}
-        </button>
-        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          <span>Already have an account? </span>
-          <a href="/?route=login" style={{ color: '#ef4444', textDecoration: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
-            Login
-          </a>
-        </div>
-      </form>
+      </div>
     </div>
   );
 };

@@ -8,6 +8,7 @@ import Header from '../components/Header';
 function HomePage({ cart, setCart, onAddToCart }) {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/products')
@@ -19,43 +20,30 @@ function HomePage({ cart, setCart, onAddToCart }) {
     setWishlistCount(wishlistCount > 0 ? 0 : 1);
   };
 
+  const onLogout = () => {
+    localStorage.clear();
+    window.location.href = '/login'; // Redirect to login page
+  };
+
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden', position: 'relative' }}>
       {/* Header */}
-      <Header cartCount={cart.length} />
+      <Header cartCount={cart.length} searchValue={searchTerm} onSearch={setSearchTerm} />
 
       {/* Main Content */}
       <main style={{ width: '100%', padding: '2rem 1rem', boxSizing: 'border-box' }}>
         {/* Best Selling Products Section */}
-        <section style={{ marginBottom: '3rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ width: '0.25rem', height: '2rem', backgroundColor: '#ef4444', borderRadius: '0.125rem' }}></div>
-            <span style={{ color: '#ef4444', fontWeight: '500' }}>This Month</span>
+        <section className="homepage-section">
+          <div className="homepage-section-header">
+            <div className="homepage-section-bar"></div>
+            <span className="homepage-section-label">This Month</span>
           </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
-            <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#1f2937', margin: '0' }}>Best Selling Products</h2>
-            <button style={{ 
-              backgroundColor: '#ef4444', 
-              color: 'white', 
-              padding: '0.5rem 1.5rem', 
-              border: 'none',
-              borderRadius: '0.25rem', 
-              cursor: 'pointer',
-              fontWeight: '500',
-              flexShrink: 0
-            }}>
-              View All
-            </button>
+          <div className="homepage-section-title-row">
+            <h2 className="homepage-section-title">Best Selling Products</h2>
+            <button className="homepage-viewall-btn">View All</button>
           </div>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '1rem',
-            width: '100%'
-          }}>
-            {products.filter(product => product.bestSelling).map(product => (
+          <div className="homepage-product-grid">
+            {products.filter(product => product.bestSelling && product.name.toLowerCase().includes(searchTerm.toLowerCase())).map(product => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -72,36 +60,17 @@ function HomePage({ cart, setCart, onAddToCart }) {
         </section>
 
         {/* Explore Our Products Section */}
-        <section>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ width: '0.25rem', height: '2rem', backgroundColor: '#ef4444', borderRadius: '0.125rem' }}></div>
-            <span style={{ color: '#ef4444', fontWeight: '500' }}>Our Products</span>
+        <section className="homepage-section">
+          <div className="homepage-section-header">
+            <div className="homepage-section-bar"></div>
+            <span className="homepage-section-label">Our Products</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
-            <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#1f2937', margin: '0' }}>Explore Our Products</h2>
-            <button
-              style={{
-                backgroundColor: '#ef4444',
-                color: 'white',
-                padding: '0.5rem 1.5rem',
-                border: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-                fontWeight: '500',
-                flexShrink: 0
-              }}
-              onClick={() => { window.location.href = '/?route=products'; }}
-            >
-              View All Products
-            </button>
+          <div className="homepage-section-title-row">
+            <h2 className="homepage-section-title">Explore Our Products</h2>
+            <button className="homepage-viewall-btn">View All Products</button>
           </div>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '1rem',
-            width: '100%'
-          }}>
-            {products.map(product => (
+          <div className="homepage-product-grid">
+            {products.filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase())).map(product => (
               <ProductCard
                 key={product.id}
                 product={product}
