@@ -248,10 +248,10 @@ function App() {
     return <CartPage cart={cart} setCart={setCart} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} user={user} />;
   }
   if (currentPage === 'aboutus') {
-    return <AboutUsPage />;
+    return <AboutUsPage cart={cart} />;
   }
   if (currentPage === 'error404') {
-    return <Error404Page />;
+    return <Error404Page cart={cart} />;
   }
   if (currentPage === 'users') {
     return <AdminUserPage onBack={navigateToDashboard} />;
@@ -265,10 +265,10 @@ function App() {
     return <CheckoutPage />;
   }
   if (currentPage === 'profile') {
-    return <UserProfilePage user={user} />;
+    return <UserProfilePage user={user} cart={cart} />;
   }
   if (currentPage === 'contact') {
-    return <ContactPage />;
+    return <ContactPage cart={cart} />;
   }
   // Default: page
   return <Error404Page />;

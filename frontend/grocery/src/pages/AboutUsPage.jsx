@@ -3,14 +3,14 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/AboutUs.css';
 import cartIcon from '../assets/grocery_shopping_cart.png';
-import team1 from '../assets/grocery_shopping_cart.png'; // Placeholder, replace with real images if available
-import team2 from '../assets/grocery_shopping_cart.png';
-import team3 from '../assets/grocery_shopping_cart.png';
+import team1 from '../assets/aboutus_vestil.png'; // Placeholder, replace with real images if available
+import team2 from '../assets/aboutus_ricablanca.png';
+import team3 from '../assets/aboutus_juen.jpg';
 
-const AboutUsPage = () => {
+const AboutUsPage = ({ cart = [] }) => {
   return (
     <>
-      <Header />
+      <Header cartCount={cart.length} />
       <div style={{ background: '#fafafa', minHeight: '80vh', padding: '40px 0' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
           {/* Breadcrumb */}
@@ -54,8 +54,8 @@ const AboutUsPage = () => {
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               <div style={{ flex: '1 1 220px', background: '#fff', borderRadius: 8, padding: 24, textAlign: 'center', boxShadow: '0 2px 8px #0001', minWidth: 200 }}>
                 <img src={team1} alt="Tom Cruise" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginBottom: 12 }} />
-                <div style={{ fontWeight: 700 }}>Tom Cruise</div>
-                <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Founder & Chairman</div>
+                <div style={{ fontWeight: 700 }}>Will Smith</div>
+                <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Founder & CEO</div>
                 <div>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>💼</span>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>🔗</span>
@@ -63,8 +63,8 @@ const AboutUsPage = () => {
               </div>
               <div style={{ flex: '1 1 220px', background: '#fff', borderRadius: 8, padding: 24, textAlign: 'center', boxShadow: '0 2px 8px #0001', minWidth: 200 }}>
                 <img src={team2} alt="Emma Watson" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginBottom: 12 }} />
-                <div style={{ fontWeight: 700 }}>Emma Watson</div>
-                <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Managing Director</div>
+                <div style={{ fontWeight: 700 }}>Claudine Margaret C. Ricablanca</div>
+                <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Operations Manager</div>
                 <div>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>💼</span>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>🔗</span>
@@ -72,8 +72,8 @@ const AboutUsPage = () => {
               </div>
               <div style={{ flex: '1 1 220px', background: '#fff', borderRadius: 8, padding: 24, textAlign: 'center', boxShadow: '0 2px 8px #0001', minWidth: 200 }}>
                 <img src={team3} alt="Will Smith" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginBottom: 12 }} />
-                <div style={{ fontWeight: 700 }}>Will Smith</div>
-                <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Product Designer</div>
+                <div style={{ fontWeight: 700 }}>Gee Caliph A. Juen</div>
+                <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>Lead Software Engineer</div>
                 <div>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>💼</span>
                   <span style={{ margin: '0 4px', fontSize: 18 }}>🔗</span>
