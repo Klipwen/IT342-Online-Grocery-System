@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body, input, button, textarea {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
 /* Admin User Page Styles */
 .admin-user-page {
   min-height: 100vh;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Heart, Eye } from 'lucide-react';
+import styles from '../styles/ProductCard.module.css';
 
 // const imageMap = {
 //   'sardines.png': sardinesImg,
@@ -9,6 +10,7 @@ import { Heart, Eye } from 'lucide-react';
 const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onClick, isInCart }) => {
   return (
     <div
+      className={styles.card}
       style={{
         backgroundColor: 'white',
         borderRadius: '0.75rem',
@@ -54,6 +56,7 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
       }}>
         <button
           onClick={onToggleWishlist}
+          className={styles.iconBtn}
           style={{
             background: 'white',
             border: '1px solid #e5e7eb',
@@ -75,6 +78,7 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
           }} />
         </button>
         <button
+          className={styles.iconBtn}
           style={{
             background: 'white',
             border: '1px solid #e5e7eb',
@@ -199,22 +203,20 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, isWishlisted, onC
       </div>
       {/* Add To Cart Button */}
       <button
-        onClick={e => {
-          e.stopPropagation();
-          if (!isInCart) onAddToCart();
-        }}
+        onClick={onAddToCart}
         disabled={isInCart}
         style={{
-          width: '100%',
-          backgroundColor: isInCart ? '#9ca3af' : '#ef4444',
-          color: 'white',
-          padding: '0.75rem 0',
+          backgroundColor: isInCart ? '#d1d5db' : '#ef4444',
+          color: isInCart ? '#6b7280' : 'white',
           border: 'none',
           borderRadius: '0.375rem',
-          fontSize: '1.1rem',
-          fontWeight: '600',
+          padding: '0.75rem 2rem',
+          fontWeight: 'bold',
+          fontSize: '1rem',
           cursor: isInCart ? 'not-allowed' : 'pointer',
           marginTop: 'auto',
+          width: '100%',
+          transition: 'background 0.2s',
         }}
       >
         {isInCart ? 'Added' : 'Add To Cart'}
