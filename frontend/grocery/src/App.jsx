@@ -35,6 +35,7 @@ function App() {
   );
   const [adminPassword, setAdminPassword] = useState('');
   const ADMIN_PASSWORD = 'admin123'; // Change as needed
+  const [routeKey, setRouteKey] = useState(0);
 
   // Fetch cart from backend when user logs in
   useEffect(() => {
@@ -48,70 +49,88 @@ function App() {
   }, [user]);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const editId = urlParams.get('edit');
-    const page = urlParams.get('page');
-    const env = urlParams.get('env');
-    const dev = urlParams.get('dev');
-    const route = urlParams.get('route');
-    const productIdParam = urlParams.get('id');
+    const handleRoute = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('edit');
+      const page = urlParams.get('page');
+      const env = urlParams.get('env');
+      const dev = urlParams.get('dev');
+      const route = urlParams.get('route');
+      const productIdParam = urlParams.get('id');
 
-    if (route === 'register') {
-      setCurrentPage('register');
-      return;
-    }
-    if (route === 'login') {
-      setCurrentPage('login');
-      return;
-    }
-    if (route === 'admin') {
-      setCurrentPage('admin');
-      return;
-    }
-    if (route === 'home') {
-      setCurrentPage('home');
-      return;
-    }
-    if (route === 'product' && productIdParam) {
-      setProductId(productIdParam);
-      setCurrentPage('product');
-      return;
-    }
-    if (route === 'cart') {
-      setCurrentPage('cart');
-      return;
-    }
-    if (route === 'aboutus') {
-      setCurrentPage('aboutus');
-      return;
-    }
-    if (route === 'error404') {
-      setCurrentPage('error404');
-      return;
-    }
-    if (route === 'users') {
-      setCurrentPage('users');
-      return;
-    }
-    if (route === 'products') {
-      setCurrentPage('products');
-      return;
-    }
-    if (route === 'checkout') {
-      setCurrentPage('checkout');
-      return;
-    }
-    if (route === 'profile') {
-      setCurrentPage('profile');
-      return;
-    }
-    if (route === 'contact') {
-      setCurrentPage('contact');
-      return;
-    }
+      if (route === 'register') {
+        setCurrentPage('register');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'login') {
+        setCurrentPage('login');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'admin') {
+        setCurrentPage('admin');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'home') {
+        setCurrentPage('home');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'product' && productIdParam) {
+        setProductId(productIdParam);
+        setCurrentPage('product');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'cart') {
+        setCurrentPage('cart');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'aboutus') {
+        setCurrentPage('aboutus');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'error404') {
+        setCurrentPage('error404');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'users') {
+        setCurrentPage('users');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'products') {
+        setCurrentPage('products');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'checkout') {
+        setCurrentPage('checkout');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'profile') {
+        setCurrentPage('profile');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'contact') {
+        setCurrentPage('contact');
+        setRouteKey(k => k + 1);
+        return;
+      }
 
-    // If no route is specified, redirect to login
-    window.location.href = '/?route=login';
+      // If no route is specified, redirect to login
+      window.location.href = '/?route=login';
+    };
+    handleRoute();
+    window.addEventListener('popstate', handleRoute);
+    return () => window.removeEventListener('popstate', handleRoute);
   }, []);
 
   // Cart handlers using backend
@@ -259,7 +278,7 @@ function App() {
   if (currentPage === 'products') {
     const urlParams = new URLSearchParams(window.location.search);
     const selectedCategory = urlParams.get('category');
-    return <ProductsPage cart={cart} setCart={setCart} selectedCategory={selectedCategory} />;
+    return <ProductsPage key={routeKey} cart={cart} setCart={setCart} selectedCategory={selectedCategory} />;
   }
   if (currentPage === 'checkout') {
     return <CheckoutPage />;

@@ -1,0 +1,21 @@
+.productsPageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 3.5rem;
+  width: 100%;
+}
+@media (max-width: 1200px) {
+  .productsPageGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .productsPageGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .productsPageGrid {
+    grid-template-columns: 1fr;
+  }
+} 
