@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ProductCard from '../components/ProductCard';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import styles from '../styles/ProductsPage.module.css';
+import cardStyles from '../styles/ProductCard.module.css';
 
-const ProductsPage = ({ cart, setCart, selectedCategory }) => {
+const ProductsPage = ({ cart, setCart, selectedCategory, onAddToCart, user }) => {
   const [products, setProducts] = useState([]);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [toast, setToast] = useState('');
+  const cartIconRef = useRef(null);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/products')
@@ -16,16 +19,25 @@ const ProductsPage = ({ cart, setCart, selectedCategory }) => {
   }, []);
 
   const handleAddToCart = (product) => {
-    setCart(prevCart => {
-      const existing = prevCart.find(item => item.id === product.id);
-      if (existing) {
-        return prevCart.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      } else {
-        return [...prevCart, { ...product, quantity: 1 }];
-      }
-    });
+    if (typeof onAddToCart === 'function') {
+      onAddToCart(product.id, 1)
+        .then(() => {
+          setToast(`${product.name} added to cart!`);
+          if (cartIconRef.current) {
+            cartIconRef.current.classList.remove('cart-bounce');
+            void cartIconRef.current.offsetWidth;
+            cartIconRef.current.classList.add('cart-bounce');
+          }
+          setTimeout(() => setToast(''), 1800);
+        })
+        .catch(() => {
+          setToast('Please log in to add to cart.');
+          setTimeout(() => setToast(''), 1800);
+        });
+    } else {
+      setToast('Please log in to add to cart.');
+      setTimeout(() => setToast(''), 1800);
+    }
   };
 
   const handleToggleWishlist = (product) => {
@@ -39,7 +51,7 @@ const ProductsPage = ({ cart, setCart, selectedCategory }) => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden', position: 'relative' }}>
-      <Header cartCount={cart.length} />
+      <Header cartCount={cart.length} ref={cartIconRef} />
       <main style={{ width: '100%', padding: '2rem 1rem', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           {selectedCategory && (
@@ -58,22 +70,6 @@ const ProductsPage = ({ cart, setCart, selectedCategory }) => {
               </button>
             </div>
           )}
-          <button
-            onClick={() => window.history.back()}
-            style={{
-              background: '#ef4444',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.375rem',
-              padding: '0.5rem 1.25rem',
-              fontWeight: 600,
-              fontSize: '1rem',
-              cursor: 'pointer',
-              marginBottom: '1.5rem'
-            }}
-          >
-            ← Back
-          </button>
           <section className="homepage-section">
             <div className="homepage-section-header">
               <div className="homepage-section-bar"></div>
@@ -91,17 +87,18 @@ const ProductsPage = ({ cart, setCart, selectedCategory }) => {
                 </div>
               ) : (
                 filteredProducts.map(product => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={() => handleAddToCart(product)}
-                    onToggleWishlist={() => handleToggleWishlist(product)}
-                    isWishlisted={wishlistCount > 0}
-                    isInCart={!!cart.find(item => item.id === product.id)}
-                    onClick={() => {
-                      window.location.href = `/?route=product&id=${product.id}`;
-                    }}
-                  />
+                  <div key={product.id} className={cardStyles.fadeInCard}>
+                    <ProductCard
+                      product={product}
+                      onAddToCart={() => handleAddToCart(product)}
+                      onToggleWishlist={() => handleToggleWishlist(product)}
+                      isWishlisted={wishlistCount > 0}
+                      isInCart={!!cart.find(item => item.id === product.id)}
+                      onClick={() => {
+                        window.location.href = `/?route=product&id=${product.id}`;
+                      }}
+                    />
+                  </div>
                 ))
               )}
             </div>
@@ -109,6 +106,9 @@ const ProductsPage = ({ cart, setCart, selectedCategory }) => {
         </div>
       </main>
       <Footer />
+      {toast && (
+        <div className="cart-toast">{toast}</div>
+      )}
     </div>
   );
 };

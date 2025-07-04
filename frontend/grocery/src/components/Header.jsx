@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Heart, User } from 'lucide-react';
+import styles from '../styles/Header.module.css';
 
 const categories = [
   'Pantry Essentials',
@@ -24,6 +25,10 @@ const Header = ({
   const [showCategories, setShowCategories] = useState(false);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: '' });
+
+  // Determine active route from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const route = urlParams.get('route') || 'home';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,7 +57,7 @@ const Header = ({
             <div style={{ position: 'relative' }}>
               <a
                 href="#"
-                style={{ color: '#4b5563', textDecoration: 'none' }}
+                className={route === 'category' ? styles.activeNav : styles.navLink}
                 onClick={e => {
                   e.preventDefault();
                   setShowCategories(v => !v);
@@ -99,9 +104,15 @@ const Header = ({
                 </div>
               )}
             </div>
-            <a href="#" style={{ color: '#1f2937', fontWeight: '500', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/?route=home'; }}>Home</a>
-            <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/?route=contact'; }}>Contact</a>
-            <a href="#" style={{ color: '#4b5563', textDecoration: 'none' }} onClick={e => { e.preventDefault(); window.location.href = '/?route=aboutus'; }}>About</a>
+            <a href="#"
+              className={route === 'home' ? styles.activeNav : styles.navLink}
+              onClick={e => { e.preventDefault(); window.location.href = '/?route=home'; }}>Home</a>
+            <a href="#"
+              className={route === 'contact' ? styles.activeNav : styles.navLink}
+              onClick={e => { e.preventDefault(); window.location.href = '/?route=contact'; }}>Contact</a>
+            <a href="#"
+              className={route === 'aboutus' ? styles.activeNav : styles.navLink}
+              onClick={e => { e.preventDefault(); window.location.href = '/?route=aboutus'; }}>About</a>
           </nav>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ position: 'relative', cursor: 'pointer' }}>

@@ -1,0 +1,48 @@
+.profileCard {
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.input {
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.input:hover {
+  background: #f3f4f6;
+}
+.input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 2px 8px 0 #ef444455;
+  outline: none;
+  background: #fff;
+}
+.saveBtn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 32px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+}
+.saveBtn:hover {
+  background: #d32f2f;
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px 0 rgb(239 68 68 / 0.13);
+}
+.saveBtn:active {
+  transform: scale(0.97);
+}
+.successMsg {
+  color: #22c55e;
+  background: #e7fbe9;
+  border-radius: 6px;
+  padding: 8px 0;
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 500;
+  animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+} 

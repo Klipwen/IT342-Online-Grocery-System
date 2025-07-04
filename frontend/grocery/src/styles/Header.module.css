@@ -1,0 +1,20 @@
+.navLink {
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s, border-bottom 0.2s;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+}
+.navLink:hover {
+  color: #ef4444;
+  border-bottom: 2px solid #ef4444;
+}
+.activeNav {
+  color: #ef4444;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 2.5px solid #ef4444;
+  padding-bottom: 2px;
+  transition: color 0.2s, border-bottom 0.2s;
+} 

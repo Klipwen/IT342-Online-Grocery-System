@@ -51,3 +51,21 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+.discountBadge {
+  animation: badgePulse 1.2s infinite alternate;
+  display: inline-block;
+}
+@keyframes badgePulse {
+  0% { transform: scale(1) rotate(-2deg); box-shadow: 0 0 0 0 #ef444455; }
+  50% { transform: scale(1.08) rotate(2deg); box-shadow: 0 2px 8px 0 #ef444433; }
+  100% { transform: scale(1) rotate(-2deg); box-shadow: 0 0 0 0 #ef444455; }
+}
+
+.fadeInCard {
+  animation: fadeInCard 0.7s cubic-bezier(.22,1,.36,1);
+}
+@keyframes fadeInCard {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -1,0 +1,37 @@
+.categoryCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.18s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  position: relative;
+  outline: none;
+}
+.categoryCard:hover, .categoryCard:focus {
+  background: #f9fafb;
+  border-color: #ef4444;
+  box-shadow: 0 4px 16px 0 rgb(239 68 68 / 0.10);
+  transform: scale(1.06);
+}
+.categoryCard:active {
+  background: #ffeaea;
+  border-color: #ef4444;
+  transform: scale(0.98);
+}
+.categoryCard:hover div:first-child, .categoryCard:focus div:first-child {
+  animation: bounceIcon 0.4s;
+}
+@keyframes bounceIcon {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25) translateY(-6px); }
+  60% { transform: scale(0.95) translateY(2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+.active {
+  /* background: #ef4444 !important; */
+  /* border-color: #ef4444 !important; */
+  /* color: white !important; */
+} 
