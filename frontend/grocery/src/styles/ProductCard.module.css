@@ -1,0 +1,53 @@
+.card {
+  transition: box-shadow 0.25s, transform 0.25s;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+  will-change: transform;
+  position: relative;
+}
+.card:hover {
+  box-shadow: 0 8px 32px 0 rgb(239 68 68 / 0.18), 0 1.5px 6px 0 rgb(0 0 0 / 0.10);
+  transform: translateY(-6px) scale(1.04);
+  z-index: 2;
+}
+
+.addToCartBtn {
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.addToCartBtn:hover:not(:disabled) {
+  background: #d32f2f;
+  transform: scale(1.04);
+  box-shadow: 0 2px 8px 0 rgb(239 68 68 / 0.10);
+}
+
+.iconBtn {
+  transition: transform 0.2s, box-shadow 0.2s, color 0.2s;
+}
+.card:hover .iconBtn {
+  transform: scale(1.15) rotate(-10deg);
+  box-shadow: 0 2px 8px 0 rgb(239 68 68 / 0.10);
+  color: #ef4444;
+}
+
+.viewOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 0.75rem;
+  transition: opacity 0.2s;
+  z-index: 3;
+}
+.card:hover .viewOverlay {
+  opacity: 1;
+  pointer-events: auto;
+}
