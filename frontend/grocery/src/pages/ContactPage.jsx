@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/ContactPage.css'; // If you want to add custom styles later
 
-const ContactPage = () => {
+const ContactPage = ({ cart = [] }) => {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -34,7 +34,7 @@ const ContactPage = () => {
 
   return (
     <>
-      <Header />
+      <Header cartCount={cart.length} />
       <div style={{ background: '#fafafa', minHeight: '80vh', padding: '40px 0' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 32, flexWrap: 'wrap' }}>
           {/* Left: Contact Info */}

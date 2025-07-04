@@ -1,30 +1,12 @@
 import React from "react";
 import cartIcon from "../assets/grocery_shopping_cart.png";
 import "../styles/Error404.css";
+import Header from "../components/Header";
 
-const Error404Page = () => {
+const Error404Page = ({ cart = [] }) => {
   return (
     <div className="error-page">
-      {/* Header */}
-      <header className="navbar">
-        <div className="logo-section">
-          <img src={cartIcon} alt="Cart Logo" />
-          <span>Online Grocery</span>
-        </div>
-        <nav className="nav-links">
-          <a href="#">Category</a>
-          <a href="#">Home</a>
-          <a href="#">Contact</a>
-          <a href="#">About</a>
-        </nav>
-        <div className="nav-icons">
-          <input type="text" placeholder="What are you looking for?" />
-          <i className="bi bi-search"></i>
-          <i className="bi bi-heart"></i>
-          <i className="bi bi-cart"></i>
-          <i className="bi bi-person"></i>
-        </div>
-      </header>
+      <Header cartCount={cart.length} />
 
       {/* Breadcrumb */}
       <div className="breadcrumb">Home / 404 Error</div>
