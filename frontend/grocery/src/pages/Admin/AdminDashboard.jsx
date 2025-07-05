@@ -1,151 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import AdminProductTable from '../../components/admin/AdminProductTable';
-import AdminHeader from '../../components/admin/AdminHeader';
-import { getApiBaseUrl } from '../../config/api';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, ClipboardList, Users as UsersIcon } from 'lucide-react';
 import AdminUserPage from './AdminUserPage';
+import AdminViewProducts from './AdminViewProducts';
+import { getApiBaseUrl } from '../../config/api';
 
 const AdminDashboard = ({ onNavigate }) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [showUserPage, setShowUserPage] = useState(false);
-
-  const categories = [
-    'all',
-    'Pantry Essentials',
-    'Canned Goods',
-    'Canned Seafood',
-    'Noodles',
-    'Snacks & Sweets',
-    'Breakfast World',
-    'Wines & Liquors',
-    'Personal Grooming',
-    'Health & Beauty',
-  ];
+  const [showProductList, setShowProductList] = useState(false);
+  const [productCount, setProductCount] = useState(null);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  // Placeholder counts for orders and users
+  const orderCount = 2650;
+  const userCount = 2650;
 
   useEffect(() => {
-    fetchProducts();
+    const fetchProductCount = async () => {
+      setLoadingProducts(true);
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/products`);
+        if (!response.ok) throw new Error('Failed to fetch products');
+        const data = await response.json();
+        setProductCount(Array.isArray(data) ? data.length : 0);
+      } catch (err) {
+        setProductCount(0);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    fetchProductCount();
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const apiBaseUrl = getApiBaseUrl();
-      const response = await fetch(`${apiBaseUrl}/api/products`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-      const data = await response.json();
-      setProducts(data);
-    } catch (err) {
-      setError('Failed to load products');
-      console.error('Error fetching products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteProduct = async (productId) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) {
-      return;
-    }
-
-    try {
-      const apiBaseUrl = getApiBaseUrl();
-      const response = await fetch(`${apiBaseUrl}/api/admin/products/${productId}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete product');
-      }
-
-      // Remove the product from the local state
-      setProducts(prev => prev.filter(product => product.id !== productId));
-      alert('Product deleted successfully!');
-    } catch (err) {
-      alert('Failed to delete product');
-      console.error('Error deleting product:', err);
-    }
-  };
-
-  const handleEditProduct = (productId) => {
-    if (onNavigate && onNavigate.onEditProduct) {
-      onNavigate.onEditProduct(productId);
-    }
-  };
-
+  // Quick Actions handlers (implement navigation as needed)
   const handleAddProduct = () => {
     if (onNavigate && onNavigate.onAddProduct) {
       onNavigate.onAddProduct();
     }
   };
-
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const handleAddDeliveryPersonnel = () => {
+    // Implement navigation or modal for adding delivery personnel
+    alert('Add Delivery Personnel feature coming soon!');
+  };
+  const handleBulkActions = () => {
+    // Implement bulk actions logic
+    alert('Bulk Actions feature coming soon!');
+  };
 
   if (showUserPage) {
     return <AdminUserPage onBack={() => setShowUserPage(false)} />;
   }
 
-  if (loading) {
+  if (showProductList) {
     return (
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '2rem auto', 
-        background: 'white', 
-        padding: '2rem', 
-        borderRadius: '0.5rem', 
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-        textAlign: 'center'
-      }}>
-        <div>Loading products...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '2rem auto', 
-        background: 'white', 
-        padding: '2rem', 
-        borderRadius: '0.5rem', 
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-        textAlign: 'center'
-      }}>
-        <div style={{ color: '#ef4444', marginBottom: '1rem' }}>{error}</div>
-        <button 
-          onClick={fetchProducts}
-          style={{
-            background: '#ef4444',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            border: 'none',
-            borderRadius: '0.375rem',
-            cursor: 'pointer'
-          }}
-        >
-          Retry
-        </button>
-      </div>
+      <AdminViewProducts onBack={() => setShowProductList(false)} />
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
-      {/* Admin Dashboard Header Card */}
+    <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '0 0 2rem 0' }}>
+      {/* Header */}
       <div style={{
         maxWidth: '1200px',
-        margin: '2rem auto 2.5rem auto',
+        margin: '2rem auto 1.5rem auto',
         background: 'white',
         padding: '2rem 2.5rem',
         borderRadius: '0.75rem',
@@ -153,134 +69,160 @@ const AdminDashboard = ({ onNavigate }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
         gap: '2rem',
-        flexWrap: 'wrap'
       }}>
-        {/* Logo (match customer header) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '220px', cursor: 'pointer' }} onClick={() => window.location.href = '/'}>
           <div style={{ backgroundColor: '#ef4444', padding: '0.5rem', borderRadius: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ShoppingCart style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
           </div>
           <span style={{ fontWeight: 'bold', fontSize: '1.125rem', color: '#1f2937' }}>Online Grocery</span>
         </div>
-        {/* AdminHeader content */}
-        <div style={{ flex: 1, minWidth: '320px' }}>
-                  <AdminHeader 
-          title="Admin Dashboard" 
-          subtitle={`${filteredProducts.length} products found`}
-          onAddProduct={handleAddProduct}
-          onViewUsers={() => setShowUserPage(true)}
-          onLogout={() => {
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>Admin Dashboard</h1>
+        <button
+          onClick={() => {
             sessionStorage.removeItem('isAdminAuthenticated');
             window.location.href = '/?route=login';
           }}
-        />
-        </div>
+          style={{ background: '#ef4444', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.375rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}
+        >
+          Logout
+        </button>
       </div>
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '2rem auto', 
-        background: 'white', 
-        padding: '2rem', 
-        borderRadius: '0.5rem', 
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' 
+
+      {/* Summary Cards with Icons */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto 2rem auto',
+        display: 'flex',
+        gap: '2rem',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
       }}>
-        {/* Search and Filter Controls */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
-          marginBottom: '2rem', 
-          flexWrap: 'wrap',
-          alignItems: 'center'
-        }}>
-          <div style={{ flex: 1, minWidth: '200px' }}>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                fontSize: '1rem',
-                outline: 'none'
-              }}
-            />
+        <div
+          onClick={() => setShowProductList(true)}
+          style={{
+            flex: 1,
+            minWidth: '220px',
+            background: '#f3f4f6',
+            borderRadius: '1rem',
+            padding: '2rem',
+            textAlign: 'center',
+            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            cursor: 'pointer',
+            transition: 'box-shadow 0.2s, background 0.2s',
+          }}
+          onMouseOver={e => e.currentTarget.style.boxShadow = '0 4px 12px 0 rgb(37 99 235 / 0.15)'}
+          onMouseOut={e => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgb(0 0 0 / 0.07)'}
+        >
+          <div style={{ background: '#ef4444', borderRadius: '50%', padding: '0.75rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShoppingCart style={{ width: '2rem', height: '2rem', color: 'white' }} />
           </div>
-          <div style={{ minWidth: '150px' }}>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                fontSize: '1rem',
-                outline: 'none',
-                background: 'white'
-              }}
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
-                </option>
-              ))}
-            </select>
+          <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Products</div>
+          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>
+            {loadingProducts ? <span style={{ color: '#aaa', fontSize: '1.2rem' }}>...</span> : productCount}
           </div>
-          <button
-            onClick={fetchProducts}
-            style={{
-              background: '#3b82f6',
-              color: 'white',
-              padding: '0.75rem 1rem',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: 'pointer',
-              fontSize: '1rem'
-            }}
-          >
-            Refresh
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }}>
+            View &gt;
           </button>
         </div>
-
-        {/* Products Table */}
-        <AdminProductTable 
-          products={filteredProducts}
-          onEdit={handleEditProduct}
-          onDelete={handleDeleteProduct}
-        />
-
-        {/* Empty State */}
-        {filteredProducts.length === 0 && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '3rem', 
-            color: '#6b7280' 
-          }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
-              {searchTerm || selectedCategory !== 'all' ? 'No products found' : 'No products yet'}
-            </div>
-            {!searchTerm && selectedCategory === 'all' && (
-              <button
-                onClick={handleAddProduct}
-                style={{
-                  background: '#ef4444',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  cursor: 'pointer',
-                  fontSize: '1rem'
-                }}
-              >
-                Add Your First Product
-              </button>
-            )}
+        <div style={{ flex: 1, minWidth: '220px', background: '#f3f4f6', borderRadius: '1rem', padding: '2rem', textAlign: 'center', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ background: '#2563eb', borderRadius: '50%', padding: '0.75rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ClipboardList style={{ width: '2rem', height: '2rem', color: 'white' }} />
           </div>
-        )}
+          <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Orders</div>
+          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>{orderCount.toLocaleString()}</div>
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => {}}>
+            View &gt;
+          </button>
+        </div>
+        <div style={{ flex: 1, minWidth: '220px', background: '#f3f4f6', borderRadius: '1rem', padding: '2rem', textAlign: 'center', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ background: '#10b981', borderRadius: '50%', padding: '0.75rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <UsersIcon style={{ width: '2rem', height: '2rem', color: 'white' }} />
+          </div>
+          <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Users</div>
+          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>{userCount.toLocaleString()}</div>
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => setShowUserPage(true)}>
+            View &gt;
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto 2rem auto',
+        display: 'flex',
+        gap: '1.5rem',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+      }}>
+        <button onClick={handleAddProduct} style={{ background: '#ef4444', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Product</button>
+        <button onClick={handleAddDeliveryPersonnel} style={{ background: '#2563eb', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Delivery Personnel</button>
+        <button onClick={handleBulkActions} style={{ background: '#111', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>Bulk Actions</button>
+      </div>
+
+      {/* Pending Orders Label */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '2rem auto 0 auto',
+        fontWeight: 'bold',
+        fontSize: '1.5rem',
+        color: '#1f2937',
+        letterSpacing: '-0.5px',
+      }}>
+        Pending Orders
+      </div>
+
+      {/* Pending Orders & Active Delivery (placeholders, style as needed) */}
+      <div style={{ maxWidth: '1200px', margin: '1rem auto 0 auto', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+        <div style={{ flex: 2, background: '#ededed', borderRadius: '1.5rem', padding: '2rem', minWidth: '400px' }}>
+          <h3 style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>Home Delivery</h3>
+          {/* Pending orders table improved styling */}
+          <table style={{ width: '100%', background: 'white', borderCollapse: 'separate', borderSpacing: 0, borderRadius: '0.75rem', overflow: 'hidden', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)', marginBottom: '1.5rem' }}>
+            <thead style={{ background: '#f3f4f6' }}>
+              <tr style={{ textAlign: 'left', color: '#222' }}>
+                <th style={{ padding: '0.75rem' }}>Customer</th>
+                <th style={{ padding: '0.75rem' }}>Address</th>
+                <th style={{ padding: '0.75rem' }}>Phone</th>
+                <th style={{ padding: '0.75rem' }}>Order Amount</th>
+                <th style={{ padding: '0.75rem' }}>Payment Method</th>
+                <th style={{ padding: '0.75rem' }}>Payment Status</th>
+                <th style={{ padding: '0.75rem' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ background: '#fff' }}>
+                <td style={{ padding: '0.75rem' }}>John Doe</td>
+                <td style={{ padding: '0.75rem' }}>Mandaue City, Cebu</td>
+                <td style={{ padding: '0.75rem' }}>09282323234</td>
+                <td style={{ padding: '0.75rem' }}>₱ 2,530</td>
+                <td style={{ padding: '0.75rem' }}>Gcash</td>
+                <td style={{ padding: '0.75rem' }}>Paid</td>
+                <td style={{ padding: '0.75rem' }}><button style={{ background: '#111', color: 'white', border: 'none', borderRadius: '0.375rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Assign Delivery</button></td>
+              </tr>
+              <tr style={{ background: '#f9fafb' }}>
+                <td style={{ padding: '0.75rem' }}>John Doe</td>
+                <td style={{ padding: '0.75rem' }}>Mandaue City, Cebu</td>
+                <td style={{ padding: '0.75rem' }}>09282323234</td>
+                <td style={{ padding: '0.75rem' }}>₱ 2,530</td>
+                <td style={{ padding: '0.75rem' }}>Gcash</td>
+                <td style={{ padding: '0.75rem' }}>Paid</td>
+                <td style={{ padding: '0.75rem' }}><button style={{ background: '#111', color: 'white', border: 'none', borderRadius: '0.375rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Assign Delivery</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <h3 style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>Personal Pickups</h3>
+          {/* Personal pickups placeholder */}
+        </div>
+        <div style={{ flex: 1, background: '#ededed', borderRadius: '1.5rem', padding: '2rem', minWidth: '220px', minHeight: '200px' }}>
+          <h2 style={{ fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '1rem' }}>Active Delivery</h2>
+          <div>James Bond</div>
+        </div>
       </div>
     </div>
   );
