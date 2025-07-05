@@ -1,71 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const LoginPage = () => {
+const DeliveryRegisterPage = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-
-  // Redirect if user is already logged in
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      try {
-        const parsed = JSON.parse(user);
-        if (parsed.role === 'admin') {
-          window.location.href = '/?route=admin';
-        } else {
-          window.location.href = '/?route=home';
-        }
-      } catch (err) {
-        // If JSON parsing fails, clear localStorage and stay on login page
-        localStorage.removeItem('user');
-      }
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     setSuccess('');
     setShowPrompt(false);
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setShowPrompt(true);
+      setTimeout(() => setShowPrompt(false), 2500);
+      return;
+    }
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const res = await fetch('/api/delivery/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, rememberMe })
+        body: JSON.stringify({ name, email, contactNumber, password })
       });
-      if (!response.ok) {
-        setError('Failed to login.');
-        setSuccess('');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.message || 'Registration failed. Email may already be in use.');
         setShowPrompt(true);
         setLoading(false);
         setTimeout(() => setShowPrompt(false), 2500);
         return;
       }
-      const data = await response.json();
-      localStorage.setItem('user', JSON.stringify(data));
-      setSuccess('Successfully Login. Please wait...');
+      setSuccess('Successfully Registered. You can now log in.');
       setError('');
       setShowPrompt(true);
       setLoading(false);
       setTimeout(() => {
         setShowPrompt(false);
-        if (data.role === 'admin') {
-          window.location.href = '/?route=admin';
-        } else {
-          window.location.href = '/?route=home';
-        }
+        window.location.href = '/?route=delivery';
       }, 1500);
-      return;
+      setName('');
+      setEmail('');
+      setContactNumber('');
+      setPassword('');
+      setConfirmPassword('');
     } catch (err) {
-      setError('Failed to login.');
-      setSuccess('');
+      setError('Registration failed');
       setShowPrompt(true);
       setTimeout(() => setShowPrompt(false), 2500);
     }
@@ -100,15 +87,31 @@ const LoginPage = () => {
       <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.07)', padding: '2.5rem 2.5rem 2rem 2.5rem', maxWidth: 400, width: '100%', border: '1px solid #ececec', textAlign: 'center' }}>
         <div style={{ color: '#888', fontWeight: 500, fontSize: 18, marginBottom: 8 }}>Please enter your details</div>
         <div style={{ fontWeight: 700, fontSize: 32, marginBottom: 28, color: '#222', lineHeight: 1.2 }}>
-          Welcome!
+          Register as Delivery Personnel
         </div>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+            placeholder="Full Name"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
+          />
           <input
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
             placeholder="Email address"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
+          />
+          <input
+            type="text"
+            value={contactNumber}
+            onChange={e => setContactNumber(e.target.value)}
+            required
+            placeholder="Contact Number"
             style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
           />
           <input
@@ -119,41 +122,37 @@ const LoginPage = () => {
             placeholder="Password"
             style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
           />
-          <div style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <label style={{ display: 'flex', alignItems: 'center', fontSize: '1rem', color: '#444', userSelect: 'none' }}>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={e => setRememberMe(e.target.checked)}
-                style={{ marginRight: '0.5rem' }}
-              />
-              Remember for 30 days
-            </label>
-            <a href="#" style={{ color: '#ef4444', fontSize: '1rem', textDecoration: 'underline', fontWeight: 500, display: 'block', textAlign: 'right' }}>Forgot password</a>
-          </div>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            required
+            placeholder="Confirm Password"
+            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', display: 'block', padding: '1rem', border: '1.5px solid #e0e0e0', borderRadius: 8, fontSize: '1rem', background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 500, fontSize: '1rem', marginBottom: 18, cursor: 'pointer', alignSelf: 'flex-end', marginRight: 20 }}
+            tabIndex={-1}
+          >
+            {showPassword ? 'Hide Passwords' : 'Show Passwords'}
+          </button>
           <button
             type="submit"
             disabled={loading}
             style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', background: '#ef4444', color: 'white', padding: '1rem', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.1rem', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 1px 3px 0 rgb(239 68 68 / 0.10)', textAlign: 'center' }}
           >
-            {loading ? 'Signing in...' : 'Sign up'}
-          </button>
-          <button
-            type="button"
-            style={{ width: '100%', maxWidth: 320, margin: '0 auto 18px auto', background: '#ef4444', color: '#fff', padding: '1rem', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, textAlign: 'center' }}
-            tabIndex={-1}
-          >
-            <span style={{ fontSize: 20, marginRight: 8, display: 'flex', alignItems: 'center' }}> <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" style={{ width: 22, height: 22, verticalAlign: 'middle' }} /> </span>
-            Sign in with Google
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
         <div style={{ textAlign: 'center', color: '#888', fontSize: '1rem', marginTop: 10 }}>
-          Don't have an account?{' '}
-          <a href="/?route=register" style={{ color: '#ef4444', textDecoration: 'underline', fontWeight: 500 }}>Sign up</a>
+          Already have an account?{' '}
+          <a href="/?route=delivery" style={{ color: '#ef4444', textDecoration: 'underline', fontWeight: 500 }}>Login</a>
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default DeliveryRegisterPage; 

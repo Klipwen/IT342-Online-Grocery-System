@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -10,6 +10,24 @@ const RegisterPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      try {
+        const parsed = JSON.parse(user);
+        if (parsed.role === 'admin') {
+          window.location.href = '/?route=admin';
+        } else {
+          window.location.href = '/?route=home';
+        }
+      } catch (err) {
+        // If JSON parsing fails, clear localStorage and stay on register page
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
