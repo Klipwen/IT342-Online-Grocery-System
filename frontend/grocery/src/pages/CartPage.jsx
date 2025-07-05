@@ -118,22 +118,9 @@ function CartPage({ cart, setCart, onRemoveFromCart, onClearCart, user }) {
               <span>Subtotal:</span>
               <span>₱{subtotal.toFixed(2)}</span>
             </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontWeight: 500, marginBottom: '0.5rem' }}>Shipping</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', cursor: 'pointer' }}>
-                  <input type="radio" name="shipping" checked={shipping === 'pickup'} onChange={() => setShipping('pickup')} />
-                  Personal Pickup
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', cursor: 'pointer' }}>
-                  <input type="radio" name="shipping" checked={shipping === 'delivery'} onChange={() => setShipping('delivery')} />
-                  Home Delivery: <span style={{ color: '#ef4444', fontWeight: 600 }}>₱150.00</span>
-                </label>
-              </div>
-            </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '1.1rem', marginBottom: '1.5rem' }}>
               <span>Total:</span>
-              <span>₱{total.toFixed(2)}</span>
+              <span>₱{subtotal.toFixed(2)}</span>
             </div>
             <button style={{ width: '100%', background: '#ef4444', color: 'white', padding: '0.75rem', border: 'none', borderRadius: '0.5rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer' }}
               onClick={() => window.location.href = '/?route=checkout'}>

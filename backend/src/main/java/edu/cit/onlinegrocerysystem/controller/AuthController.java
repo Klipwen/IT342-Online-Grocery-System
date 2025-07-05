@@ -71,6 +71,10 @@ public class AuthController {
             existing.setEmail(user.getEmail());
         if (user.getPassword() != null && !user.getPassword().isEmpty())
             existing.setPassword(user.getPassword());
+        if (user.getAddress() != null)
+            existing.setAddress(user.getAddress());
+        if (user.getPhone() != null)
+            existing.setPhone(user.getPhone());
         userRepository.save(existing);
         return ResponseEntity.ok(existing);
     }

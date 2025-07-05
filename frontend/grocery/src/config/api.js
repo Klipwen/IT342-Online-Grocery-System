@@ -101,4 +101,16 @@ export const getCurrentConfig = () => {
   return API_CONFIG[env][dev];
 };
 
+// Update user info
+export const updateUserInfo = async (userId, data) => {
+  const baseUrl = getApiBaseUrl();
+  const res = await fetch(`${baseUrl}/api/auth/users/${userId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update user info');
+  return res.json();
+};
+
 export default API_CONFIG; 

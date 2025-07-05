@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { fetchCart } from '../utils/cartApi';
+import { updateUserInfo } from '../config/api';
 import '../styles/CheckoutPage.css';
 
 const SHIPPING_OPTIONS = [
@@ -31,6 +32,15 @@ const CheckoutPage = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [addressEditMode, setAddressEditMode] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    name: '',
+    phone: '',
+    address: '',
+  });
+  const [addressError, setAddressError] = useState('');
+  const [addressSuccess, setAddressSuccess] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod', 'pickup', 'gcash'
 
   // Get userId from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -44,6 +54,14 @@ const CheckoutPage = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+    // Set address form from user info in localStorage
+    if (user) {
+      setAddressForm({
+        name: user.name || '',
+        phone: user.phone || '',
+        address: user.address || '',
+      });
+    }
   }, [userId]);
 
   // Calculate subtotal safely
@@ -103,69 +121,152 @@ const CheckoutPage = () => {
     }
   }, []);
 
+  // Handle address form changes
+  const handleAddressChange = e => {
+    const { name, value } = e.target;
+    setAddressForm(f => ({ ...f, [name]: value }));
+  };
+
+  // Save address to backend
+  const handleAddressSave = async () => {
+    setAddressError('');
+    if (!addressForm.name || !addressForm.phone || !addressForm.address) {
+      setAddressError('Please fill in all address fields.');
+      return;
+    }
+    try {
+      const updated = await updateUserInfo(userId, {
+        name: addressForm.name,
+        phone: addressForm.phone,
+        address: addressForm.address,
+        email: user.email,
+      });
+      localStorage.setItem('user', JSON.stringify(updated));
+      setAddressSuccess('Address updated!');
+      setTimeout(() => setAddressSuccess(''), 1500);
+      setAddressEditMode(false);
+    } catch (err) {
+      setAddressError('Failed to update address.');
+    }
+  };
+
   return (
     <div className="checkout-page">
       <Header cartCount={cart.length} />
       <div className="breadcrumb">Home / Product / View Cart / <b>CheckOut</b></div>
-      <div className="checkout-container">
-        <div className="billing-details">
-          <h2>Billing Details</h2>
-          <form onSubmit={handleSubmit}>
-            <input type="text" name="fullName" placeholder="Full name" value={form.fullName} onChange={handleChange} required />
-            <input type="text" name="country" value={form.country} disabled />
-            <input type="text" name="street" placeholder="Street address *" value={form.street} onChange={handleChange} required />
-            <input type="text" name="apartment" placeholder="Apartment, floor, etc. (optional)" value={form.apartment} onChange={handleChange} />
-            <input type="text" name="city" placeholder="Town/City*" value={form.city} onChange={handleChange} required />
-            <input type="text" name="phone" placeholder="Phone Number*" value={form.phone} onChange={handleChange} required />
-            <input type="text" name="email" placeholder="Email Address*" value={form.email} onChange={handleChange} required />
-            <label className="save-info">
-              <input type="checkbox" name="saveInfo" checked={form.saveInfo} onChange={handleChange} />
-              Save this information for faster check-out next time
-            </label>
-            {error && <div style={{ color: '#e63946', fontSize: 14 }}>{error}</div>}
-            {success && <div style={{ color: 'green', fontSize: 15, marginBottom: 10 }}>Order placed successfully!</div>}
-          </form>
+      <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #ececec', padding: 24, margin: '24px auto 16px auto', maxWidth: 800, display: 'flex', alignItems: 'flex-start', gap: 24 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: '#ef4444', fontWeight: 600, fontSize: 18, marginBottom: 8 }}>
+            <span style={{ marginRight: 8 }}>📍</span>Delivery Address
+          </div>
+          {!addressEditMode ? (
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 16 }}>{addressForm.name} <span style={{ fontWeight: 400, color: '#444', fontSize: 15 }}>({addressForm.phone})</span></div>
+              <div style={{ color: '#444', marginBottom: 4 }}>{addressForm.address}</div>
+              <button style={{ color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, padding: 0 }} onClick={() => setAddressEditMode(true)}>Change</button>
+              {addressSuccess && <div style={{ color: 'green', fontSize: 13, marginTop: 4 }}>{addressSuccess}</div>}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <input type="text" name="name" placeholder="Full Name" value={addressForm.name} onChange={handleAddressChange} style={{ padding: 8, borderRadius: 5, border: '1px solid #ddd' }} />
+              <input type="text" name="phone" placeholder="Phone Number" value={addressForm.phone} onChange={handleAddressChange} style={{ padding: 8, borderRadius: 5, border: '1px solid #ddd' }} />
+              <input type="text" name="address" placeholder="Complete Address" value={addressForm.address} onChange={handleAddressChange} style={{ padding: 8, borderRadius: 5, border: '1px solid #ddd' }} />
+              {addressError && <div style={{ color: '#e63946', fontSize: 13 }}>{addressError}</div>}
+              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                <button onClick={handleAddressSave} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 5, padding: '6px 18px', fontWeight: 600, cursor: 'pointer' }}>Save</button>
+                <button onClick={() => { setAddressEditMode(false); setAddressError(''); }} style={{ background: 'none', color: '#222', border: '1px solid #ddd', borderRadius: 5, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}>Cancel</button>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="order-summary">
-          <div className="summary-card">
-            <div style={{ fontWeight: 600, fontSize: '1.2rem', marginBottom: '1rem', color: '#222' }}>Your Order</div>
-            {loading ? <div>Loading cart...</div> : cart.length === 0 ? <div>No items in cart.</div> : (
-              <>
-                {cart.map(item => (
-                  <div className="product-summary" key={item.id}>
-                    <img src={item.image || require('../assets/sardines_product.png')} alt={item.name} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 500, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 120 }}>{`[${item.quantity}pcs] ${item.name}`}</div>
-                    </div>
-                    <div className="price">₱{item.price * item.quantity}</div>
-                  </div>
-                ))}
-                <div className="summary-line"><span>Subtotal:</span><span>₱{subtotal.toFixed(2)}</span></div>
-                <div className="summary-shipping">Shipping:</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                  {SHIPPING_OPTIONS.map(opt => (
-                    <label key={opt.value} className="summary-shipping" style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-                      <input type="radio" name="shipping" value={opt.value} checked={form.shipping === opt.value} onChange={handleChange} style={{ marginRight: 8 }} />
-                      {opt.label}{opt.cost > 0 && <b>: ₱{opt.cost.toFixed(2)}</b>}
-                    </label>
-                  ))}
+      </div>
+      <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #ececec', padding: 24, margin: '0 auto 24px auto', maxWidth: 800 }}>
+        <div style={{ fontWeight: 600, fontSize: 20, marginBottom: 18 }}>Products Ordered</div>
+        {loading ? <div>Loading cart...</div> : cart.length === 0 ? <div>No items in cart.</div> : (
+          <>
+            {cart.map(item => (
+              <div key={item.id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #f1f1f1', padding: '12px 0' }}>
+                <img src={item.image || require('../assets/sardines_product.png')} alt={item.name} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 6, marginRight: 16, border: '1px solid #eee' }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 500, fontSize: 15 }}>{item.name}</div>
+                  {item.variation && <div style={{ color: '#888', fontSize: 13 }}>Variation: {item.variation}</div>}
                 </div>
-                <div className="summary-line total"><span>Total:</span><span>₱{total.toFixed(2)}</span></div>
-                <div className="payment-method" style={{ marginTop: 10 }}>
-                  {PAYMENT_OPTIONS.map(opt => (
-                    <label key={opt.value}>
-                      <input type="radio" name="payment" value={opt.value} checked={form.payment === opt.value} onChange={handleChange} />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
-                <label style={{ fontSize: 13, marginTop: 10, display: 'block' }}>
-                  <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} />
-                  I have read and agree to <a href="#" style={{ color: '#e63946' }}>Terms and Conditions</a> and <a href="#" style={{ color: '#e63946' }}>Privacy Policy</a>.
-                </label>
-                <button className="place-order-btn" onClick={handleSubmit} disabled={loading || cart.length === 0}>Place Order</button>
-              </>
-            )}
+                <div style={{ width: 80, textAlign: 'right', fontSize: 15 }}>₱{item.price}</div>
+                <div style={{ width: 60, textAlign: 'center', fontSize: 15 }}>{item.quantity}</div>
+                <div style={{ width: 80, textAlign: 'right', fontWeight: 600, fontSize: 15 }}>₱{item.price * item.quantity}</div>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+      <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #ececec', padding: 0, margin: '0 auto 24px auto', maxWidth: 800, overflow: 'hidden' }}>
+        <div style={{ borderBottom: '1px solid #f1f1f1', padding: '20px 24px', fontWeight: 600, fontSize: 18 }}>Payment Method</div>
+        <div style={{ display: 'flex', gap: 12, padding: '20px 24px' }}>
+          <button
+            type="button"
+            onClick={() => setPaymentMethod('cod')}
+            style={{
+              padding: '10px 24px',
+              borderRadius: 6,
+              border: paymentMethod === 'cod' ? '2px solid #222' : '1px solid #ddd',
+              background: paymentMethod === 'cod' ? '#f8fafc' : '#fff',
+              fontWeight: paymentMethod === 'cod' ? 700 : 500,
+              color: paymentMethod === 'cod' ? '#111' : '#444',
+              cursor: 'pointer',
+            }}
+          >
+            Cash on Delivery
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentMethod('pickup')}
+            style={{
+              padding: '10px 24px',
+              borderRadius: 6,
+              border: paymentMethod === 'pickup' ? '2px solid #ef4444' : '1px solid #ddd',
+              background: paymentMethod === 'pickup' ? '#fff1f2' : '#fff',
+              fontWeight: paymentMethod === 'pickup' ? 700 : 500,
+              color: paymentMethod === 'pickup' ? '#ef4444' : '#444',
+              cursor: 'pointer',
+            }}
+          >
+            Self Pick-up
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentMethod('gcash')}
+            style={{
+              padding: '10px 24px',
+              borderRadius: 6,
+              border: paymentMethod === 'gcash' ? '2px solid #2563eb' : '1px solid #ddd',
+              background: paymentMethod === 'gcash' ? '#eff6ff' : '#fff',
+              fontWeight: paymentMethod === 'gcash' ? 700 : 500,
+              color: paymentMethod === 'gcash' ? '#2563eb' : '#444',
+              cursor: 'pointer',
+            }}
+          >
+            GCash
+          </button>
+        </div>
+        <div style={{ background: '#fdfcf9', padding: '32px 24px 24px 24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+            <div style={{ width: 220, fontSize: 15, color: '#888' }}>Merchandise Subtotal</div>
+            <div style={{ width: 120, textAlign: 'right', fontWeight: 500 }}>₱{subtotal.toLocaleString()}</div>
+          </div>
+          {paymentMethod === 'cod' && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+              <div style={{ width: 220, fontSize: 15, color: '#888' }}>Shipping Subtotal</div>
+              <div style={{ width: 120, textAlign: 'right', fontWeight: 500 }}>₱150</div>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 16, borderTop: '1px dashed #eee', paddingTop: 18 }}>
+            <div style={{ width: 220, fontSize: 18, fontWeight: 600 }}>Total Payment:</div>
+            <div style={{ width: 120, textAlign: 'right', color: '#ef4444', fontWeight: 700, fontSize: 26 }}>
+              ₱{(subtotal + (paymentMethod === 'cod' ? 150 : 0)).toLocaleString()}
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
+            <button className="place-order-btn" style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 5, padding: '14px 48px', fontWeight: 600, fontSize: 18, cursor: 'pointer' }} onClick={handleSubmit} disabled={loading || cart.length === 0}>Place Order</button>
           </div>
         </div>
       </div>
