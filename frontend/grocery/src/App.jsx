@@ -20,6 +20,9 @@ import { fetchCart, addOrUpdateCartItem, removeCartItem, clearCart } from './uti
 import CheckoutPage from './pages/CheckoutPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ContactPage from './pages/ContactPage';
+import DeliveryLoginPage from './pages/DeliveryLoginPage';
+import DeliveryRegisterPage from './pages/DeliveryRegisterPage';
+import DeliveryDashboard from './pages/DeliveryDashboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -129,6 +132,21 @@ function App() {
         setRouteKey(k => k + 1);
         return;
       }
+      if (route === 'delivery') {
+        setCurrentPage('delivery-login');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'delivery-register') {
+        setCurrentPage('delivery-register');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'delivery-dashboard') {
+        setCurrentPage('delivery-dashboard');
+        setRouteKey(k => k + 1);
+        return;
+      }
 
       // If no route is specified, redirect to home
       window.location.href = '/?route=home';
@@ -208,13 +226,23 @@ function App() {
   };
 
   const handleLogout = () => {
+    // Check if it's an admin logout
+    const isAdminLogout = isAdminAuthenticated;
+    
     setUser(null);
     setCart([]);
     setIsAdminAuthenticated(false);
     sessionStorage.removeItem('isAdminAuthenticated');
     localStorage.removeItem('user');
-    setCurrentPage('login');
-    window.history.pushState({}, '', '/?route=login');
+    
+    // Redirect based on who is logging out
+    if (isAdminLogout) {
+      setCurrentPage('admin-login');
+      window.history.pushState({}, '', '/?route=admin-login');
+    } else {
+      setCurrentPage('login');
+      window.history.pushState({}, '', '/?route=login');
+    }
   };
 
   // Routing logic
@@ -285,6 +313,15 @@ function App() {
   }
   if (currentPage === 'contact') {
     return <ContactPage cart={cart} />;
+  }
+  if (currentPage === 'delivery-login') {
+    return <DeliveryLoginPage />;
+  }
+  if (currentPage === 'delivery-register') {
+    return <DeliveryRegisterPage />;
+  }
+  if (currentPage === 'delivery-dashboard') {
+    return <DeliveryDashboard />;
   }
   // Default: page
   return <Error404Page />;

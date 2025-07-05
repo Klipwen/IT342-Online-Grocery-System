@@ -172,30 +172,6 @@ const Header = ({
             >
               Logout
             </button>
-            <button
-              onClick={() => window.location.href = '/?route=admin-login'}
-              style={{
-                backgroundColor: 'transparent',
-                color: '#6b7280',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                padding: '0.5rem 0.75rem',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                marginLeft: '0.5rem',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#f3f4f6';
-                e.target.style.color = '#374151';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent';
-                e.target.style.color = '#6b7280';
-              }}
-            >
-              Admin
-            </button>
           </div>
         </div>
       </div>
