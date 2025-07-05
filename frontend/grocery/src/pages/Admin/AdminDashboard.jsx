@@ -165,12 +165,16 @@ const AdminDashboard = ({ onNavigate }) => {
         </div>
         {/* AdminHeader content */}
         <div style={{ flex: 1, minWidth: '320px' }}>
-          <AdminHeader 
-            title="Admin Dashboard" 
-            subtitle={`${filteredProducts.length} products found`}
-            onAddProduct={handleAddProduct}
-            onViewUsers={() => setShowUserPage(true)}
-          />
+                  <AdminHeader 
+          title="Admin Dashboard" 
+          subtitle={`${filteredProducts.length} products found`}
+          onAddProduct={handleAddProduct}
+          onViewUsers={() => setShowUserPage(true)}
+          onLogout={() => {
+            sessionStorage.removeItem('isAdminAuthenticated');
+            window.location.href = '/?route=login';
+          }}
+        />
         </div>
       </div>
       <div style={{ 

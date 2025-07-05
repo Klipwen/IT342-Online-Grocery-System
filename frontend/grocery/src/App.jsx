@@ -1,6 +1,7 @@
 import './styles/App.css';
 import { useState, useEffect } from 'react';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminLoginPage from './pages/Admin/AdminLoginPage';
 import AddProductPage from './pages/Admin/AddProductPage';
 import EditProductPage from './pages/Admin/EditProductPage';
 import RegisterPage from './pages/RegisterPage'; // Ricablanca's page
@@ -33,7 +34,6 @@ function App() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(
     () => sessionStorage.getItem('isAdminAuthenticated') === 'true'
   );
-  const [adminPassword, setAdminPassword] = useState('');
   const ADMIN_PASSWORD = 'admin123'; // Change as needed
   const [routeKey, setRouteKey] = useState(0);
 
@@ -70,6 +70,11 @@ function App() {
       }
       if (route === 'admin') {
         setCurrentPage('admin');
+        setRouteKey(k => k + 1);
+        return;
+      }
+      if (route === 'admin-login') {
+        setCurrentPage('admin-login');
         setRouteKey(k => k + 1);
         return;
       }
@@ -125,8 +130,8 @@ function App() {
         return;
       }
 
-      // If no route is specified, redirect to login
-      window.location.href = '/?route=login';
+      // If no route is specified, redirect to home
+      window.location.href = '/?route=home';
     };
     handleRoute();
     window.addEventListener('popstate', handleRoute);
@@ -187,15 +192,19 @@ function App() {
     onEditProduct: navigateToEdit
   };
 
-  const handleAdminLogin = (e) => {
-    e.preventDefault();
-    if (adminPassword === ADMIN_PASSWORD) {
+  const handleAdminLogin = (password) => {
+    if (password === ADMIN_PASSWORD) {
       setIsAdminAuthenticated(true);
       sessionStorage.setItem('isAdminAuthenticated', 'true');
-      setAdminPassword('');
-    } else {
-      alert('Incorrect password!');
+      // Navigate to admin dashboard after successful login
+      setCurrentPage('admin');
+      window.history.pushState({}, '', '/?route=admin');
     }
+  };
+
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+    window.history.pushState({}, '', '/?route=home');
   };
 
   const handleLogout = () => {
@@ -215,28 +224,16 @@ function App() {
   if (currentPage === 'login') {
     return <LoginPage />;
   }
+  if (currentPage === 'admin-login') {
+    return <AdminLoginPage onLogin={handleAdminLogin} onBackToHome={handleBackToHome} />;
+  }
   if (currentPage === 'admin') {
     if (!isAdminAuthenticated) {
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10%' }}>
-          <h2>Admin</h2>
-          <form onSubmit={handleAdminLogin}>
-            <input
-              type="password"
-              placeholder="Enter admin password"
-              value={adminPassword}
-              onChange={e => setAdminPassword(e.target.value)}
-              style={{ padding: '8px', margin: '8px 0' }}
-            />
-            <button type="submit" style={{ padding: '8px 16px' }}>Enter</button>
-          </form>
-        </div>
-      );
+      return <AdminLoginPage onLogin={handleAdminLogin} onBackToHome={handleBackToHome} />;
     }
     return (
       <>
         {/* <EnvironmentSwitcher /> */}
-        <button onClick={handleLogout} style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000 }}>Logout</button>
         <AdminDashboard onNavigate={dashboardNavigation} />
       </>
     );
