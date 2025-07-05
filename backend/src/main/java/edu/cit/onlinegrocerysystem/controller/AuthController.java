@@ -2,6 +2,8 @@ package edu.cit.onlinegrocerysystem.controller;
 
 import edu.cit.onlinegrocerysystem.model.User;
 import edu.cit.onlinegrocerysystem.repository.UserRepository;
+import edu.cit.onlinegrocerysystem.repository.CartItemRepository;
+import edu.cit.onlinegrocerysystem.repository.DeliveryOrderRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,9 +12,14 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class AuthController {
     private final UserRepository userRepository;
+    private final CartItemRepository cartItemRepository;
+    private final DeliveryOrderRepository deliveryOrderRepository;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository, CartItemRepository cartItemRepository,
+            DeliveryOrderRepository deliveryOrderRepository) {
         this.userRepository = userRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.deliveryOrderRepository = deliveryOrderRepository;
     }
 
     @PostMapping("/register")
@@ -85,6 +92,9 @@ public class AuthController {
         if (existing == null) {
             return ResponseEntity.notFound().build();
         }
+        // Delete related cart items and delivery orders first
+        cartItemRepository.deleteByUserId(id);
+        deliveryOrderRepository.deleteByUserId(id);
         userRepository.deleteById(id);
         return ResponseEntity.ok("User deleted");
     }
