@@ -7,6 +7,11 @@ const EditProductPage = ({ productId, onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleLogout = () => {
+    sessionStorage.removeItem('isAdminAuthenticated');
+    window.location.href = '/?route=login';
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -84,9 +89,41 @@ const EditProductPage = ({ productId, onNavigate }) => {
       borderRadius: '0.5rem', 
       boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' 
     }}>
-      <h2 style={{ marginBottom: '1.5rem', fontWeight: 'bold', fontSize: '1.5rem' }}>
-        Edit Product: {product?.name}
-      </h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h2 style={{ fontWeight: 'bold', fontSize: '1.5rem', margin: 0 }}>
+          Edit Product: {product?.name}
+        </h2>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={onNavigate}
+            style={{
+              background: '#2563eb',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              border: 'none',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Back to Dashboard
+          </button>
+          <button
+            onClick={handleLogout}
+            style={{
+              background: '#6b7280',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              border: 'none',
+              borderRadius: '0.375rem',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
       <ProductForm product={product} isEdit={true} onNavigate={onNavigate} />
     </div>
   );

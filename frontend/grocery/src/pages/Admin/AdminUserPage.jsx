@@ -45,6 +45,11 @@ const AdminUserPage = ({ onBack }) => {
   const [search, setSearch] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
 
+  const handleLogout = () => {
+    sessionStorage.removeItem('isAdminAuthenticated');
+    window.location.href = '/?route=login';
+  };
+
   const fetchUsers = () => {
     setLoading(true);
     fetch('http://localhost:8080/api/auth/users')
@@ -144,6 +149,7 @@ const AdminUserPage = ({ onBack }) => {
         <h1>User List</h1>
         <button onClick={handleAdd} className="btn btn-primary">+ Add User</button>
         <button onClick={fetchUsers} className="btn btn-secondary" title="Refresh user list">⟳</button>
+        <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
       </div>
       <div className="admin-user-search">
         <input

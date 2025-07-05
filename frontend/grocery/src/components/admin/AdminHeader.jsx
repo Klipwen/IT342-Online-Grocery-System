@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AdminHeader = ({ title, subtitle, onAddProduct, onViewUsers }) => {
+const AdminHeader = ({ title, subtitle, onAddProduct, onViewUsers, onLogout }) => {
   return (
     <div style={{ 
       display: 'flex', 
@@ -64,6 +64,22 @@ const AdminHeader = ({ title, subtitle, onAddProduct, onViewUsers }) => {
           }}
         >
           Users
+        </button>
+        <button
+          onClick={onLogout}
+          style={{
+            background: '#6b7280',
+            color: 'white',
+            padding: '0.75rem 1.5rem',
+            border: 'none',
+            borderRadius: '0.375rem',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            boxShadow: '0 1px 3px 0 rgb(107 114 128 / 0.15)'
+          }}
+        >
+          Logout
         </button>
       </div>
     </div>
