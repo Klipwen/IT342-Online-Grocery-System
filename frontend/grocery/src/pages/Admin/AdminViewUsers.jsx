@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Plus, RefreshCw, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Plus, RefreshCw, ShoppingCart, Edit, Trash2, X } from 'lucide-react';
 import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 
 const AdminViewUsers = ({ onBack }) => {
@@ -10,6 +10,18 @@ const AdminViewUsers = ({ onBack }) => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [showAddDelivery, setShowAddDelivery] = useState(false);
+  
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
+  
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchUsersAndDelivery = () => {
     setLoading(true);
@@ -30,6 +42,8 @@ const AdminViewUsers = ({ onBack }) => {
           id: d.id,
           name: d.name,
           email: d.email,
+          contactNumber: d.contactNumber,
+          status: d.status,
           _role: 'Delivery',
         }));
         setUsers([...usersList, ...deliveryList]);
@@ -63,6 +77,80 @@ const AdminViewUsers = ({ onBack }) => {
   const handleLogout = () => {
     sessionStorage.removeItem('isAdminAuthenticated');
     window.location.href = '/?route=login';
+  };
+
+  // Edit functionality
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      contactNumber: user.contactNumber || '',
+      status: user.status || 'Active'
+    });
+    setShowEditModal(true);
+    setEditError('');
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditLoading(true);
+    setEditError('');
+    
+    try {
+      const payload = { ...editForm };
+      if (!payload.password) delete payload.password;
+      
+      const endpoint = editingUser._role === 'Customer' 
+        ? `http://localhost:8080/api/auth/users/${editingUser.id}`
+        : `http://localhost:8080/api/delivery/${editingUser.id}`;
+      
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) throw new Error('Failed to update user');
+      
+      setShowEditModal(false);
+      setEditingUser(null);
+      fetchUsersAndDelivery();
+    } catch (err) {
+      setEditError(err.message);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  // Delete functionality
+  const handleDelete = (user) => {
+    setDeletingUser(user);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    setDeleteLoading(true);
+    
+    try {
+      const endpoint = deletingUser._role === 'Customer' 
+        ? `http://localhost:8080/api/auth/users/${deletingUser.id}`
+        : `http://localhost:8080/api/delivery/${deletingUser.id}`;
+      
+      const response = await fetch(endpoint, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete user');
+      
+      setShowDeleteConfirm(false);
+      setDeletingUser(null);
+      fetchUsersAndDelivery();
+    } catch (err) {
+      alert('Failed to delete user: ' + err.message);
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   if (showAddDelivery) {
@@ -155,8 +243,18 @@ const AdminViewUsers = ({ onBack }) => {
                     <td style={{ padding: '1rem' }}>{user.email}</td>
                     <td style={{ padding: '1rem' }}>{user._role}</td>
                     <td style={{ padding: '1rem', display: 'flex', gap: 8 }}>
-                      <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Edit user not supported in this version.')}>Edit</button>
-                      <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Delete user not supported in this version.')}>Delete</button>
+                      <button 
+                        style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }} 
+                        onClick={() => handleEdit(user)}
+                      >
+                        <Edit size={16} /> Edit
+                      </button>
+                      <button 
+                        style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }} 
+                        onClick={() => handleDelete(user)}
+                      >
+                        <Trash2 size={16} /> Delete
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -165,6 +263,166 @@ const AdminViewUsers = ({ onBack }) => {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                Edit {editingUser?._role === 'Customer' ? 'Customer' : 'Delivery Personnel'}
+              </h2>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditSubmit}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                />
+              </div>
+              
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                />
+              </div>
+              
+              {editingUser?._role === 'Delivery' && (
+                <>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Contact Number</label>
+                    <input
+                      type="text"
+                      value={editForm.contactNumber}
+                      onChange={(e) => setEditForm({...editForm, contactNumber: e.target.value})}
+                      required
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                    />
+                  </div>
+                  
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Status</label>
+                    <select
+                      value={editForm.status}
+                      onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </>
+              )}
+              
+              {editError && (
+                <div style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                  {editError}
+                </div>
+              )}
+              
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', background: 'white', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editLoading}
+                  style={{ padding: '0.75rem 1.5rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  {editLoading ? 'Updating...' : 'Update'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '90%',
+            maxWidth: '400px'
+          }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+              Confirm Delete
+            </h3>
+            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+              Are you sure you want to delete {deletingUser?.name} ({deletingUser?._role})? This action cannot be undone.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleteLoading}
+                style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', background: 'white', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteLoading}
+                style={{ padding: '0.75rem 1.5rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

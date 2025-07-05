@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, ClipboardList, Users as UsersIcon } from 'lucide-react';
+import { ShoppingCart, ClipboardList, Users as UsersIcon, CreditCard, Truck } from 'lucide-react';
 import AdminViewUsers from './AdminViewUsers';
 import AdminViewProducts from './AdminViewProducts';
 import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 import AdminViewDeliveryPersonnel from './AdminViewDeliveryPersonnel';
+import PaymentsPage from './PaymentsPage';
+import DeliveriesPage from './DeliveriesPage';
 import { getApiBaseUrl } from '../../config/api';
 
 const AdminDashboard = ({ onNavigate }) => {
@@ -11,10 +13,16 @@ const AdminDashboard = ({ onNavigate }) => {
   const [showProductList, setShowProductList] = useState(false);
   const [showAddDelivery, setShowAddDelivery] = useState(false);
   const [showManageDelivery, setShowManageDelivery] = useState(false);
+  const [showPayments, setShowPayments] = useState(false);
+  const [showDeliveries, setShowDeliveries] = useState(false);
   const [productCount, setProductCount] = useState(null);
   const [userCount, setUserCount] = useState(null);
+  const [paymentCount, setPaymentCount] = useState(null);
+  const [deliveryCount, setDeliveryCount] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingPayments, setLoadingPayments] = useState(true);
+  const [loadingDeliveries, setLoadingDeliveries] = useState(true);
   // Placeholder count for orders
   const orderCount = 2650;
 
@@ -54,6 +62,24 @@ const AdminDashboard = ({ onNavigate }) => {
     fetchUserCount();
   }, []);
 
+  useEffect(() => {
+    // Placeholder: simulate loading payments
+    setLoadingPayments(true);
+    setTimeout(() => {
+      setPaymentCount(120); // Replace with real API call later
+      setLoadingPayments(false);
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    // Placeholder: simulate loading deliveries
+    setLoadingDeliveries(true);
+    setTimeout(() => {
+      setDeliveryCount(42); // Replace with real API call later
+      setLoadingDeliveries(false);
+    }, 1000);
+  }, []);
+
   // Quick Actions handlers (implement navigation as needed)
   const handleAddProduct = () => {
     if (onNavigate && onNavigate.onAddProduct) {
@@ -82,6 +108,12 @@ const AdminDashboard = ({ onNavigate }) => {
     return (
       <AdminViewProducts onBack={() => setShowProductList(false)} />
     );
+  }
+  if (showPayments) {
+    return <PaymentsPage onBack={() => setShowPayments(false)} />;
+  }
+  if (showDeliveries) {
+    return <DeliveriesPage onBack={() => setShowDeliveries(false)} />;
   }
 
   return (
@@ -199,6 +231,68 @@ const AdminDashboard = ({ onNavigate }) => {
             View &gt;
           </button>
         </div>
+        <div
+          onClick={() => setShowPayments(true)}
+          style={{
+            flex: 1,
+            minWidth: '220px',
+            background: '#f3f4f6',
+            borderRadius: '1rem',
+            padding: '2rem',
+            textAlign: 'center',
+            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            cursor: 'pointer',
+            transition: 'box-shadow 0.2s, background 0.2s',
+          }}
+          onMouseOver={e => e.currentTarget.style.boxShadow = '0 4px 12px 0 rgb(245 158 66 / 0.15)'}
+          onMouseOut={e => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgb(0 0 0 / 0.07)'}
+        >
+          <div style={{ background: '#f59e42', borderRadius: '50%', padding: '0.75rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CreditCard style={{ width: '2rem', height: '2rem', color: 'white' }} />
+          </div>
+          <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Payments</div>
+          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>
+            {loadingPayments ? <span style={{ color: '#aaa', fontSize: '1.2rem' }}>...</span> : paymentCount}
+          </div>
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }}>
+            View &gt;
+          </button>
+        </div>
+        <div
+          onClick={() => setShowDeliveries(true)}
+          style={{
+            flex: 1,
+            minWidth: '220px',
+            background: '#f3f4f6',
+            borderRadius: '1rem',
+            padding: '2rem',
+            textAlign: 'center',
+            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            cursor: 'pointer',
+            transition: 'box-shadow 0.2s, background 0.2s',
+          }}
+          onMouseOver={e => e.currentTarget.style.boxShadow = '0 4px 12px 0 rgb(59 130 246 / 0.15)'}
+          onMouseOut={e => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgb(0 0 0 / 0.07)'}
+        >
+          <div style={{ background: '#2563eb', borderRadius: '50%', padding: '0.75rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Truck style={{ width: '2rem', height: '2rem', color: 'white' }} />
+          </div>
+          <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Deliveries</div>
+          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>
+            {loadingDeliveries ? <span style={{ color: '#aaa', fontSize: '1.2rem' }}>...</span> : deliveryCount}
+          </div>
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }}>
+            View &gt;
+          </button>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -213,6 +307,7 @@ const AdminDashboard = ({ onNavigate }) => {
         <button onClick={handleAddProduct} style={{ background: '#ef4444', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Product</button>
         <button onClick={() => setShowAddDelivery(true)} style={{ background: '#ef4444', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Delivery Personnel</button>
         <button onClick={() => setShowManageDelivery(true)} style={{ background: '#2563eb', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>Manage Delivery Personnel</button>
+        <button onClick={() => setShowPayments(true)} style={{ background: '#f59e42', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>Manage Payments</button>
       </div>
 
       {/* Pending Orders Label */}
