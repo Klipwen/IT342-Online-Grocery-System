@@ -63,27 +63,33 @@ public class AdminProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        Product product = productService.getById(id);
-        if (product != null) {
-            // Delete the image file if it exists
-            if (product.getImage() != null && !product.getImage().isEmpty()) {
-                try {
-                    String imageUrl = product.getImage();
-                    String filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-                    String uploadsDir = System.getProperty("user.dir") + "/uploads/";
-                    File imageFile = new File(uploadsDir + filename);
-                    if (imageFile.exists()) {
-                        imageFile.delete();
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        try {
+            Product product = productService.getById(id);
+            if (product != null) {
+                // Delete the image file if it exists
+                if (product.getImage() != null && !product.getImage().isEmpty()) {
+                    try {
+                        String imageUrl = product.getImage();
+                        String filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+                        String uploadsDir = System.getProperty("user.dir") + "/uploads/";
+                        File imageFile = new File(uploadsDir + filename);
+                        if (imageFile.exists()) {
+                            imageFile.delete();
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error deleting image file: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.out.println("Error deleting image file: " + e.getMessage());
                 }
+                productService.delete(id);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
             }
-            productService.delete(id);
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(409).body(
+                    "Cannot delete product: It is referenced by other records (e.g., orders, cart, wishlist). Remove those references first.");
         }
     }
 

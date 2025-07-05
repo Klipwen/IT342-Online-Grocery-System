@@ -37,94 +37,89 @@ const EditProductPage = ({ productId, onNavigate }) => {
 
   if (loading) {
     return (
-      <div style={{ 
-        maxWidth: '600px', 
-        margin: '2rem auto', 
-        background: 'white', 
-        padding: '2rem', 
-        borderRadius: '0.5rem', 
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-        textAlign: 'center'
-      }}>
-        <div>Loading product...</div>
+      <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '2rem 0' }}>
+        <div style={{
+          maxWidth: '600px',
+          margin: '2rem auto',
+          background: 'white',
+          padding: '2.5rem',
+          borderRadius: '1rem',
+          boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.07)',
+          textAlign: 'center',
+        }}>
+          <div>Loading product...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ 
-        maxWidth: '600px', 
-        margin: '2rem auto', 
-        background: 'white', 
-        padding: '2rem', 
-        borderRadius: '0.5rem', 
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-        textAlign: 'center'
-      }}>
-        <div style={{ color: '#ef4444', marginBottom: '1rem' }}>{error}</div>
-        <button 
-          onClick={onNavigate}
-          style={{
-            background: '#ef4444',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            border: 'none',
-            borderRadius: '0.375rem',
-            cursor: 'pointer'
-          }}
-        >
-          Back to Dashboard
-        </button>
+      <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '2rem 0' }}>
+        <div style={{
+          maxWidth: '600px',
+          margin: '2rem auto',
+          background: 'white',
+          padding: '2.5rem',
+          borderRadius: '1rem',
+          boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.07)',
+          textAlign: 'center',
+        }}>
+          <div style={{ color: '#ef4444', marginBottom: '1rem' }}>{error}</div>
+          <button 
+            onClick={onNavigate}
+            style={{
+              background: '#2563eb',
+              color: 'white',
+              padding: '0.5rem 1.25rem',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+            }}
+          >
+            Back to Dashboard
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      maxWidth: '600px', 
-      margin: '2rem auto', 
-      background: 'white', 
-      padding: '2rem', 
-      borderRadius: '0.5rem', 
-      boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' 
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 style={{ fontWeight: 'bold', fontSize: '1.5rem', margin: 0 }}>
-          Edit Product: {product?.name}
-        </h2>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            onClick={onNavigate}
-            style={{
-              background: '#2563eb',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: 'pointer',
-              fontSize: '0.875rem'
-            }}
-          >
-            Back to Dashboard
-          </button>
-          <button
-            onClick={handleLogout}
-            style={{
-              background: '#6b7280',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: 'pointer',
-              fontSize: '0.875rem'
-            }}
-          >
-            Logout
-          </button>
+    <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '2rem 0' }}>
+      <div style={{
+        maxWidth: '600px',
+        margin: '2rem auto',
+        background: 'white',
+        padding: '2.5rem',
+        borderRadius: '1rem',
+        boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.07)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <h2 style={{ fontWeight: 'bold', fontSize: '2rem', margin: 0 }}>
+            Edit Product: {product?.name}
+          </h2>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={onNavigate}
+              style={{
+                background: '#2563eb',
+                color: 'white',
+                padding: '0.5rem 1.25rem',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+              }}
+            >
+              Back
+            </button>
+          </div>
         </div>
+        <ProductForm product={product} isEdit={true} onNavigate={onNavigate} />
       </div>
-      <ProductForm product={product} isEdit={true} onNavigate={onNavigate} />
     </div>
   );
 };
