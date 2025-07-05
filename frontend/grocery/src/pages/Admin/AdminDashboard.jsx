@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, ClipboardList, Users as UsersIcon } from 'lucide-react';
 import AdminViewUsers from './AdminViewUsers';
 import AdminViewProducts from './AdminViewProducts';
+import AddDeliveryPersonPage from './AddDeliveryPersonPage';
+import AdminViewDeliveryPersonnel from './AdminViewDeliveryPersonnel';
 import { getApiBaseUrl } from '../../config/api';
 
 const AdminDashboard = ({ onNavigate }) => {
   const [showViewUsers, setShowViewUsers] = useState(false);
   const [showProductList, setShowProductList] = useState(false);
+  const [showAddDelivery, setShowAddDelivery] = useState(false);
+  const [showManageDelivery, setShowManageDelivery] = useState(false);
   const [productCount, setProductCount] = useState(null);
   const [userCount, setUserCount] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -65,10 +69,15 @@ const AdminDashboard = ({ onNavigate }) => {
     alert('Bulk Actions feature coming soon!');
   };
 
+  if (showAddDelivery) {
+    return <AddDeliveryPersonPage onNavigate={() => setShowAddDelivery(false)} />;
+  }
+  if (showManageDelivery) {
+    return <AdminViewDeliveryPersonnel onBack={() => setShowManageDelivery(false)} />;
+  }
   if (showViewUsers) {
     return <AdminViewUsers onBack={() => setShowViewUsers(false)} />;
   }
-
   if (showProductList) {
     return (
       <AdminViewProducts onBack={() => setShowProductList(false)} />
@@ -202,8 +211,8 @@ const AdminDashboard = ({ onNavigate }) => {
         alignItems: 'center',
       }}>
         <button onClick={handleAddProduct} style={{ background: '#ef4444', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Product</button>
-        <button onClick={handleAddDeliveryPersonnel} style={{ background: '#2563eb', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Delivery Personnel</button>
-        <button onClick={handleBulkActions} style={{ background: '#111', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>Bulk Actions</button>
+        <button onClick={() => setShowAddDelivery(true)} style={{ background: '#ef4444', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>+ Add Delivery Personnel</button>
+        <button onClick={() => setShowManageDelivery(true)} style={{ background: '#2563eb', color: 'white', padding: '0.75rem 2rem', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>Manage Delivery Personnel</button>
       </div>
 
       {/* Pending Orders Label */}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Plus, RefreshCw, ShoppingCart } from 'lucide-react';
+import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 
 const AdminViewUsers = ({ onBack }) => {
   const [users, setUsers] = useState([]);
@@ -8,24 +9,38 @@ const AdminViewUsers = ({ onBack }) => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [showAddDelivery, setShowAddDelivery] = useState(false);
 
-  const fetchUsers = () => {
+  const fetchUsersAndDelivery = () => {
     setLoading(true);
-    fetch('http://localhost:8080/api/auth/users')
-      .then(res => {
+    setError(null);
+    Promise.all([
+      fetch('http://localhost:8080/api/auth/users').then(res => {
         if (!res.ok) throw new Error('Failed to fetch users');
         return res.json();
+      }),
+      fetch('http://localhost:8080/api/delivery').then(res => {
+        if (!res.ok) throw new Error('Failed to fetch delivery personnel');
+        return res.json();
       })
-      .then(data => {
-        setUsers(data);
-        setFilteredUsers(data);
+    ])
+      .then(([usersData, deliveryData]) => {
+        const usersList = usersData.map(u => ({ ...u, _role: 'Customer' }));
+        const deliveryList = deliveryData.map(d => ({
+          id: d.id,
+          name: d.name,
+          email: d.email,
+          _role: 'Delivery',
+        }));
+        setUsers([...usersList, ...deliveryList]);
+        setFilteredUsers([...usersList, ...deliveryList]);
       })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsersAndDelivery();
   }, []);
 
   useEffect(() => {
@@ -37,9 +52,10 @@ const AdminViewUsers = ({ onBack }) => {
           u.email.toLowerCase().includes(search.toLowerCase())
       );
     }
-    // Only 'Customer' role exists
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(u => true); // all are customers
+    if (roleFilter === 'customer') {
+      filtered = filtered.filter(u => u._role === 'Customer');
+    } else if (roleFilter === 'delivery') {
+      filtered = filtered.filter(u => u._role === 'Delivery');
     }
     setFilteredUsers(filtered);
   }, [search, roleFilter, users]);
@@ -48,6 +64,10 @@ const AdminViewUsers = ({ onBack }) => {
     sessionStorage.removeItem('isAdminAuthenticated');
     window.location.href = '/?route=login';
   };
+
+  if (showAddDelivery) {
+    return <AddDeliveryPersonPage onNavigate={() => { setShowAddDelivery(false); fetchUsersAndDelivery(); }} />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '0 0 2rem 0' }}>
@@ -81,12 +101,11 @@ const AdminViewUsers = ({ onBack }) => {
       </div>
       {/* Main Content */}
       <div style={{ background: '#fff', borderRadius: '1.5rem', maxWidth: 1100, margin: '2rem auto', boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.07)', padding: '2.5rem 2rem 2rem 2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '1rem', justifyContent: 'space-between' }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: 8 }} title="Back">
             <ArrowLeft size={28} />
           </button>
-          <div style={{ flex: 1 }} />
-          <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7rem 1.5rem', fontWeight: 600, fontSize: 16, marginRight: 8, cursor: 'pointer' }} onClick={() => alert('Adding delivery personnel is not supported in this version.')}>+ Add Delivery Personnel</button>
+          <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7rem 1.5rem', fontWeight: 600, fontSize: 16, marginLeft: 8, cursor: 'pointer' }} onClick={() => setShowAddDelivery(true)}>+ Add Delivery Personnel</button>
         </div>
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center' }}>
           <input
@@ -103,8 +122,9 @@ const AdminViewUsers = ({ onBack }) => {
           >
             <option value="all">All Users</option>
             <option value="customer">Customer</option>
+            <option value="delivery">Delivery</option>
           </select>
-          <button onClick={fetchUsers} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '0.8rem 1.5rem', fontWeight: 600, fontSize: 16, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+          <button onClick={fetchUsersAndDelivery} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '0.8rem 1.5rem', fontWeight: 600, fontSize: 16, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
             <RefreshCw size={20} /> Refresh
           </button>
         </div>
@@ -129,11 +149,11 @@ const AdminViewUsers = ({ onBack }) => {
                 <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No users found.</td></tr>
               ) : (
                 filteredUsers.map((user, idx) => (
-                  <tr key={user.id} style={{ background: idx % 2 === 0 ? '#fff' : '#f9fafb' }}>
+                  <tr key={user.id + user._role} style={{ background: idx % 2 === 0 ? '#fff' : '#f9fafb' }}>
                     <td style={{ padding: '1rem' }}>{user.id}</td>
                     <td style={{ padding: '1rem' }}>{user.name}</td>
                     <td style={{ padding: '1rem' }}>{user.email}</td>
-                    <td style={{ padding: '1rem' }}>Customer</td>
+                    <td style={{ padding: '1rem' }}>{user._role}</td>
                     <td style={{ padding: '1rem', display: 'flex', gap: 8 }}>
                       <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Edit user not supported in this version.')}>Edit</button>
                       <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Delete user not supported in this version.')}>Delete</button>
