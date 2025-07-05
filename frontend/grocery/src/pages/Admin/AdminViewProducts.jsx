@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, ArrowLeft } from 'lucide-react';
 import { getApiBaseUrl } from '../../config/api';
 import AddProductPage from './AddProductPage';
 import EditProductPage from './EditProductPage';
@@ -112,30 +112,6 @@ const AdminViewProducts = ({ onBack }) => {
           Logout
         </button>
       </div>
-      {/* Divider */}
-      <div style={{ maxWidth: '1000px', margin: '0 auto', borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem' }} />
-      {/* Back Button */}
-      <div style={{ maxWidth: '1000px', margin: '0 auto 1.5rem auto' }}>
-        {onBack && (
-          <button
-            onClick={onBack}
-            style={{
-              background: '#2563eb',
-              color: 'white',
-              padding: '0.5rem 1.5rem',
-              border: 'none',
-              borderRadius: '0.5rem',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              marginBottom: '1.5rem',
-              cursor: 'pointer',
-              boxShadow: '0 1px 3px 0 rgb(37 99 235 / 0.15)',
-            }}
-          >
-            &lt; Back to Dashboard
-          </button>
-        )}
-      </div>
       <div style={{
         maxWidth: '1000px',
         margin: '0 auto',
@@ -146,11 +122,27 @@ const AdminViewProducts = ({ onBack }) => {
         position: 'relative',
         border: '1px solid #e5e7eb',
       }}>
-        {/* Product Count and Add Product */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
+        {/* Top Row: Back Button and Add Product */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
+          {onBack && (
+            <button
+              onClick={onBack}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: 0,
+              }}
+              title="Back"
+            >
+              <ArrowLeft size={28} />
+            </button>
+          )}
           <button
             style={{
-              background: 'linear-gradient(90deg, #ef4444 60%, #f59e42 100%)',
+              background: '#ef4444',
               color: 'white',
               padding: '0.6rem 1.7rem',
               border: 'none',
