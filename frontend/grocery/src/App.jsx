@@ -14,7 +14,7 @@ import CartPage from './pages/CartPage';
 import sardinesImg from './assets/sardines_product.png';
 import AboutUsPage from './pages/AboutUsPage';
 import Error404Page from './pages/Error404Page';
-import AdminUserPage from './pages/Admin/AdminUserPage';
+import AdminViewUsers from './pages/Admin/AdminViewUsers';
 import ProductsPage from './pages/ProductsPage';
 import { fetchCart, addOrUpdateCartItem, removeCartItem, clearCart } from './utils/cartApi';
 import CheckoutPage from './pages/CheckoutPage';
@@ -310,7 +310,7 @@ function App() {
     return <Error404Page cart={cart} />;
   }
   if (currentPage === 'users') {
-    return <AdminUserPage onBack={navigateToDashboard} />;
+    return <AdminViewUsers onBack={navigateToDashboard} />;
   }
   if (currentPage === 'products') {
     const urlParams = new URLSearchParams(window.location.search);

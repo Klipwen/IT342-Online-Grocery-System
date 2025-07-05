@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, ClipboardList, Users as UsersIcon } from 'lucide-react';
-import AdminUserPage from './AdminUserPage';
+import AdminViewUsers from './AdminViewUsers';
 import AdminViewProducts from './AdminViewProducts';
 import { getApiBaseUrl } from '../../config/api';
 
 const AdminDashboard = ({ onNavigate }) => {
-  const [showUserPage, setShowUserPage] = useState(false);
+  const [showViewUsers, setShowViewUsers] = useState(false);
   const [showProductList, setShowProductList] = useState(false);
   const [productCount, setProductCount] = useState(null);
+  const [userCount, setUserCount] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  // Placeholder counts for orders and users
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  // Placeholder count for orders
   const orderCount = 2650;
-  const userCount = 2650;
 
   useEffect(() => {
     const fetchProductCount = async () => {
@@ -31,6 +32,24 @@ const AdminDashboard = ({ onNavigate }) => {
     fetchProductCount();
   }, []);
 
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      setLoadingUsers(true);
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/auth/users`);
+        if (!response.ok) throw new Error('Failed to fetch users');
+        const data = await response.json();
+        setUserCount(Array.isArray(data) ? data.length : 0);
+      } catch (err) {
+        setUserCount(0);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+    fetchUserCount();
+  }, []);
+
   // Quick Actions handlers (implement navigation as needed)
   const handleAddProduct = () => {
     if (onNavigate && onNavigate.onAddProduct) {
@@ -46,8 +65,8 @@ const AdminDashboard = ({ onNavigate }) => {
     alert('Bulk Actions feature coming soon!');
   };
 
-  if (showUserPage) {
-    return <AdminUserPage onBack={() => setShowUserPage(false)} />;
+  if (showViewUsers) {
+    return <AdminViewUsers onBack={() => setShowViewUsers(false)} />;
   }
 
   if (showProductList) {
@@ -140,13 +159,34 @@ const AdminDashboard = ({ onNavigate }) => {
             View &gt;
           </button>
         </div>
-        <div style={{ flex: 1, minWidth: '220px', background: '#f3f4f6', borderRadius: '1rem', padding: '2rem', textAlign: 'center', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+        <div
+          onClick={() => setShowViewUsers(true)}
+          style={{
+            flex: 1,
+            minWidth: '220px',
+            background: '#f3f4f6',
+            borderRadius: '1rem',
+            padding: '2rem',
+            textAlign: 'center',
+            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.07)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            cursor: 'pointer',
+            transition: 'box-shadow 0.2s, background 0.2s',
+          }}
+          onMouseOver={e => e.currentTarget.style.boxShadow = '0 4px 12px 0 rgb(16 185 129 / 0.15)'}
+          onMouseOut={e => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgb(0 0 0 / 0.07)'}
+        >
           <div style={{ background: '#10b981', borderRadius: '50%', padding: '0.75rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <UsersIcon style={{ width: '2rem', height: '2rem', color: 'white' }} />
           </div>
           <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Users</div>
-          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>{userCount.toLocaleString()}</div>
-          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => setShowUserPage(true)}>
+          <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>
+            {loadingUsers ? <span style={{ color: '#aaa', fontSize: '1.2rem' }}>...</span> : userCount}
+          </div>
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }}>
             View &gt;
           </button>
         </div>
