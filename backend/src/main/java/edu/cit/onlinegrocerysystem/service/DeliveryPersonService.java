@@ -62,4 +62,40 @@ public class DeliveryPersonService {
         }
         return null;
     }
+
+    public DeliveryPerson loginDeliveryPersonByPassword(String rawPassword) {
+        // Create a default delivery person if none exists
+        createDefaultDeliveryPersonIfNeeded();
+        
+        List<DeliveryPerson> allDeliveryPersons = deliveryPersonRepository.findByDeletedFalse();
+        for (DeliveryPerson dp : allDeliveryPersons) {
+            if (passwordEncoder.matches(rawPassword, dp.getPassword())) {
+                return dp;
+            }
+        }
+        return null;
+    }
+
+    private void createDefaultDeliveryPersonIfNeeded() {
+        String defaultEmail = "delivery@test.com";
+        String defaultPassword = "delivery123";
+        DeliveryPerson existing = deliveryPersonRepository.findByEmail(defaultEmail);
+        if (existing == null) {
+            DeliveryPerson defaultDeliveryPerson = DeliveryPerson.builder()
+                .name("Test Delivery Person")
+                .email(defaultEmail)
+                .contactNumber("09123456789")
+                .status("Active")
+                .deleted(false)
+                .password(passwordEncoder.encode(defaultPassword))
+                .build();
+            deliveryPersonRepository.save(defaultDeliveryPerson);
+        } else {
+            // Always update the password to the default
+            existing.setPassword(passwordEncoder.encode(defaultPassword));
+            existing.setStatus("Active");
+            existing.setDeleted(false);
+            deliveryPersonRepository.save(existing);
+        }
+    }
 } 

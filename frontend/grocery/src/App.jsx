@@ -148,8 +148,8 @@ function App() {
         return;
       }
 
-      // If no route is specified, redirect to home
-      window.location.href = '/?route=home';
+      // If no route is specified, redirect to login
+      window.location.href = '/?route=login';
     };
     handleRoute();
     window.addEventListener('popstate', handleRoute);
@@ -283,13 +283,25 @@ function App() {
     );
   }
   if (currentPage === 'home') {
-    return <HomePage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} user={user} />;
+    return (
+      <ProtectedRoute>
+        <HomePage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} user={user} />
+      </ProtectedRoute>
+    );
   }
   if (currentPage === 'product' && productId) {
-    return <ProductPage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} />;
+    return (
+      <ProtectedRoute>
+        <ProductPage cart={cart} setCart={setCart} onAddToCart={handleAddToCart} />
+      </ProtectedRoute>
+    );
   }
   if (currentPage === 'cart') {
-    return <CartPage cart={cart} setCart={setCart} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} user={user} />;
+    return (
+      <ProtectedRoute>
+        <CartPage cart={cart} setCart={setCart} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} user={user} />
+      </ProtectedRoute>
+    );
   }
   if (currentPage === 'aboutus') {
     return <AboutUsPage cart={cart} />;
@@ -303,13 +315,25 @@ function App() {
   if (currentPage === 'products') {
     const urlParams = new URLSearchParams(window.location.search);
     const selectedCategory = urlParams.get('category');
-    return <ProductsPage key={routeKey} cart={cart} setCart={setCart} selectedCategory={selectedCategory} onAddToCart={handleAddToCart} user={user} />;
+    return (
+      <ProtectedRoute>
+        <ProductsPage key={routeKey} cart={cart} setCart={setCart} selectedCategory={selectedCategory} onAddToCart={handleAddToCart} user={user} />
+      </ProtectedRoute>
+    );
   }
   if (currentPage === 'checkout') {
-    return <CheckoutPage />;
+    return (
+      <ProtectedRoute>
+        <CheckoutPage />
+      </ProtectedRoute>
+    );
   }
   if (currentPage === 'profile') {
-    return <UserProfilePage user={user} cart={cart} />;
+    return (
+      <ProtectedRoute>
+        <UserProfilePage user={user} cart={cart} />
+      </ProtectedRoute>
+    );
   }
   if (currentPage === 'contact') {
     return <ContactPage cart={cart} />;
