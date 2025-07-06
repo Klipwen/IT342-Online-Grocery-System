@@ -141,18 +141,6 @@ const UserProfile = ({ user, onNavigate }) => {
                     style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500, marginBottom: 6 }}>Address</div>
-                  <input
-                    type="text"
-                    name="address"
-                    value={form.address}
-                    onChange={handleChange}
-                    disabled={!editMode}
-                    className={styles.input}
-                    style={{ width: '100%', padding: '10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#f7f7f7', marginBottom: 0 }}
-                  />
-                </div>
               </div>
               <div style={{ fontWeight: 600, margin: '24px 0 12px 0', color: '#222' }}>Password Changes</div>
               <div style={{ marginBottom: 14 }}>
