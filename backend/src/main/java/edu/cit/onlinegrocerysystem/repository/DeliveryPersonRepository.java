@@ -8,6 +8,10 @@ import java.util.List;
 
 @Repository
 public interface DeliveryPersonRepository extends JpaRepository<DeliveryPerson, Long> {
-    List<DeliveryPerson> findByDeletedFalse();
+
+    // For login
     DeliveryPerson findByEmail(String email);
-} 
+
+    // For listing active accounts (not soft-deleted)
+    List<DeliveryPerson> findByDeletedFalse();
+}

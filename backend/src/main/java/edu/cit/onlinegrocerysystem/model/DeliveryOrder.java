@@ -4,35 +4,43 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+
 @Entity
-@Table(name = "delivery_order")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class DeliveryOrder {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long orderId;
-
-    @Column(nullable = false)
+    /* keep using primitive IDs, since your service expects them */
     private Long userId;
-
-    @Column(nullable = false)
     private Long deliveryPersonId;
-
-    @Column(nullable = false)
     private String deliveryAddress;
-
     private LocalDateTime deliveryDate;
     private LocalDateTime pickupTime;
-
-    @Column(nullable = false)
-    private String deliveryStatus; // Pending, In Transit, Delivered, Failed
-
+    private String deliveryStatus;
     private LocalDateTime deliveryTime;
     private String remarks;
-} 
+
+    /* ---- getters & setters ---- */
+    public Long getDeliveryPersonId() { return deliveryPersonId; }
+    public void setDeliveryPersonId(Long deliveryPersonId) { this.deliveryPersonId = deliveryPersonId; }
+
+    public String getDeliveryStatus() { return deliveryStatus; }
+    public void setDeliveryStatus(String deliveryStatus) { this.deliveryStatus = deliveryStatus; }
+
+    public String getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
+
+    public LocalDateTime getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(LocalDateTime deliveryDate) { this.deliveryDate = deliveryDate; }
+
+    public LocalDateTime getPickupTime() { return pickupTime; }
+    public void setPickupTime(LocalDateTime pickupTime) { this.pickupTime = pickupTime; }
+
+    public LocalDateTime getDeliveryTime() { return deliveryTime; }
+    public void setDeliveryTime(LocalDateTime deliveryTime) { this.deliveryTime = deliveryTime; }
+
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
+}
