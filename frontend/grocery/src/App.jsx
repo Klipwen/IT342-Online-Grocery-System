@@ -19,6 +19,7 @@ import ProductsPage from './pages/ProductsPage';
 import { fetchCart, addOrUpdateCartItem, removeCartItem, clearCart } from './utils/cartApi';
 import CheckoutPage from './pages/CheckoutPage';
 import UserProfilePage from './pages/UserProfilePage';
+import UserOrdersPage from './pages/UserOrdersPage';
 import ContactPage from './pages/ContactPage';
 import DeliveryLoginPage from './pages/DeliveryLoginPage';
 import DeliveryRegisterPage from './pages/DeliveryRegisterPage';
@@ -127,6 +128,11 @@ function App() {
         setRouteKey(k => k + 1);
         return;
       }
+      if (route === 'user-orders') {
+        setCurrentPage('user-orders');
+        setRouteKey(k => k + 1);
+        return;
+      }
       if (route === 'contact') {
         setCurrentPage('contact');
         setRouteKey(k => k + 1);
@@ -223,6 +229,13 @@ function App() {
   const handleBackToHome = () => {
     setCurrentPage('home');
     window.history.pushState({}, '', '/?route=home');
+  };
+
+  const handleUserProfileNavigation = (page) => {
+    if (page === 'user-orders') {
+      setCurrentPage('user-orders');
+      window.history.pushState({}, '', '/?route=user-orders');
+    }
   };
 
   const handleLogout = () => {
@@ -324,14 +337,21 @@ function App() {
   if (currentPage === 'checkout') {
     return (
       <ProtectedRoute>
-        <CheckoutPage />
+        <CheckoutPage cart={cart} setCart={setCart} onClearCart={handleClearCart} user={user} />
       </ProtectedRoute>
     );
   }
   if (currentPage === 'profile') {
     return (
       <ProtectedRoute>
-        <UserProfilePage user={user} cart={cart} />
+        <UserProfilePage user={user} cart={cart} onNavigate={handleUserProfileNavigation} />
+      </ProtectedRoute>
+    );
+  }
+  if (currentPage === 'user-orders') {
+    return (
+      <ProtectedRoute>
+        <UserOrdersPage user={user} cart={cart} />
       </ProtectedRoute>
     );
   }

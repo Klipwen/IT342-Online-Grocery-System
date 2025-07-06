@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { fetchCart } from '../utils/cartApi';
+import { fetchCart, clearCart } from '../utils/cartApi';
 import { updateUserInfo, placeOrder } from '../config/api';
 import '../styles/CheckoutPage.css';
 
@@ -14,8 +14,7 @@ const PAYMENT_OPTIONS = [
   { label: 'Cash on delivery', value: 'cod' },
 ];
 
-const CheckoutPage = () => {
-  const [cart, setCart] = useState([]);
+const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     fullName: '',
@@ -42,18 +41,23 @@ const CheckoutPage = () => {
   const [addressSuccess, setAddressSuccess] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod'); // 'cod', 'pickup', 'gcash'
 
-  // Get userId from localStorage
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  // Get userId from props or localStorage
+  const user = appUser || JSON.parse(localStorage.getItem('user') || '{}');
   const userId = user.id;
 
   useEffect(() => {
     if (!userId) return;
-    fetchCart(userId)
-      .then(data => {
-        setCart(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    // If cart is already loaded from props, don't fetch again
+    if (cart && cart.length > 0) {
+      setLoading(false);
+    } else {
+      fetchCart(userId)
+        .then(data => {
+          setCart(data);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }
     // Set address form from user info in localStorage
     if (user) {
       setAddressForm({
@@ -62,7 +66,7 @@ const CheckoutPage = () => {
         address: user.address || '',
       });
     }
-  }, [userId]);
+  }, [userId, cart]);
 
   // Calculation helper to ensure consistency
   function calculateTotals(cart, paymentMethod) {
@@ -115,11 +119,23 @@ const CheckoutPage = () => {
     try {
       await placeOrder(orderData);
       setSuccess(true);
-      // Delay clearing the cart so the UI shows the correct total after placing the order
+      // Clear the cart from backend and local state after successful order placement
+      if (onClearCart) {
+        await onClearCart();
+      } else {
+        try {
+          await clearCart(userId);
+          setCart([]);
+          localStorage.removeItem('cart');
+        } catch (clearError) {
+          console.error('Failed to clear cart:', clearError);
+          // Even if clearing fails, the order was successful
+        }
+      }
+      // Redirect to home page after 3 seconds
       setTimeout(() => {
-        setCart([]);
-        localStorage.removeItem('cart');
-      }, 2000); // 2 seconds after showing success
+        window.location.href = '/?route=home';
+      }, 3000);
     } catch (err) {
       alert('Failed to place order. Please try again.');
     }
@@ -216,46 +232,22 @@ const CheckoutPage = () => {
         <div style={{ display: 'flex', gap: 12, padding: '20px 24px' }}>
           <button
             type="button"
+            className={`payment-method-btn${paymentMethod === 'cod' ? ' selected' : ''}`}
             onClick={() => setPaymentMethod('cod')}
-            style={{
-              padding: '10px 24px',
-              borderRadius: 6,
-              border: paymentMethod === 'cod' ? '2px solid #222' : '1px solid #ddd',
-              background: paymentMethod === 'cod' ? '#f8fafc' : '#fff',
-              fontWeight: paymentMethod === 'cod' ? 700 : 500,
-              color: paymentMethod === 'cod' ? '#111' : '#444',
-              cursor: 'pointer',
-            }}
           >
             Cash on Delivery
           </button>
           <button
             type="button"
+            className={`payment-method-btn${paymentMethod === 'pickup' ? ' selected' : ''}`}
             onClick={() => setPaymentMethod('pickup')}
-            style={{
-              padding: '10px 24px',
-              borderRadius: 6,
-              border: paymentMethod === 'pickup' ? '2px solid #ef4444' : '1px solid #ddd',
-              background: paymentMethod === 'pickup' ? '#fff1f2' : '#fff',
-              fontWeight: paymentMethod === 'pickup' ? 700 : 500,
-              color: paymentMethod === 'pickup' ? '#ef4444' : '#444',
-              cursor: 'pointer',
-            }}
           >
             Self Pick-up
           </button>
           <button
             type="button"
+            className={`payment-method-btn${paymentMethod === 'gcash' ? ' selected' : ''}`}
             onClick={() => setPaymentMethod('gcash')}
-            style={{
-              padding: '10px 24px',
-              borderRadius: 6,
-              border: paymentMethod === 'gcash' ? '2px solid #2563eb' : '1px solid #ddd',
-              background: paymentMethod === 'gcash' ? '#eff6ff' : '#fff',
-              fontWeight: paymentMethod === 'gcash' ? 700 : 500,
-              color: paymentMethod === 'gcash' ? '#2563eb' : '#444',
-              cursor: 'pointer',
-            }}
           >
             GCash
           </button>
@@ -278,13 +270,22 @@ const CheckoutPage = () => {
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
-            <button className="place-order-btn" style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 5, padding: '14px 48px', fontWeight: 600, fontSize: 18, cursor: 'pointer' }} onClick={handleSubmit} disabled={loading || cart.length === 0}>Place Order</button>
+            <button
+              className="place-order-btn"
+              onClick={handleSubmit}
+              disabled={loading || cart.length === 0}
+              title={cart.length === 0 ? "Your cart is empty" : ""}
+            >
+              Place Order
+            </button>
           </div>
         </div>
       </div>
       {success && (
-        <div style={{ color: 'green', fontWeight: 600, fontSize: 18, margin: '16px 0', textAlign: 'center' }}>
+        <div className="success-message" style={{ color: 'green', fontWeight: 600, fontSize: 18, margin: '16px 0', textAlign: 'center' }}>
           Order placed successfully! Your order has been sent to the store and will be processed soon.
+          <br />
+          <small style={{ color: '#666', fontWeight: 400 }}>You will be redirected to the home page in 3 seconds...</small>
         </div>
       )}
       <div style={{ margin: '24px 0', textAlign: 'center' }}>
