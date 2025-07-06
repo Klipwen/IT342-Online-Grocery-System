@@ -23,6 +23,7 @@ import ContactPage from './pages/ContactPage';
 import DeliveryLoginPage from './pages/DeliveryLoginPage';
 import DeliveryRegisterPage from './pages/DeliveryRegisterPage';
 import DeliveryDashboard from './pages/DeliveryDashboard';
+import AssignedDeliveries from './components/AssignedDeliveries';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -137,11 +138,7 @@ function App() {
         setRouteKey(k => k + 1);
         return;
       }
-      if (route === 'delivery-register') {
-        setCurrentPage('delivery-register');
-        setRouteKey(k => k + 1);
-        return;
-      }
+
       if (route === 'delivery-dashboard') {
         setCurrentPage('delivery-dashboard');
         setRouteKey(k => k + 1);
@@ -349,6 +346,11 @@ function App() {
   }
   // Default: page
   return <Error404Page />;
+  if (currentPage === 'assigned-deliveries') {
+    return <AssignedDeliveries deliveryPersonId={user?.id} />;
+  }
 }
+
+
 
 export default App;

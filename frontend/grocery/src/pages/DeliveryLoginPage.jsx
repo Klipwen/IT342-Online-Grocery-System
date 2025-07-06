@@ -116,8 +116,7 @@ const DeliveryLoginPage = () => {
           </button>
         </form>
         <div style={{ textAlign: 'center', color: '#888', fontSize: '1rem', marginTop: 10 }}>
-          Don&apos;t have an account?{' '}
-          <a href="/?route=delivery-register" style={{ color: '#ef4444', textDecoration: 'underline', fontWeight: 500 }}>Sign up</a>
+          Need an account? Please contact the admin.
         </div>
       </div>
     </div>

@@ -42,16 +42,6 @@ public class DeliveryPersonController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<DeliveryPerson> login(@RequestBody DeliveryPerson loginRequest) {
-        DeliveryPerson dp = deliveryPersonService.loginDeliveryPerson(loginRequest.getEmail(), loginRequest.getPassword());
-        if (dp != null) {
-            return ResponseEntity.ok(dp);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
     @PostMapping("/login-password")
     public ResponseEntity<DeliveryPerson> loginByPassword(@RequestBody DeliveryPerson loginRequest) {
         DeliveryPerson dp = deliveryPersonService.loginDeliveryPersonByPassword(loginRequest.getPassword());
