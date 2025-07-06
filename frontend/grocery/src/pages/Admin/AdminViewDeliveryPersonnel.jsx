@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, RefreshCw, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, RefreshCw, ShoppingCart, X, Eye } from 'lucide-react';
 import { getApiBaseUrl } from '../../config/api';
 
 const AdminViewDeliveryPersonnel = ({ onBack }) => {
@@ -8,6 +8,17 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [filteredPersonnel, setFilteredPersonnel] = useState([]);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingPerson, setEditingPerson] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
+
+  // View modal state
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingPerson, setViewingPerson] = useState(null);
 
   const fetchPersonnel = () => {
     setLoading(true);
@@ -40,6 +51,42 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
     }
     setFilteredPersonnel(filtered);
   }, [search, personnel]);
+
+  // Edit logic
+  const handleEdit = (person) => {
+    setEditingPerson(person);
+    setEditForm({
+      name: person.name,
+      email: person.email,
+      contactNumber: person.contactNumber || '',
+      status: person.status || 'Active',
+    });
+    setShowEditModal(true);
+    setEditError('');
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditLoading(true);
+    setEditError('');
+    try {
+      const payload = { ...editForm };
+      const endpoint = `${getApiBaseUrl()}/api/delivery/${editingPerson.id}`;
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('Failed to update delivery personnel');
+      setShowEditModal(false);
+      setEditingPerson(null);
+      fetchPersonnel();
+    } catch (err) {
+      setEditError(err.message);
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '0 0 2rem 0' }}>
@@ -120,8 +167,14 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
                     <td style={{ padding: '1rem' }}>{person.contactNumber}</td>
                     <td style={{ padding: '1rem' }}>{person.status}</td>
                     <td style={{ padding: '1rem', display: 'flex', gap: 8 }}>
-                      <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Edit delivery personnel not supported in this version.')}>Edit</button>
+                      <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleEdit(person)}>Edit</button>
                       <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Delete delivery personnel not supported in this version.')}>Delete</button>
+                      <button 
+                        style={{ background: '#6b7280', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }} 
+                        onClick={() => { setViewingPerson(person); setShowViewModal(true); }}
+                      >
+                        <Eye size={16} /> Info
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -130,6 +183,169 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
           </table>
         </div>
       </div>
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                Edit Delivery Personnel
+              </h2>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleEditSubmit}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Contact Number</label>
+                <input
+                  type="text"
+                  value={editForm.contactNumber}
+                  onChange={(e) => setEditForm({...editForm, contactNumber: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Status</label>
+                <select
+                  value={editForm.status}
+                  onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+              {editError && (
+                <div style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                  {editError}
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', background: 'white', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editLoading}
+                  style={{ padding: '0.75rem 1.5rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                >
+                  {editLoading ? 'Updating...' : 'Update'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* View Modal */}
+      {showViewModal && viewingPerson && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                Delivery Personnel Info
+              </h2>
+              <button 
+                onClick={() => setShowViewModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Name</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingPerson.name}</div>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Email</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingPerson.email}</div>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Contact Number</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingPerson.contactNumber}</div>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Status</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingPerson.status}</div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setShowViewModal(false)}
+                style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', background: 'white', cursor: 'pointer' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

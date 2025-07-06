@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Plus, RefreshCw, ShoppingCart, Edit, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Plus, RefreshCw, ShoppingCart, Edit, Trash2, X, Eye } from 'lucide-react';
 import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 
 const AdminViewUsers = ({ onBack }) => {
@@ -22,6 +22,10 @@ const AdminViewUsers = ({ onBack }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingUser, setDeletingUser] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // View modal state
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingUser, setViewingUser] = useState(null);
 
   const fetchUsersAndDelivery = () => {
     setLoading(true);
@@ -255,6 +259,12 @@ const AdminViewUsers = ({ onBack }) => {
                       >
                         <Trash2 size={16} /> Delete
                       </button>
+                      <button 
+                        style={{ background: '#6b7280', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }} 
+                        onClick={() => { setViewingUser(user); setShowViewModal(true); }}
+                      >
+                        <Eye size={16} /> Info
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -418,6 +428,77 @@ const AdminViewUsers = ({ onBack }) => {
                 style={{ padding: '0.75rem 1.5rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
               >
                 {deleteLoading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {showViewModal && viewingUser && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+                {viewingUser._role === 'Customer' ? 'Customer Info' : 'Delivery Personnel Info'}
+              </h2>
+              <button 
+                onClick={() => setShowViewModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Name</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingUser.name}</div>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Email</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingUser.email}</div>
+            </div>
+            {viewingUser._role === 'Delivery' && (
+              <>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Contact Number</label>
+                  <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingUser.contactNumber}</div>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Status</label>
+                  <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingUser.status}</div>
+                </div>
+              </>
+            )}
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>Role</label>
+              <div style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #ddd', background: '#f3f4f6' }}>{viewingUser._role}</div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setShowViewModal(false)}
+                style={{ padding: '0.75rem 1.5rem', border: '1px solid #ddd', borderRadius: '6px', background: 'white', cursor: 'pointer' }}
+              >
+                Close
               </button>
             </div>
           </div>
