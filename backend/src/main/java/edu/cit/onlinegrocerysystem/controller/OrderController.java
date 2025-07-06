@@ -25,14 +25,14 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
-    @GetMapping("/{id}")
-    public Order getOrderById(@PathVariable Long id) {
-        return orderService.getOrderById(id);
-    }
-
     @GetMapping("/user/{userId}")
     public List<Order> getOrdersByUserId(@PathVariable Long userId) {
         return orderService.getOrdersByUserId(userId);
+    }
+
+    @GetMapping("/{id}")
+    public Order getOrderById(@PathVariable Long id) {
+        return orderService.getOrderById(id);
     }
 
     @PatchMapping("/{id}/status")
