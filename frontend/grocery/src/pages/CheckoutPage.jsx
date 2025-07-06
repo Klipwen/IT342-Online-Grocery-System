@@ -27,7 +27,6 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
     saveInfo: false,
     shipping: 'delivery',
     payment: 'cod',
-    agree: false,
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -170,7 +169,7 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
         email: user.email,
       });
       localStorage.setItem('user', JSON.stringify(updated));
-      setAddressSuccess('Address updated!');
+      setAddressSuccess('Great! Your address was updated successfully.');
       setTimeout(() => setAddressSuccess(''), 1500);
       setAddressEditMode(false);
     } catch (err) {
@@ -181,29 +180,62 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
   return (
     <div className="checkout-page">
       <Header cartCount={cart.length} />
-      <div className="breadcrumb">Home / Product / View Cart / <b>CheckOut</b></div>
+      <div style={{ width: '100%', maxWidth: 800, margin: '32px auto 0 auto', paddingLeft: 24, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div className="breadcrumb" style={{ marginBottom: 8, paddingLeft: 0 }}>Home / Product / View Cart / <b>CheckOut</b></div>
+        <span style={{ fontSize: 42, fontWeight: 800, color: '#222', letterSpacing: '-1.5px', marginBottom: 4 }}>Checkout</span>
+        <span style={{ color: '#6b7280', fontSize: 18, fontWeight: 400 }}>Review and complete your order</span>
+      </div>
       <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 2px 8px #ececec', padding: 24, margin: '24px auto 16px auto', maxWidth: 800, display: 'flex', alignItems: 'flex-start', gap: 24 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ color: '#ef4444', fontWeight: 600, fontSize: 18, marginBottom: 8 }}>
-            <span style={{ marginRight: 8 }}>📍</span>Delivery Address
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: 22, marginRight: 10, color: '#ef4444' }}>📍</span>
+            <span style={{ color: '#ef4444', fontWeight: 700, fontSize: 20, letterSpacing: '-0.5px' }}>Delivery Address</span>
+            <span title="We need your address to deliver your order!" style={{ marginLeft: 8, color: '#ef4444', cursor: 'pointer', fontSize: 18 }}>ℹ️</span>
           </div>
-          {!addressEditMode ? (
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 16 }}>{addressForm.name} <span style={{ fontWeight: 400, color: '#444', fontSize: 15 }}>({addressForm.phone})</span></div>
-              <div style={{ color: '#444', marginBottom: 4 }}>{addressForm.address}</div>
-              <button style={{ color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, padding: 0 }} onClick={() => setAddressEditMode(true)}>Change</button>
-              {addressSuccess && <div style={{ color: 'green', fontSize: 13, marginTop: 4 }}>{addressSuccess}</div>}
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <input type="text" name="name" placeholder="Full Name" value={addressForm.name} onChange={handleAddressChange} style={{ padding: 8, borderRadius: 5, border: '1px solid #ddd' }} />
-              <input type="text" name="phone" placeholder="Phone Number" value={addressForm.phone} onChange={handleAddressChange} style={{ padding: 8, borderRadius: 5, border: '1px solid #ddd' }} />
-              <input type="text" name="address" placeholder="Complete Address" value={addressForm.address} onChange={handleAddressChange} style={{ padding: 8, borderRadius: 5, border: '1px solid #ddd' }} />
-              {addressError && <div style={{ color: '#e63946', fontSize: 13 }}>{addressError}</div>}
-              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                <button onClick={handleAddressSave} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 5, padding: '6px 18px', fontWeight: 600, cursor: 'pointer' }}>Save</button>
-                <button onClick={() => { setAddressEditMode(false); setAddressError(''); }} style={{ background: 'none', color: '#222', border: '1px solid #ddd', borderRadius: 5, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}>Cancel</button>
+          <div style={{ background: '#fdf2f8', borderRadius: 10, padding: 18, boxShadow: '0 1px 4px #fce7ef', marginBottom: 8, minHeight: 80, display: 'flex', alignItems: 'center', gap: 16, position: 'relative', transition: 'box-shadow 0.2s', cursor: !addressEditMode ? 'pointer' : 'default' }}
+            onClick={() => { if (!addressEditMode) setAddressEditMode(true); }}
+            onMouseOver={e => { if (!addressEditMode) e.currentTarget.style.boxShadow = '0 4px 16px #fca5a5'; }}
+            onMouseOut={e => { if (!addressEditMode) e.currentTarget.style.boxShadow = '0 1px 4px #fce7ef'; }}
+          >
+            {!addressEditMode ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 18, color: '#ef4444' }}>👤</span>
+                  <span style={{ fontWeight: 700, fontSize: 16, color: addressForm.name ? '#222' : '#bbb' }}>{addressForm.name || 'No Name'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 18, color: '#ef4444' }}>🏠</span>
+                  <span style={{ fontSize: 15, color: addressForm.address ? '#444' : '#bbb' }}>{addressForm.address || 'No Address Provided'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 18, color: '#ef4444' }}>📞</span>
+                  <span style={{ fontSize: 15, color: addressForm.phone ? '#444' : '#bbb' }}>{addressForm.phone || 'No Contact Number'}</span>
+                </div>
+                <button style={{ position: 'absolute', right: 18, top: 18, color: '#fff', background: '#ef4444', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, padding: '5px 14px', fontWeight: 600, boxShadow: '0 2px 8px #fca5a5', transition: 'background 0.2s' }} onClick={e => { e.stopPropagation(); setAddressEditMode(true); }} onMouseOver={e => e.currentTarget.style.background = '#dc2626'} onMouseOut={e => e.currentTarget.style.background = '#ef4444'}>Edit</button>
+                {(!addressForm.name || !addressForm.address || !addressForm.phone) && (
+                  <span style={{ marginTop: 8, color: '#ef4444', fontWeight: 600, fontSize: 14 }}>⚠️ Please complete your address</span>
+                )}
               </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', animation: 'fadeIn 0.3s' }}>
+                <label style={{ fontWeight: 600, color: '#ef4444', fontSize: 14, marginBottom: 2 }}>Full Name</label>
+                <input type="text" name="name" placeholder="Full Name" value={addressForm.name} onChange={handleAddressChange} style={{ padding: 10, borderRadius: 6, border: '1.5px solid #ef4444', fontSize: 15, marginBottom: 4 }} />
+                <label style={{ fontWeight: 600, color: '#ef4444', fontSize: 14, marginBottom: 2 }}>Address</label>
+                <input type="text" name="address" placeholder="Complete Address" value={addressForm.address} onChange={handleAddressChange} style={{ padding: 10, borderRadius: 6, border: '1.5px solid #ef4444', fontSize: 15, marginBottom: 4 }} />
+                <label style={{ fontWeight: 600, color: '#ef4444', fontSize: 14, marginBottom: 2 }}>Contact Number</label>
+                <input type="text" name="phone" placeholder="Contact Number" value={addressForm.phone} onChange={handleAddressChange} style={{ padding: 10, borderRadius: 6, border: '1.5px solid #ef4444', fontSize: 15, marginBottom: 4 }} />
+                {addressError && <div style={{ color: '#e63946', fontSize: 13 }}>{addressError}</div>}
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                  <button onClick={handleAddressSave} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 18px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 8px #fca5a5' }}>Save</button>
+                  <button onClick={() => { setAddressEditMode(false); setAddressError(''); }} style={{ background: 'none', color: '#222', border: '1px solid #ddd', borderRadius: 6, padding: '7px 18px', fontWeight: 500, cursor: 'pointer' }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+          {addressSuccess && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#16a34a', fontWeight: 600, fontSize: 15, marginTop: 8, background: 'rgba(34,197,94,0.08)', borderRadius: 8, padding: '8px 16px', boxShadow: '0 2px 8px #bbf7d0', animation: 'fadeIn 0.5s' }}>
+              <span style={{ fontSize: 22, animation: 'popIn 0.5s' }}>✅</span>
+              <span>Great! Your address was updated successfully.</span>
             </div>
           )}
         </div>
@@ -213,8 +245,14 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
         {loading ? <div>Loading cart...</div> : cart.length === 0 ? <div>No items in cart.</div> : (
           <>
             {cart.map(item => (
-              <div key={item.id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #f1f1f1', padding: '12px 0' }}>
-                <img src={item.image || require('../assets/sardines_product.png')} alt={item.name} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 6, marginRight: 16, border: '1px solid #eee' }} />
+              <div key={item.id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #f1f1f1', padding: '12px 0', transition: 'box-shadow 0.18s, transform 0.18s', boxShadow: 'none' }}
+                onMouseOver={e => { e.currentTarget.style.boxShadow = '0 4px 16px #fca5a5'; e.currentTarget.style.transform = 'scale(1.01)'; }}
+                onMouseOut={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <img src={item.image || require('../assets/sardines_product.png')} alt={item.name} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 6, marginRight: 16, border: '1px solid #eee', transition: 'transform 0.18s' }}
+                  onMouseOver={e => e.currentTarget.style.transform = 'scale(1.12)'}
+                  onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 500, fontSize: 15 }}>{item.name}</div>
                   {item.variation && <div style={{ color: '#888', fontSize: 13 }}>Variation: {item.variation}</div>}
@@ -234,6 +272,7 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
             type="button"
             className={`payment-method-btn${paymentMethod === 'cod' ? ' selected' : ''}`}
             onClick={() => setPaymentMethod('cod')}
+            style={{ background: paymentMethod === 'cod' ? '#fee2e2' : '#fff', color: paymentMethod === 'cod' ? '#ef4444' : '#222', border: '1.5px solid #ef4444', borderRadius: 8, fontWeight: 600, fontSize: 15, padding: '10px 24px', cursor: 'pointer', boxShadow: paymentMethod === 'cod' ? '0 2px 8px #fca5a5' : 'none', transition: 'all 0.18s' }}
           >
             Cash on Delivery
           </button>
@@ -241,6 +280,7 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
             type="button"
             className={`payment-method-btn${paymentMethod === 'pickup' ? ' selected' : ''}`}
             onClick={() => setPaymentMethod('pickup')}
+            style={{ background: paymentMethod === 'pickup' ? '#e0e7ff' : '#fff', color: paymentMethod === 'pickup' ? '#3730a3' : '#222', border: '1.5px solid #3730a3', borderRadius: 8, fontWeight: 600, fontSize: 15, padding: '10px 24px', cursor: 'pointer', boxShadow: paymentMethod === 'pickup' ? '0 2px 8px #a5b4fc' : 'none', transition: 'all 0.18s' }}
           >
             Self Pick-up
           </button>
@@ -248,9 +288,30 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
             type="button"
             className={`payment-method-btn${paymentMethod === 'gcash' ? ' selected' : ''}`}
             onClick={() => setPaymentMethod('gcash')}
+            style={{ background: paymentMethod === 'gcash' ? '#f0fdf4' : '#fff', color: paymentMethod === 'gcash' ? '#166534' : '#222', border: '1.5px solid #16a34a', borderRadius: 8, fontWeight: 600, fontSize: 15, padding: '10px 24px', cursor: 'pointer', boxShadow: paymentMethod === 'gcash' ? '0 2px 8px #bbf7d0' : 'none', transition: 'all 0.18s' }}
           >
             GCash
           </button>
+        </div>
+        <div style={{ padding: '0 24px 24px 24px', minHeight: 40 }}>
+          {paymentMethod === 'pickup' && (
+            <div style={{ background: '#e0e7ff', color: '#3730a3', borderRadius: 8, padding: '14px 18px', marginTop: 8, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 22 }}>🏪</span>
+              Pick up your order at <b>Online Grocery Store, Labangon, Cebu City</b> <span style={{ marginLeft: 8, fontSize: 15, color: '#6366f1' }}>(View Map)</span>
+            </div>
+          )}
+          {paymentMethod === 'cod' && (
+            <div style={{ background: '#fee2e2', color: '#ef4444', borderRadius: 8, padding: '14px 18px', marginTop: 8, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, animation: 'slideIn 0.3s' }}>
+              <span style={{ fontSize: 22 }}>🚚</span>
+              Your order will be delivered to your address in <b>1-2 days</b>! <span style={{ marginLeft: 8, fontSize: 15, color: '#ef4444' }}>Enjoy fast delivery!</span>
+            </div>
+          )}
+          {paymentMethod === 'gcash' && (
+            <div style={{ background: '#f0fdf4', color: '#166534', borderRadius: 8, padding: '14px 18px', marginTop: 8, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, animation: 'slideIn 0.3s' }}>
+              <span style={{ fontSize: 22 }}>💸</span>
+              Pay securely with <b>GCash</b>. You will receive payment instructions after placing your order.
+            </div>
+          )}
         </div>
         <div style={{ background: '#fdfcf9', padding: '32px 24px 24px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
@@ -282,25 +343,23 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
         </div>
       </div>
       {success && (
-        <div className="success-message" style={{ color: 'green', fontWeight: 600, fontSize: 18, margin: '16px 0', textAlign: 'center' }}>
+        <div className="success-message" style={{ color: 'green', fontWeight: 600, fontSize: 18, margin: '16px 0', textAlign: 'center', position: 'relative' }}>
+          <span style={{ fontSize: 32, marginRight: 8, verticalAlign: 'middle', animation: 'popIn 0.5s' }}>✅</span>
           Order placed successfully! Your order has been sent to the store and will be processed soon.
           <br />
           <small style={{ color: '#666', fontWeight: 400 }}>You will be redirected to the home page in 3 seconds...</small>
+          <div style={{ position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', pointerEvents: 'none' }}>
+            {/* Confetti animation (simple emoji confetti) */}
+            <span style={{ fontSize: 24, animation: 'fall 1.2s linear infinite alternate' }}>🎉🎊✨</span>
+          </div>
         </div>
       )}
-      <div style={{ margin: '24px 0', textAlign: 'center' }}>
-        <label style={{ fontSize: 15 }}>
-          <input
-            type="checkbox"
-            name="agree"
-            checked={form.agree}
-            onChange={handleChange}
-            style={{ marginRight: 8 }}
-          />
-          I agree to the terms and conditions
-        </label>
-      </div>
       <Footer />
+      <style>{`
+      @keyframes popIn { 0% { transform: scale(0.7); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+      @keyframes fall { 0% { transform: translateY(-10px); } 100% { transform: translateY(20px); } }
+      @keyframes pulsePin { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+      `}</style>
     </div>
   );
 };
