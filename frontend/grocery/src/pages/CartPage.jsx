@@ -34,12 +34,17 @@ function CartPage({ cart, setCart, onRemoveFromCart, onClearCart, user }) {
             borderRadius: '0.375rem',
             padding: '0.5rem 1.25rem',
             fontWeight: 600,
-            fontSize: '1rem',
+            fontSize: '1.5rem',
             cursor: 'pointer',
-            marginBottom: '1.5rem'
+            marginBottom: '1.5rem',
+            width: 40,
+            height: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          ← Back
+          {'<'}
         </button>
       </div>
       <div style={{ maxWidth: '1200px', margin: '2rem auto', flex: 1, width: '100%' }}>

@@ -30,6 +30,11 @@ public class OrderController {
         return orderService.getOrderById(id);
     }
 
+    @GetMapping("/user/{userId}")
+    public List<Order> getOrdersByUserId(@PathVariable Long userId) {
+        return orderService.getOrdersByUserId(userId);
+    }
+
     @PatchMapping("/{id}/status")
     public Order updateOrderStatus(@PathVariable Long id, @RequestBody String status) {
         Order order = orderService.getOrderById(id);
