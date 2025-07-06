@@ -6,6 +6,7 @@ import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 import AdminViewDeliveryPersonnel from './AdminViewDeliveryPersonnel';
 import PaymentsPage from './PaymentsPage';
 import DeliveriesPage from './DeliveriesPage';
+import AdminViewOrders from './AdminViewOrders';
 import { getApiBaseUrl } from '../../config/api';
 
 const AdminDashboard = ({ onNavigate }) => {
@@ -15,6 +16,7 @@ const AdminDashboard = ({ onNavigate }) => {
   const [showManageDelivery, setShowManageDelivery] = useState(false);
   const [showPayments, setShowPayments] = useState(false);
   const [showDeliveries, setShowDeliveries] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
   const [productCount, setProductCount] = useState(null);
   const [userCount, setUserCount] = useState(null);
   const [paymentCount, setPaymentCount] = useState(null);
@@ -115,6 +117,9 @@ const AdminDashboard = ({ onNavigate }) => {
   if (showDeliveries) {
     return <DeliveriesPage onBack={() => setShowDeliveries(false)} />;
   }
+  if (showOrders) {
+    return <AdminViewOrders onBack={() => setShowOrders(false)} />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '0 0 2rem 0' }}>
@@ -196,7 +201,7 @@ const AdminDashboard = ({ onNavigate }) => {
           </div>
           <div style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Orders</div>
           <div style={{ fontWeight: 'bold', fontSize: '2rem' }}>{orderCount.toLocaleString()}</div>
-          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => {}}>
+          <button style={{ background: 'none', border: 'none', color: '#111', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => setShowOrders(true)}>
             View &gt;
           </button>
         </div>
