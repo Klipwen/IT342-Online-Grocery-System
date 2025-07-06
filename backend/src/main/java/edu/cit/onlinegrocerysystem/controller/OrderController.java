@@ -29,4 +29,14 @@ public class OrderController {
     public Order getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
     }
-} 
+
+    @PatchMapping("/{id}/status")
+    public Order updateOrderStatus(@PathVariable Long id, @RequestBody String status) {
+        Order order = orderService.getOrderById(id);
+        if (order != null) {
+            order.setStatus(status.replaceAll("\"", "")); // Remove quotes if sent as JSON string
+            return orderService.saveOrder(order);
+        }
+        return null;
+    }
+}
