@@ -4,8 +4,9 @@ import AdminViewUsers from './AdminViewUsers';
 import AdminViewProducts from './AdminViewProducts';
 import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 import AdminViewDeliveryPersonnel from './AdminViewDeliveryPersonnel';
-import PaymentsPage from './PaymentsPage';
-import DeliveriesPage from './DeliveriesPage';
+import AdminViewPayments from './AdminViewPayments';
+import AdminViewDeliveries from './AdminViewDeliveries';
+import AdminViewOrders from './AdminViewOrders';
 import { getApiBaseUrl } from '../../config/api';
 
 // Color tokens for easy reference
@@ -44,8 +45,35 @@ const AdminDashboard = ({ onNavigate }) => {
   const [loadingDeliveries, setLoadingDeliveries] = useState(true);
   const [deliveryPersonnel, setDeliveryPersonnel] = useState([]);
   const [loadingDeliveryPersonnel, setLoadingDeliveryPersonnel] = useState(true);
-  // Placeholder count for orders
-  const orderCount = 2650;
+  const [orderCount, setOrderCount] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [errorOrders, setErrorOrders] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedAssignOrder, setSelectedAssignOrder] = useState(null);
+  const [selectedDeliveryPerson, setSelectedDeliveryPerson] = useState(null);
+  const [assigning, setAssigning] = useState(false);
+
+  const statusOptions = [
+    "Processing",
+    "Ready to Pick Up",
+    "Ready to Deliver",
+    "Completed",
+    "Cancelled"
+  ];
+
+  // Define shared columns for both tables
+  const orderTableColumns = [
+    { label: 'Customer', key: 'customerName', width: '16%' },
+    { label: 'Address', key: 'address', width: '22%' },
+    { label: 'Amount', key: 'totalAmount', width: '13%' },
+    { label: 'Payment', key: 'paymentMethod', width: '12%' },
+    { label: 'Date', key: 'orderDate', width: '18%' },
+    { label: '', key: 'manage', width: '10%' },
+  ];
 
   useEffect(() => {
     const fetchProductCount = async () => {
@@ -84,12 +112,21 @@ const AdminDashboard = ({ onNavigate }) => {
   }, []);
 
   useEffect(() => {
-    // Placeholder: simulate loading payments
-    setLoadingPayments(true);
-    setTimeout(() => {
-      setPaymentCount(120); // Replace with real API call later
-      setLoadingPayments(false);
-    }, 1000);
+    const fetchPaymentCount = async () => {
+      setLoadingPayments(true);
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/orders`);
+        if (!response.ok) throw new Error('Failed to fetch payments');
+        const data = await response.json();
+        setPaymentCount(Array.isArray(data) ? data.length : 0);
+      } catch (err) {
+        setPaymentCount(0);
+      } finally {
+        setLoadingPayments(false);
+      }
+    };
+    fetchPaymentCount();
   }, []);
 
   useEffect(() => {
@@ -114,6 +151,48 @@ const AdminDashboard = ({ onNavigate }) => {
       .finally(() => setLoadingDeliveryPersonnel(false));
   }, []);
 
+  useEffect(() => {
+    const fetchOrderCount = async () => {
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/orders`);
+        if (!response.ok) throw new Error('Failed to fetch orders');
+        const data = await response.json();
+        setOrderCount(Array.isArray(data) ? data.length : 0);
+      } catch (err) {
+        setOrderCount(0);
+      }
+    };
+    fetchOrderCount();
+  }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoadingOrders(true);
+      setErrorOrders('');
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/orders`);
+        if (!response.ok) throw new Error('Failed to fetch orders');
+        const data = await response.json();
+        setOrders(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setOrders([]);
+        setErrorOrders('Could not load orders.');
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  // Sync newStatus with selectedOrder when modal opens
+  useEffect(() => {
+    if (showOrderModal && selectedOrder) {
+      setNewStatus(selectedOrder.status);
+    }
+  }, [showOrderModal, selectedOrder]);
+
   // Quick Actions handlers (implement navigation as needed)
   const handleAddProduct = () => {
     if (onNavigate && onNavigate.onAddProduct) {
@@ -127,6 +206,42 @@ const AdminDashboard = ({ onNavigate }) => {
   const handleBulkActions = () => {
     // Implement bulk actions logic
     alert('Bulk Actions feature coming soon!');
+  };
+
+  // Only show orders with status 'Pending' in Pending Orders section
+  const deliveryOrders = orders.filter(order => order.paymentMethod !== 'pickup' && order.status === 'Pending');
+  const pickupOrders = orders.filter(order => order.paymentMethod === 'pickup' && order.status === 'Pending');
+
+  const handleMarkPickedUp = (orderId) => {
+    alert(`Order ${orderId} marked as picked up!`);
+    // TODO: Implement backend call to update order status
+  };
+
+  const readyToDeliverOrders = orders.filter(order => order.status === 'Ready to Deliver');
+
+  const handleAssignDelivery = () => {
+    setShowAssignModal(true);
+  };
+
+  // Add a function to refresh orders and counts
+  const refreshDashboardData = async () => {
+    try {
+      const apiBaseUrl = getApiBaseUrl();
+      // Fetch orders
+      const ordersRes = await fetch(`${apiBaseUrl}/api/orders`);
+      const ordersData = ordersRes.ok ? await ordersRes.json() : [];
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
+      // Fetch counts
+      const productsRes = await fetch(`${apiBaseUrl}/api/products`);
+      const usersRes = await fetch(`${apiBaseUrl}/api/auth/users`);
+      const paymentsRes = await fetch(`${apiBaseUrl}/api/orders`);
+      setProductCount(productsRes.ok ? (await productsRes.json()).length : 0);
+      setUserCount(usersRes.ok ? (await usersRes.json()).length : 0);
+      setPaymentCount(paymentsRes.ok ? (await paymentsRes.json()).length : 0);
+      setOrderCount(ordersRes.ok ? (await ordersRes.json()).length : 0);
+    } catch (err) {
+      // fallback: do not update counts
+    }
   };
 
   if (showAddDelivery) {
@@ -144,10 +259,13 @@ const AdminDashboard = ({ onNavigate }) => {
     );
   }
   if (showPayments) {
-    return <PaymentsPage onBack={() => setShowPayments(false)} />;
+    return <AdminViewPayments onBack={() => setShowPayments(false)} />;
   }
   if (showDeliveries) {
-    return <DeliveriesPage onBack={() => setShowDeliveries(false)} />;
+    return <AdminViewDeliveries onBack={() => setShowDeliveries(false)} />;
+  }
+  if (showOrders) {
+    return <AdminViewOrders onBack={() => setShowOrders(false)} />;
   }
   
   
@@ -338,7 +456,7 @@ const AdminDashboard = ({ onNavigate }) => {
             <ClipboardList style={{ width: '2.5rem', height: '2.5rem', color: COLORS.primary }} />
           </div>
           <div style={{ fontWeight: 'bold', fontSize: '1.5rem', color: COLORS.text }}>Orders</div>
-          <div style={{ fontWeight: 'bold', fontSize: '3rem', color: COLORS.button1 }}>{orderCount.toLocaleString()}</div>
+          <div style={{ fontWeight: 'bold', fontSize: '3rem', color: COLORS.button1 }}>{orderCount != null ? orderCount.toLocaleString() : 0}</div>
           <div
             style={{
               display: 'flex',
@@ -561,8 +679,32 @@ const AdminDashboard = ({ onNavigate }) => {
             >
               <Package size={18} /> Add Product
             </button>
+            <button
+              onClick={handleAssignDelivery}
+              style={{
+                background: COLORS.button1,
+                color: COLORS.primary,
+                padding: '0.75rem 1.5rem',
+                border: 'none',
+                borderRadius: '0.75rem',
+                fontWeight: 'bold',
+                fontSize: '1.1rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                flex: 1,
+                minHeight: '48px',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#1d4ed8'}
+              onMouseLeave={(e) => e.currentTarget.style.background = COLORS.button1}
+            >
+              <Truck size={18} /> Assign Delivery
+            </button>
             <button 
-              onClick={() => setShowAddDelivery(true)} 
+              onClick={() => setShowManageDelivery(true)} 
               style={{ 
                 background: COLORS.button2, 
                 color: COLORS.primary, 
@@ -583,39 +725,15 @@ const AdminDashboard = ({ onNavigate }) => {
               onMouseEnter={(e) => e.currentTarget.style.background = '#059669'}
               onMouseLeave={(e) => e.currentTarget.style.background = COLORS.button2}
             >
-              <Truck size={18} /> Add Personnel
-            </button>
-            <button 
-              onClick={() => setShowManageDelivery(true)} 
-              style={{ 
-                background: COLORS.button1, 
-                color: COLORS.primary, 
-                padding: '0.75rem 1.5rem', 
-                border: 'none', 
-                borderRadius: '0.75rem', 
-                fontWeight: 'bold', 
-                fontSize: '1.1rem', 
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                flex: 1,
-                minHeight: '48px',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#1d4ed8'}
-              onMouseLeave={(e) => e.currentTarget.style.background = COLORS.button1}
-            >
               <UsersIcon size={18} /> Manage Personnel
             </button>
             <button 
-              onClick={() => setShowPayments(true)} 
+              onClick={() => setShowOrders(true)} 
               style={{ 
                 background: COLORS.secondary2, 
                 color: COLORS.primary, 
-                  padding: '0.75rem 1.5rem',
-                  border: 'none',
+                padding: '0.75rem 1.5rem',
+                border: 'none',
                 borderRadius: '0.75rem', 
                 fontWeight: 'bold', 
                 fontSize: '1.1rem', 
@@ -631,7 +749,7 @@ const AdminDashboard = ({ onNavigate }) => {
               onMouseEnter={(e) => e.currentTarget.style.background = '#d97706'}
               onMouseLeave={(e) => e.currentTarget.style.background = COLORS.secondary2}
             >
-              <span style={{fontWeight:'bold',fontSize:'1.2em',marginRight:'0.2em'}}>₱</span> Manage Payments
+              <ClipboardList size={18} /> Manage Orders
             </button>
           </div>
         </div>
@@ -687,99 +805,93 @@ const AdminDashboard = ({ onNavigate }) => {
               borderRadius: '1rem',
               overflow: 'hidden',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-              border: '1px solid #e2e8f0'
+              border: '1px solid #e2e8f0',
+              maxHeight: '420px',
+              minHeight: '120px',
+              display: 'block',
             }}>
-              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
-                <thead style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' }}>
-                  <tr>
-                    <th style={{ padding: '1rem', textAlign: 'left', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Customer</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Address</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Phone</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Amount</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Payment</th>
-                    <th style={{ padding: '1rem', textAlign: 'left', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', color: '#374151', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap' }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ background: '#fff', borderBottom: '1px solid #f1f5f9', height: '56px' }}>
-                    <td style={{ padding: '1rem', fontWeight: '600', color: '#1f2937', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>John Doe</td>
-                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Mandaue City, Cebu</td>
-                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>09282323234</td>
-                    <td style={{ padding: '1rem', fontWeight: 'bold', color: '#10b981', verticalAlign: 'middle', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.2em' }}>
-                      <span style={{fontWeight:'bold',fontSize:'1.1em'}}>₱</span> 2,530
-                    </td>
-                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Gcash</td>
-                    <td style={{ padding: '1rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                      <span style={{ 
-                        background: '#dcfce7', 
-                        color: '#166534', 
-                        padding: '0.25rem 0.75rem', 
-                        borderRadius: '0.5rem', 
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>Paid</span>
-                    </td>
-                    <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                      <button style={{ 
-                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '0.5rem', 
-                        padding: '0.5rem 1.2rem', 
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '0.95rem',
-                        transition: 'all 0.2s ease',
-                        whiteSpace: 'nowrap'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                      >
-                        Assign Delivery
-                      </button>
-                    </td>
-                  </tr>
-                  <tr style={{ background: '#f9fafb', borderBottom: '1px solid #f1f5f9', height: '56px' }}>
-                    <td style={{ padding: '1rem', fontWeight: '600', color: '#1f2937', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Jane Smith</td>
-                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Cebu City, Cebu</td>
-                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>09123456789</td>
-                    <td style={{ padding: '1rem', fontWeight: 'bold', color: '#10b981', verticalAlign: 'middle', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.2em' }}>
-                      <span style={{fontWeight:'bold',fontSize:'1.1em'}}>₱</span> 1,850
-                    </td>
-                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Cash</td>
-                    <td style={{ padding: '1rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                      <span style={{ 
-                        background: '#fef3c7', 
-                        color: '#92400e', 
-                        padding: '0.25rem 0.75rem', 
-                        borderRadius: '0.5rem', 
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold'
-                      }}>Pending</span>
-                    </td>
-                    <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                      <button style={{ 
-                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '0.5rem', 
-                        padding: '0.5rem 1.2rem', 
-                  cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '0.95rem',
-                        transition: 'all 0.2s ease',
-                        whiteSpace: 'nowrap'
-                }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                        Assign Delivery
-              </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div style={{ maxHeight: '300px', overflowY: deliveryOrders.length > 5 ? 'auto' : 'visible' }}>
+                <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
+                  <thead style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', position: 'sticky', top: 0, zIndex: 2 }}>
+                    <tr>
+                      {orderTableColumns.map(col => (
+                        <th
+                          key={col.key}
+                          style={{
+                            padding: '1rem',
+                            textAlign: col.key === 'manage' ? 'center' : 'left',
+                            color: '#374151',
+                            fontWeight: 'bold',
+                            fontSize: '0.95rem',
+                            whiteSpace: 'nowrap',
+                            width: col.width
+                          }}
+                        >
+                          {col.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loadingOrders ? (
+                      <tr><td colSpan={orderTableColumns.length} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Loading orders...</td></tr>
+                    ) : errorOrders ? (
+                      <tr><td colSpan={orderTableColumns.length} style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>{errorOrders}</td></tr>
+                    ) : deliveryOrders.length === 0 ? (
+                      <tr><td colSpan={orderTableColumns.length} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No delivery orders found.</td></tr>
+                    ) : (
+                      deliveryOrders.map((order, idx) => (
+                        <tr
+                          key={order.id}
+                          style={{ background: idx % 2 === 0 ? '#fff' : '#f9fafb', borderBottom: '1px solid #f1f5f9', height: '56px', cursor: 'pointer' }}
+                          onClick={e => {
+                            // Prevent modal if clicking the action button
+                            if (e.target.tagName === 'BUTTON') return;
+                            setSelectedOrder(order);
+                            setShowOrderModal(true);
+                          }}
+                        >
+                          <td style={{ padding: '1rem', fontWeight: '600', color: '#1f2937', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[0].width }}>{order.customerName}</td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: orderTableColumns[1].width }}>{order.address}</td>
+                          <td style={{ padding: '1rem', fontWeight: 'bold', color: '#10b981', verticalAlign: 'middle', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.2em', width: orderTableColumns[2].width }}>
+                            <span style={{fontWeight:'bold',fontSize:'1.1em'}}>₱</span> {order.totalAmount?.toLocaleString()}
+                          </td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[3].width }}>{order.paymentMethod}</td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[4].width }}>
+                            {order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[5].width }}>
+                            <button
+                              style={{
+                                background: '#2563eb',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '0.5rem',
+                                padding: '0.32rem 1.1rem',
+                                fontWeight: 700,
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'background 0.18s',
+                                boxShadow: '0 1px 4px rgba(37,99,235,0.08)',
+                                letterSpacing: '0.01em',
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                setSelectedOrder(order);
+                                setShowOrderModal(true);
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = '#1d4ed8'}
+                              onMouseLeave={e => e.currentTarget.style.background = '#2563eb'}
+                            >
+                              Manage
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <h3 style={{ 
@@ -796,15 +908,93 @@ const AdminDashboard = ({ onNavigate }) => {
               Personal Pickups
             </h3>
             <div style={{
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+              background: '#f8fafc',
               borderRadius: '1rem',
-              padding: '2rem',
-              textAlign: 'center',
-              border: '2px dashed #cbd5e1',
-              color: '#64748b'
+              overflow: 'hidden',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #e2e8f0',
+              maxHeight: '420px',
+              minHeight: '120px',
+              display: 'block',
             }}>
-              <Package size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-              <p style={{ margin: 0, fontSize: '1.1rem' }}>No personal pickup orders at the moment</p>
+              <div style={{ maxHeight: '300px', overflowY: pickupOrders.length > 5 ? 'auto' : 'visible' }}>
+                <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
+                  <thead style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', position: 'sticky', top: 0, zIndex: 2 }}>
+                    <tr>
+                      {orderTableColumns.map(col => (
+                        <th
+                          key={col.key}
+                          style={{
+                            padding: '1rem',
+                            textAlign: col.key === 'manage' ? 'center' : 'left',
+                            color: '#374151',
+                            fontWeight: 'bold',
+                            fontSize: '0.95rem',
+                            whiteSpace: 'nowrap',
+                            width: col.width
+                          }}
+                        >
+                          {col.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pickupOrders.length === 0 ? (
+                      <tr><td colSpan={orderTableColumns.length} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No personal pickup orders at the moment</td></tr>
+                    ) : (
+                      pickupOrders.map((order, idx) => (
+                        <tr
+                          key={order.id}
+                          style={{ background: idx % 2 === 0 ? '#fff' : '#f9fafb', borderBottom: '1px solid #f1f5f9', height: '56px', cursor: 'pointer' }}
+                          onClick={e => {
+                            // Prevent modal if clicking the action button
+                            if (e.target.tagName === 'BUTTON') return;
+                            setSelectedOrder(order);
+                            setShowOrderModal(true);
+                          }}
+                        >
+                          <td style={{ padding: '1rem', fontWeight: '600', color: '#1f2937', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[0].width }}>{order.customerName}</td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: orderTableColumns[1].width }}>{order.address}</td>
+                          <td style={{ padding: '1rem', fontWeight: 'bold', color: '#10b981', verticalAlign: 'middle', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.2em', width: orderTableColumns[2].width }}>
+                            <span style={{fontWeight:'bold',fontSize:'1.1em'}}>₱</span> {order.totalAmount?.toLocaleString()}
+                          </td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[3].width }}>{order.paymentMethod}</td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[4].width }}>
+                            {order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[5].width }}>
+                            <button
+                              style={{
+                                background: '#2563eb',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '0.5rem',
+                                padding: '0.32rem 1.1rem',
+                                fontWeight: 700,
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'background 0.18s',
+                                boxShadow: '0 1px 4px rgba(37,99,235,0.08)',
+                                letterSpacing: '0.01em',
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                setSelectedOrder(order);
+                                setShowOrderModal(true);
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = '#1d4ed8'}
+                              onMouseLeave={e => e.currentTarget.style.background = '#2563eb'}
+                            >
+                              Manage
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
@@ -890,6 +1080,283 @@ const AdminDashboard = ({ onNavigate }) => {
           </div>
         </div>
       </div>
+
+      {/* Modal popup for order details */}
+      {showOrderModal && selectedOrder && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.18)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setShowOrderModal(false)}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: '1.1rem',
+              padding: '2rem 2rem 1.5rem 2rem',
+              minWidth: 340,
+              maxWidth: 440,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              position: 'relative',
+              border: '1px solid #e5e7eb',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowOrderModal(false)}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 16,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#888',
+                fontSize: 22,
+              }}
+              title="Close"
+            >
+              ×
+            </button>
+            <h3 style={{ fontWeight: 700, fontSize: '1.35rem', marginBottom: 10, color: '#1f2937', textAlign: 'center', letterSpacing: '-0.5px' }}>Order Details</h3>
+            <div style={{ fontSize: '1.05rem', color: '#1f2937', marginBottom: 10, width: '100%' }}>
+              <div style={{ marginBottom: 4 }}><b>Order ID:</b> {selectedOrder.id}</div>
+              <div style={{ marginBottom: 4 }}><b>Customer:</b> {selectedOrder.customerName}</div>
+              <div style={{ marginBottom: 4 }}><b>Amount:</b> ₱{selectedOrder.totalAmount?.toLocaleString()}</div>
+              <div style={{ marginBottom: 4 }}><b>Status:</b> {selectedOrder.status}</div>
+            </div>
+            <div style={{ width: '100%', borderTop: '1px solid #e5e7eb', margin: '10px 0 12px 0', paddingTop: 10 }}>
+              <div style={{ fontWeight: 600, marginBottom: 6, color: '#222' }}>Items:</div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {(selectedOrder.items && selectedOrder.items.length > 0)
+                  ? selectedOrder.items.map((item, idx) => (
+                      <li key={idx} style={{ marginBottom: 4, color: '#374151', fontSize: '0.98rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontWeight: 600 }}>{item.quantity}x</span>
+                        <span>{item.productName || item.product_name || 'Item'}</span>
+                      </li>
+                    ))
+                  : <li style={{ color: '#888', fontSize: '0.97rem' }}>No items</li>
+                }
+              </ul>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 8, flexWrap: 'wrap', justifyContent: 'center', margin: '10px 0 0 0', width: '100%' }}>
+              {(
+                selectedOrder.paymentMethod === 'pickup'
+                  ? ["Processing", "Ready to Pick Up", "Completed", "Cancelled"]
+                  : ["Processing", "Ready to Deliver", "Completed", "Cancelled"]
+              ).map(status => (
+                <button
+                  key={status}
+                  onClick={async () => {
+                    try {
+                      const apiBaseUrl = getApiBaseUrl();
+                      const response = await fetch(`${apiBaseUrl}/api/orders/${selectedOrder.id}/status`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(status),
+                      });
+                      if (!response.ok) throw new Error('Failed to update status');
+                      setOrders(orders =>
+                        orders.map(o => o.id === selectedOrder.id ? { ...o, status } : o)
+                      );
+                      setShowOrderModal(false);
+                      await refreshDashboardData();
+                    } catch (err) {
+                      alert('Failed to update order status.');
+                    }
+                  }}
+                  style={{
+                    padding: '0.5rem 0.9rem',
+                    borderRadius: '0.5rem',
+                    border: status === selectedOrder.status ? '2px solid #2563eb' : '1px solid #e5e7eb',
+                    background: status === selectedOrder.status ? '#2563eb' : '#f3f4f6',
+                    color: status === selectedOrder.status ? '#fff' : '#222',
+                    fontWeight: 600,
+                    fontSize: '0.97rem',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    transition: 'all 0.15s',
+                    minWidth: 90,
+                  }}
+                  disabled={status === selectedOrder.status}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+            {/* Delete button at the bottom of the modal */}
+            <button
+              style={{
+                marginTop: 24,
+                background: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '0.5rem',
+                padding: '0.6rem 1.2rem',
+                fontWeight: 700,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                width: '100%',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+              }}
+              onClick={async () => {
+                if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
+                try {
+                  const apiBaseUrl = getApiBaseUrl();
+                  const response = await fetch(`${apiBaseUrl}/api/orders/${selectedOrder.id}`, {
+                    method: 'DELETE',
+                  });
+                  if (!response.ok) throw new Error('Failed to delete order');
+                  setOrders(orders => orders.filter(o => o.id !== selectedOrder.id));
+                  setShowOrderModal(false);
+                  await refreshDashboardData();
+                } catch (err) {
+                  alert('Failed to delete order.');
+                }
+              }}
+            >
+              Delete Order
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Delivery Modal */}
+      {showAssignModal && (
+        <div
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setShowAssignModal(false)}
+        >
+          <div
+            style={{ background: '#fff', borderRadius: '1.25rem', padding: '2.5rem 2.5rem 2rem 2.5rem', minWidth: 400, maxWidth: 520, boxShadow: '0 12px 40px rgba(0,0,0,0.18)', position: 'relative', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: '100%', height: 6, background: '#2563eb', borderRadius: '1.25rem 1.25rem 0 0', position: 'absolute', top: 0, left: 0 }} />
+            <button onClick={() => setShowAssignModal(false)} style={{ position: 'absolute', top: 18, right: 22, background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: 26, fontWeight: 700 }} title="Close">×</button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 10, marginTop: 6 }}>
+              <div style={{ background: '#2563eb', borderRadius: '50%', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: '0 2px 8px rgba(37,99,235,0.10)' }}>
+                <Truck size={28} color="#fff" />
+              </div>
+              <h3 style={{ fontWeight: 800, fontSize: '1.45rem', marginBottom: 0, color: '#1f2937', textAlign: 'center', letterSpacing: '-0.5px' }}>Assign Delivery</h3>
+            </div>
+            <div style={{ width: '100%', borderBottom: '1px solid #e5e7eb', marginBottom: 18 }} />
+            <div style={{ width: '100%', marginBottom: 18 }}>
+              <label style={{ fontWeight: 700, color: '#222', marginBottom: 6, display: 'block', fontSize: '1.05rem' }}>Order (Ready to Deliver):</label>
+              <select
+                value={selectedAssignOrder ? selectedAssignOrder.id : ''}
+                onChange={e => {
+                  const order = readyToDeliverOrders.find(o => String(o.id) === String(e.target.value));
+                  setSelectedAssignOrder(order || null);
+                }}
+                style={{ width: '100%', padding: '0.7rem', borderRadius: '0.6rem', border: '1.5px solid #d1d5db', marginBottom: 4, fontSize: '1.05rem', background: '#f9fafb', outline: 'none', transition: 'border 0.2s', boxShadow: '0 1px 4px rgba(37,99,235,0.04)' }}
+                onFocus={e => e.target.style.border = '1.5px solid #2563eb'}
+                onBlur={e => e.target.style.border = '1.5px solid #d1d5db'}
+              >
+                <option value="">Select an order...</option>
+                {readyToDeliverOrders.map(order => (
+                  <option key={order.id} value={order.id}>
+                    #{order.id} - {order.customerName} (₱{order.totalAmount?.toLocaleString()})
+                  </option>
+                ))}
+              </select>
+              <div style={{ color: '#64748b', fontSize: '0.97rem', marginBottom: 8, marginLeft: 2 }}>Choose an order that is ready for delivery.</div>
+            </div>
+            <div style={{ width: '100%', marginBottom: 18 }}>
+              <label style={{ fontWeight: 700, color: '#222', marginBottom: 6, display: 'block', fontSize: '1.05rem' }}>Delivery Personnel:</label>
+              <select
+                value={selectedDeliveryPerson ? selectedDeliveryPerson.id : ''}
+                onChange={e => {
+                  const person = deliveryPersonnel.find(p => String(p.id) === String(e.target.value));
+                  setSelectedDeliveryPerson(person || null);
+                }}
+                style={{ width: '100%', padding: '0.7rem', borderRadius: '0.6rem', border: '1.5px solid #d1d5db', marginBottom: 4, fontSize: '1.05rem', background: '#f9fafb', outline: 'none', transition: 'border 0.2s', boxShadow: '0 1px 4px rgba(37,99,235,0.04)' }}
+                onFocus={e => e.target.style.border = '1.5px solid #2563eb'}
+                onBlur={e => e.target.style.border = '1.5px solid #d1d5db'}
+              >
+                <option value="">Select personnel...</option>
+                {deliveryPersonnel.map(person => (
+                  <option key={person.id} value={person.id}>{person.name}</option>
+                ))}
+              </select>
+              <div style={{ color: '#64748b', fontSize: '0.97rem', marginBottom: 8, marginLeft: 2 }}>Select a delivery person to assign to this order.</div>
+            </div>
+            {selectedAssignOrder && selectedDeliveryPerson && (
+              <div style={{ width: '100%', background: '#f3f4f6', borderRadius: '0.6rem', padding: '0.9rem 1.1rem', marginBottom: 18, fontSize: '1.05rem', color: '#222', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div><b>Order:</b> #{selectedAssignOrder.id} - {selectedAssignOrder.customerName} (₱{selectedAssignOrder.totalAmount?.toLocaleString()})</div>
+                <div><b>Delivery Person:</b> {selectedDeliveryPerson.name}</div>
+              </div>
+            )}
+            {assigning && (
+              <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '1.05rem', marginBottom: 10, marginTop: 2 }}>Assigning delivery...</div>
+            )}
+            <button
+              disabled={!selectedAssignOrder || !selectedDeliveryPerson || assigning}
+              style={{
+                background: (!selectedAssignOrder || !selectedDeliveryPerson) ? '#e5e7eb' : 'linear-gradient(90deg,#2563eb 60%,#1d4ed8 100%)',
+                color: (!selectedAssignOrder || !selectedDeliveryPerson) ? '#888' : '#fff',
+                border: 'none',
+                borderRadius: '0.6rem',
+                padding: '0.9rem 1.2rem',
+                fontWeight: 800,
+                fontSize: '1.13rem',
+                cursor: (!selectedAssignOrder || !selectedDeliveryPerson) ? 'not-allowed' : 'pointer',
+                transition: 'background 0.18s, box-shadow 0.18s',
+                width: '100%',
+                marginTop: 8,
+                boxShadow: (!selectedAssignOrder || !selectedDeliveryPerson) ? 'none' : '0 2px 8px rgba(37,99,235,0.10)',
+                letterSpacing: '0.01em',
+              }}
+              onMouseEnter={e => {
+                if (!selectedAssignOrder || !selectedDeliveryPerson) return;
+                e.currentTarget.style.background = 'linear-gradient(90deg,#1d4ed8 60%,#2563eb 100%)';
+              }}
+              onMouseLeave={e => {
+                if (!selectedAssignOrder || !selectedDeliveryPerson) return;
+                e.currentTarget.style.background = 'linear-gradient(90deg,#2563eb 60%,#1d4ed8 100%)';
+              }}
+              onClick={async () => {
+                if (!selectedAssignOrder || !selectedDeliveryPerson) return;
+                setAssigning(true);
+                try {
+                  const apiBaseUrl = getApiBaseUrl();
+                  const response = await fetch(`${apiBaseUrl}/api/orders/${selectedAssignOrder.id}/assign-delivery`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deliveryPersonId: selectedDeliveryPerson.id }),
+                  });
+                  if (!response.ok) throw new Error('Failed to assign delivery');
+                  setOrders(orders => orders.map(o => o.id === selectedAssignOrder.id ? { ...o, deliveryPerson: selectedDeliveryPerson } : o));
+                  setShowAssignModal(false);
+                  setSelectedAssignOrder(null);
+                  setSelectedDeliveryPerson(null);
+                  await refreshDashboardData();
+                  // Show a success message (optional: implement a toast or alert)
+                  setTimeout(() => alert('Delivery assigned successfully!'), 200);
+                } catch (err) {
+                  alert('Failed to assign delivery.');
+                } finally {
+                  setAssigning(false);
+                }
+              }}
+            >
+              {assigning ? 'Assigning...' : 'Assign'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

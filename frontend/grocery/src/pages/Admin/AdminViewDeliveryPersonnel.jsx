@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, RefreshCw, ShoppingCart, X, Eye } from 'lucide-react';
 import { getApiBaseUrl } from '../../config/api';
+import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 
 const AdminViewDeliveryPersonnel = ({ onBack }) => {
   const [personnel, setPersonnel] = useState([]);
@@ -19,6 +20,9 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
   // View modal state
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingPerson, setViewingPerson] = useState(null);
+
+  // Add modal state
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const fetchPersonnel = () => {
     setLoading(true);
@@ -124,6 +128,12 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: 8 }} title="Back">
             <ArrowLeft size={28} />
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            style={{ marginLeft: 'auto', background: '#10b981', color: 'white', border: 'none', borderRadius: 8, padding: '0.7rem 1.5rem', fontWeight: 700, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+          >
+            <span style={{ fontSize: 20, display: 'flex', alignItems: 'center' }}>+</span> Add Personnel
           </button>
         </div>
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center' }}>
@@ -343,6 +353,24 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {showAddModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{ minWidth: 400, maxWidth: 520, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.13)', padding: 0 }}>
+            <AddDeliveryPersonPage onNavigate={() => { setShowAddModal(false); fetchPersonnel(); }} />
           </div>
         </div>
       )}
