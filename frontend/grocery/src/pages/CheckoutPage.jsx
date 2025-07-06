@@ -67,10 +67,15 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
     }
   }, [userId, cart]);
 
-  // Calculation helper to ensure consistency
+  // Add this helper at the top of the component
+  function getItemPrice(item) {
+    return item.salePrice != null ? item.salePrice : item.price;
+  }
+
+  // Update calculateTotals to use getItemPrice
   function calculateTotals(cart, paymentMethod) {
     const subtotal = cart.reduce(
-      (sum, item) => sum + ((item.price || 0) * item.quantity),
+      (sum, item) => sum + (getItemPrice(item) * item.quantity),
       0
     );
     const shippingCost = paymentMethod === 'cod' ? 150 : 0;
@@ -95,7 +100,7 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
       alert('Please fill in your name, address, and contact number.');
       return;
     }
-    // Use calculation for backend
+    // Recalculate using the latest paymentMethod
     const { subtotal, shippingCost, total } = calculateTotals(cart, paymentMethod);
 
     const orderData = {
@@ -103,14 +108,14 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
       customerName: addressForm.name,
       address: addressForm.address,
       phone: addressForm.phone,
-      totalAmount: total,
+      totalAmount: total, // This will always include shipping if COD
       status: 'Pending',
       paymentMethod: paymentMethod,
       items: cart.map(item => ({
         productId: item.id,
         productName: item.name,
         quantity: item.quantity,
-        price: item.price
+        price: getItemPrice(item)
       }))
     };
     // Debug log to trace order values
@@ -257,9 +262,9 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
                   <div style={{ fontWeight: 500, fontSize: 15 }}>{item.name}</div>
                   {item.variation && <div style={{ color: '#888', fontSize: 13 }}>Variation: {item.variation}</div>}
                 </div>
-                <div style={{ width: 80, textAlign: 'right', fontSize: 15 }}>₱{item.price}</div>
+                <div style={{ width: 80, textAlign: 'right', fontSize: 15 }}>₱{getItemPrice(item)}</div>
                 <div style={{ width: 60, textAlign: 'center', fontSize: 15 }}>{item.quantity}</div>
-                <div style={{ width: 80, textAlign: 'right', fontWeight: 600, fontSize: 15 }}>₱{item.price * item.quantity}</div>
+                <div style={{ width: 80, textAlign: 'right', fontWeight: 600, fontSize: 15 }}>₱{getItemPrice(item) * item.quantity}</div>
               </div>
             ))}
           </>
@@ -348,10 +353,6 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
           Order placed successfully! Your order has been sent to the store and will be processed soon.
           <br />
           <small style={{ color: '#666', fontWeight: 400 }}>You will be redirected to the home page in 3 seconds...</small>
-          <div style={{ position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', pointerEvents: 'none' }}>
-            {/* Confetti animation (simple emoji confetti) */}
-            <span style={{ fontSize: 24, animation: 'fall 1.2s linear infinite alternate' }}>🎉🎊✨</span>
-          </div>
         </div>
       )}
       <Footer />

@@ -14,14 +14,12 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     public Order placeOrder(Order order) {
-        double calculatedTotal = 0.0;
         if (order.getItems() != null) {
             for (OrderItem item : order.getItems()) {
                 item.setOrder(order);
-                calculatedTotal += item.getPrice() * item.getQuantity();
             }
         }
-        order.setTotalAmount(calculatedTotal);
+        // Do NOT overwrite totalAmount; use the value sent from the frontend (includes shipping if COD)
         return orderRepository.save(order);
     }
 
