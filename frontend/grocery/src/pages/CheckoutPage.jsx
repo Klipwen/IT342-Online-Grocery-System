@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { fetchCart } from '../utils/cartApi';
-import { updateUserInfo } from '../config/api';
+import { updateUserInfo, placeOrder } from '../config/api';
 import '../styles/CheckoutPage.css';
 
 const SHIPPING_OPTIONS = [
@@ -64,13 +64,19 @@ const CheckoutPage = () => {
     }
   }, [userId]);
 
-  // Calculate subtotal safely
-  const subtotal = cart.reduce(
-    (sum, item) => sum + ((item.price || 0) * item.quantity),
-    0
-  );
-  const shippingCost = SHIPPING_OPTIONS.find(opt => opt.value === form.shipping)?.cost || 0;
-  const total = subtotal + shippingCost;
+  // Calculation helper to ensure consistency
+  function calculateTotals(cart, paymentMethod) {
+    const subtotal = cart.reduce(
+      (sum, item) => sum + ((item.price || 0) * item.quantity),
+      0
+    );
+    const shippingCost = paymentMethod === 'cod' ? 150 : 0;
+    const total = subtotal + shippingCost;
+    return { subtotal, shippingCost, total };
+  }
+
+  // Use calculation for UI
+  const { subtotal, shippingCost, total } = calculateTotals(cart, paymentMethod);
 
   // Handle form input
   const handleChange = e => {
@@ -79,38 +85,44 @@ const CheckoutPage = () => {
   };
 
   // Handle form submit
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
-    // Validate required fields
-    if (!form.fullName || !form.street || !form.city || !form.phone || !form.email || !form.agree) {
-      setError('Please fill in all required fields and agree to the terms.');
+    setSuccess(false);
+    if (!addressForm.name || !addressForm.address || !addressForm.phone) {
+      alert('Please fill in your name, address, and contact number.');
       return;
     }
-    // Save info if checked
-    if (form.saveInfo) {
-      localStorage.setItem('checkoutInfo', JSON.stringify(form));
-    }
-    // Prepare order data
+    // Use calculation for backend
+    const { subtotal, shippingCost, total } = calculateTotals(cart, paymentMethod);
+
     const orderData = {
-      userId,
-      items: cart.map(item => ({ productId: item.id, quantity: item.quantity })),
-      billing: {
-        fullName: form.fullName,
-        country: form.country,
-        street: form.street,
-        apartment: form.apartment,
-        city: form.city,
-        phone: form.phone,
-        email: form.email,
-      },
-      shipping: form.shipping,
-      payment: form.payment,
-      total,
+      userId: userId,
+      customerName: addressForm.name,
+      address: addressForm.address,
+      phone: addressForm.phone,
+      totalAmount: total,
+      status: 'Pending',
+      paymentMethod: paymentMethod,
+      items: cart.map(item => ({
+        productId: item.id,
+        productName: item.name,
+        quantity: item.quantity,
+        price: item.price
+      }))
     };
-    // For now, just log order data and show success
-    console.log('Order placed:', orderData);
-    setSuccess(true);
+    // Debug log to trace order values
+    console.log('DEBUG ORDER SUBMIT', { cart, subtotal, shippingCost, total, orderData });
+    try {
+      await placeOrder(orderData);
+      setSuccess(true);
+      // Delay clearing the cart so the UI shows the correct total after placing the order
+      setTimeout(() => {
+        setCart([]);
+        localStorage.removeItem('cart');
+      }, 2000); // 2 seconds after showing success
+    } catch (err) {
+      alert('Failed to place order. Please try again.');
+    }
   };
 
   // Load saved info
@@ -256,19 +268,36 @@ const CheckoutPage = () => {
           {paymentMethod === 'cod' && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
               <div style={{ width: 220, fontSize: 15, color: '#888' }}>Shipping Subtotal</div>
-              <div style={{ width: 120, textAlign: 'right', fontWeight: 500 }}>₱150</div>
+              <div style={{ width: 120, textAlign: 'right', fontWeight: 500 }}>₱{shippingCost.toLocaleString()}</div>
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 16, borderTop: '1px dashed #eee', paddingTop: 18 }}>
             <div style={{ width: 220, fontSize: 18, fontWeight: 600 }}>Total Payment:</div>
             <div style={{ width: 120, textAlign: 'right', color: '#ef4444', fontWeight: 700, fontSize: 26 }}>
-              ₱{(subtotal + (paymentMethod === 'cod' ? 150 : 0)).toLocaleString()}
+              ₱{total.toLocaleString()}
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
             <button className="place-order-btn" style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 5, padding: '14px 48px', fontWeight: 600, fontSize: 18, cursor: 'pointer' }} onClick={handleSubmit} disabled={loading || cart.length === 0}>Place Order</button>
           </div>
         </div>
+      </div>
+      {success && (
+        <div style={{ color: 'green', fontWeight: 600, fontSize: 18, margin: '16px 0', textAlign: 'center' }}>
+          Order placed successfully! Your order has been sent to the store and will be processed soon.
+        </div>
+      )}
+      <div style={{ margin: '24px 0', textAlign: 'center' }}>
+        <label style={{ fontSize: 15 }}>
+          <input
+            type="checkbox"
+            name="agree"
+            checked={form.agree}
+            onChange={handleChange}
+            style={{ marginRight: 8 }}
+          />
+          I agree to the terms and conditions
+        </label>
       </div>
       <Footer />
     </div>

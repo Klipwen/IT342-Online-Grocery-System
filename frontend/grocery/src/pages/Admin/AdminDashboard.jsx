@@ -6,7 +6,6 @@ import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 import AdminViewDeliveryPersonnel from './AdminViewDeliveryPersonnel';
 import PaymentsPage from './PaymentsPage';
 import DeliveriesPage from './DeliveriesPage';
-import OrdersPage from './OrdersPage';
 import { getApiBaseUrl } from '../../config/api';
 
 // Color tokens for easy reference
@@ -150,9 +149,8 @@ const AdminDashboard = ({ onNavigate }) => {
   if (showDeliveries) {
     return <DeliveriesPage onBack={() => setShowDeliveries(false)} />;
   }
-  if (showOrders) {
-    return <OrdersPage onBack={() => setShowOrders(false)} />;
-  }
+  
+  
 
   return (
     <div style={{ 
@@ -358,6 +356,7 @@ const AdminDashboard = ({ onNavigate }) => {
           >
             View Details <TrendingUp size={16} />
           </div>
+
         </div>
 
         {/* Users Card */}

@@ -7,7 +7,7 @@ const API_CONFIG = {
       frontend: 'http://localhost:5173'
     },
     ricablanca: {
-      backend: 'http://localhost:8081', 
+      backend: 'http://localhost:8080', 
       frontend: 'http://localhost:5174'
     },
     vestil: {
@@ -110,6 +110,18 @@ export const updateUserInfo = async (userId, data) => {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to update user info');
+  return res.json();
+};
+
+// Place an order
+export const placeOrder = async (orderData) => {
+  const baseUrl = getApiBaseUrl();
+  const res = await fetch(`${baseUrl}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderData),
+  });
+  if (!res.ok) throw new Error('Failed to place order');
   return res.json();
 };
 
