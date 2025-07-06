@@ -142,10 +142,13 @@ const UserOrdersPage = ({ user, cart = [] }) => {
                         Status
                       </th>
                       <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#374151', borderBottom: '1px solid #e5e7eb' }}>
-                        Date
+                        Type
                       </th>
                       <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#374151', borderBottom: '1px solid #e5e7eb' }}>
-                        Type
+                        Payment
+                      </th>
+                      <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#374151', borderBottom: '1px solid #e5e7eb' }}>
+                        Date
                       </th>
                     </tr>
                   </thead>
@@ -179,9 +182,6 @@ const UserOrdersPage = ({ user, cart = [] }) => {
                               {order.status}
                             </span>
                           </td>
-                          <td style={{ padding: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}>
-                            {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}
-                          </td>
                           <td style={{ padding: '1rem', textAlign: 'center' }}>
                             <span style={{
                               background: order.paymentMethod === 'pickup' ? '#e0e7ff' : '#f0fdf4',
@@ -193,6 +193,12 @@ const UserOrdersPage = ({ user, cart = [] }) => {
                             }}>
                               {order.paymentMethod === 'pickup' ? 'Pickup' : 'Delivery'}
                             </span>
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'center', color: '#1f2937', fontWeight: 600 }}>
+                            {order.paymentMethod ? order.paymentMethod : '-'}
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}>
+                            {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}
                           </td>
                         </tr>
                       );
@@ -241,6 +247,7 @@ const UserOrdersPage = ({ user, cart = [] }) => {
                 <div style={{ marginBottom: 4 }}><b>Amount:</b> ₱{selectedOrder.totalAmount?.toLocaleString()}</div>
                 <div style={{ marginBottom: 4 }}><b>Status:</b> {selectedOrder.status}</div>
                 <div style={{ marginBottom: 4 }}><b>Type:</b> {selectedOrder.paymentMethod === 'pickup' ? 'Pickup' : 'Delivery'}</div>
+                <div style={{ marginBottom: 4 }}><b>Payment:</b> {selectedOrder.paymentMethod ? selectedOrder.paymentMethod : '-'}</div>
                 <div style={{ marginBottom: 4 }}><b>Date:</b> {selectedOrder.orderDate ? new Date(selectedOrder.orderDate).toLocaleString() : '-'}</div>
                 <div style={{ marginBottom: 4 }}><b>Address:</b> {selectedOrder.address}</div>
                 <div style={{ marginBottom: 4 }}><b>Phone:</b> {selectedOrder.phone}</div>
