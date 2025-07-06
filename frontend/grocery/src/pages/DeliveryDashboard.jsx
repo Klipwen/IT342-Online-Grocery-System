@@ -10,7 +10,6 @@ const DeliveryDashboard = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Get delivery person from localStorage
     const storedDeliveryPerson = localStorage.getItem('deliveryPerson');
     if (!storedDeliveryPerson) {
       window.location.href = '/?route=delivery';
@@ -20,8 +19,7 @@ const DeliveryDashboard = () => {
     try {
       const parsedDeliveryPerson = JSON.parse(storedDeliveryPerson);
       setDeliveryPerson(parsedDeliveryPerson);
-      
-      // Fetch deliveries for this delivery person
+
       const fetchDeliveries = async () => {
         setLoading(true);
         setError('');
@@ -40,14 +38,14 @@ const DeliveryDashboard = () => {
           setLoading(false);
         }
       };
-      
+
       fetchDeliveries();
     } catch (err) {
       console.error('Error parsing delivery person data:', err);
       localStorage.removeItem('deliveryPerson');
       window.location.href = '/?route=delivery';
     }
-  }, []); // Empty dependency array to run only once
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('deliveryPerson');
@@ -68,6 +66,32 @@ const DeliveryDashboard = () => {
       }
     } catch (err) {
       console.error('Error fetching logs:', err);
+    }
+  };
+
+  const handleAccept = async (orderId) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/delivery-order/accept/${orderId}`, { method: 'POST' });
+      if (res.ok) {
+        setDeliveries(prev => prev.map(order => order.id === orderId ? { ...order, deliveryStatus: 'Accepted' } : order));
+      } else {
+        console.error('Failed to accept delivery.');
+      }
+    } catch (err) {
+      console.error('Error accepting delivery:', err);
+    }
+  };
+
+  const handleReject = async (orderId) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/delivery-order/reject/${orderId}`, { method: 'POST' });
+      if (res.ok) {
+        setDeliveries(prev => prev.map(order => order.id === orderId ? { ...order, deliveryStatus: 'Rejected' } : order));
+      } else {
+        console.error('Failed to reject delivery.');
+      }
+    } catch (err) {
+      console.error('Error rejecting delivery:', err);
     }
   };
 
@@ -120,7 +144,14 @@ const DeliveryDashboard = () => {
                     <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.deliveryTime ? new Date(order.deliveryTime).toLocaleString() : '-'}</td>
                     <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.deliveryAddress}</td>
                     <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                      <button onClick={() => handleViewLogs(order.id)} style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer' }}>View Log</button>
+                      {order.deliveryStatus === 'Pending' ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                          <button onClick={() => handleAccept(order.id)} style={{ background: '#22c55e', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontWeight: 500, cursor: 'pointer' }}>Accept</button>
+                          <button onClick={() => handleReject(order.id)} style={{ background: '#ef4444', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontWeight: 500, cursor: 'pointer' }}>Reject</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => handleViewLogs(order.id)} style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer' }}>View Log</button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -154,4 +185,4 @@ const DeliveryDashboard = () => {
   );
 };
 
-export default DeliveryDashboard; 
+export default DeliveryDashboard;
