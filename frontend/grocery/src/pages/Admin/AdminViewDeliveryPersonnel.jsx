@@ -267,6 +267,9 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
+                  <option value="Offline">Offline</option>
+                  <option value="Available">Available</option>
+                  <option value="On Route">On Route</option>
                 </select>
               </div>
               {editError && (

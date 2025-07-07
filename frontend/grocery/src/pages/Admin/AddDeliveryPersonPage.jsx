@@ -8,7 +8,6 @@ const AddDeliveryPersonPage = ({ onNavigate }) => {
     email: '',
     contactNumber: '',
     password: '',
-    status: 'Active',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -23,10 +22,11 @@ const AddDeliveryPersonPage = ({ onNavigate }) => {
     setError('');
     try {
       const apiBaseUrl = getApiBaseUrl();
+      const { name, email, contactNumber, password } = form;
       const response = await fetch(`${apiBaseUrl}/api/delivery`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ name, email, contactNumber, password }),
       });
       if (!response.ok) throw new Error('Failed to add delivery personnel');
       if (onNavigate) onNavigate();
@@ -60,13 +60,6 @@ const AddDeliveryPersonPage = ({ onNavigate }) => {
           <div style={{ marginBottom: 18 }}>
             <label style={{ fontWeight: 600 }}>Password</label>
             <input name="password" type="password" value={form.password} onChange={handleChange} required style={{ width: '100%', padding: '0.7rem', borderRadius: 8, border: '1px solid #ddd', marginTop: 6 }} />
-          </div>
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ fontWeight: 600 }}>Status</label>
-            <select name="status" value={form.status} onChange={handleChange} style={{ width: '100%', padding: '0.7rem', borderRadius: 8, border: '1px solid #ddd', marginTop: 6 }}>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
           </div>
           {error && <div style={{ color: '#e11d48', marginBottom: 16 }}>{error}</div>}
           <button type="submit" disabled={loading} style={{ background: '#ef4444', color: 'white', padding: '0.8rem 2.5rem', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 18, cursor: 'pointer', width: '100%' }}>

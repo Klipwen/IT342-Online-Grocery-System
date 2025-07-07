@@ -20,6 +20,7 @@ public class DeliveryPerson {
 
     private String contactNumber;
 
+    // Possible statuses: "Active", "Inactive", "Offline", "Available", "On Route"
     private String status; // e.g. "Active" or "Inactive"
 
     private Boolean deleted;
