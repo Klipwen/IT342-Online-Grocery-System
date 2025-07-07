@@ -3,6 +3,23 @@ import { ArrowLeft, RefreshCw, ShoppingCart, X, Eye } from 'lucide-react';
 import { getApiBaseUrl } from '../../config/api';
 import AddDeliveryPersonPage from './AddDeliveryPersonPage';
 
+const useClickOutside = (ref, handler) => {
+  React.useEffect(() => {
+    const listener = (event) => {
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+      handler(event);
+    };
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, handler]);
+};
+
 const AdminViewDeliveryPersonnel = ({ onBack }) => {
   const [personnel, setPersonnel] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +40,9 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
 
   // Add modal state
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const editModalRef = React.useRef();
+  const viewModalRef = React.useRef();
 
   const fetchPersonnel = () => {
     setLoading(true);
@@ -89,6 +109,17 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
       setEditError(err.message);
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  const handleDelete = async (person) => {
+    if (!window.confirm(`Are you sure you want to delete ${person.name}? This action cannot be undone.`)) return;
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/delivery/${person.id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete delivery personnel');
+      fetchPersonnel();
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -178,7 +209,7 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
                     <td style={{ padding: '1rem' }}>{person.status}</td>
                     <td style={{ padding: '1rem', display: 'flex', gap: 8 }}>
                       <button style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleEdit(person)}>Edit</button>
-                      <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => alert('Delete delivery personnel not supported in this version.')}>Delete</button>
+                      <button style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => handleDelete(person)}>Delete</button>
                       <button 
                         style={{ background: '#6b7280', color: '#fff', border: 'none', borderRadius: 6, padding: '0.4rem 1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }} 
                         onClick={() => { setViewingPerson(person); setShowViewModal(true); }}
@@ -195,19 +226,8 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
       </div>
       {/* Edit Modal */}
       {showEditModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
+        <ModalOverlay onClose={() => setShowEditModal(false)}>
+          <div ref={editModalRef} style={{
             background: 'white',
             borderRadius: '12px',
             padding: '2rem',
@@ -295,23 +315,12 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
               </div>
             </form>
           </div>
-        </div>
+        </ModalOverlay>
       )}
       {/* View Modal */}
       {showViewModal && viewingPerson && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
+        <ModalOverlay onClose={() => setShowViewModal(false)}>
+          <div ref={viewModalRef} style={{
             background: 'white',
             borderRadius: '12px',
             padding: '2rem',
@@ -357,26 +366,25 @@ const AdminViewDeliveryPersonnel = ({ onBack }) => {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
       {showAddModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
+        <ModalOverlay onClose={() => setShowAddModal(false)}>
           <div style={{ minWidth: 400, maxWidth: 520, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.13)', padding: 0 }}>
             <AddDeliveryPersonPage onNavigate={() => { setShowAddModal(false); fetchPersonnel(); }} />
           </div>
-        </div>
+        </ModalOverlay>
       )}
+    </div>
+  );
+};
+
+const ModalOverlay = ({ children, onClose }) => {
+  const overlayRef = React.useRef();
+  useClickOutside(overlayRef, onClose);
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div ref={overlayRef} style={{ position: 'relative' }}>{children}</div>
     </div>
   );
 };
