@@ -29,21 +29,22 @@ const AdminViewOrders = ({ onBack }) => {
   const [deliveryPersonnel, setDeliveryPersonnel] = useState([]);
   const [assigning, setAssigning] = useState(false);
   const [typeFilter, setTypeFilter] = useState('All');
+  const [ordersTab, setOrdersTab] = useState('active'); // 'active', 'completed', 'cancelled'
 
-  const fetchOrders = async () => {
-    setLoading(true);
+    const fetchOrders = async () => {
+      setLoading(true);
     setError("");
-    try {
-      const res = await fetch(`${getApiBaseUrl()}/api/orders`);
-      if (!res.ok) throw new Error('Failed to fetch orders');
-      const data = await res.json();
-      setOrders(data);
-    } catch (err) {
-      setError('Could not load orders.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/api/orders`);
+        if (!res.ok) throw new Error('Failed to fetch orders');
+        const data = await res.json();
+        setOrders(data);
+      } catch (err) {
+        setError('Could not load orders.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
   useEffect(() => {
     fetchOrders();
@@ -79,8 +80,28 @@ const AdminViewOrders = ({ onBack }) => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const homeDeliveryOrders = filteredOrders.filter(o => o.paymentMethod !== 'pickup');
-  const pickupOrders = filteredOrders.filter(o => o.paymentMethod === 'pickup');
+  // Sort orders: Pending first, then by orderDate ascending (first come, first serve)
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (a.status === 'Pending' && b.status !== 'Pending') return -1;
+    if (a.status !== 'Pending' && b.status === 'Pending') return 1;
+    // Both are same status group, sort by orderDate ascending
+    const dateA = new Date(a.orderDate || 0).getTime();
+    const dateB = new Date(b.orderDate || 0).getTime();
+    return dateA - dateB;
+  });
+
+  const homeDeliveryOrders = sortedOrders.filter(o => o.paymentMethod !== 'pickup');
+  const pickupOrders = sortedOrders.filter(o => o.paymentMethod === 'pickup');
+
+  // Update sortedOrders to filter by tab
+  const activeStatuses = ['Pending', 'Processing', 'Ready to Deliver', 'Ready to Pick Up'];
+  const completedStatuses = ['Completed'];
+  const cancelledStatuses = ['Cancelled'];
+  const tabFilteredOrders = sortedOrders.filter(order =>
+    ordersTab === 'active' ? activeStatuses.includes(order.status) :
+    ordersTab === 'completed' ? completedStatuses.includes(order.status) :
+    cancelledStatuses.includes(order.status)
+  );
 
   return (
     <div style={{ minHeight: '100vh', background: COLORS.secondary, padding: '2rem 0' }}>
@@ -151,8 +172,64 @@ const AdminViewOrders = ({ onBack }) => {
         >
           <ArrowLeft size={32} />
         </button>
-        {/* Controls above the table */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 18, alignItems: 'center', flexWrap: 'wrap' }}>
+        {/* Tabs at the top right of the content card */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 18 }}>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button
+              onClick={() => setOrdersTab('active')}
+              style={{
+                background: ordersTab === 'active' ? '#2563eb' : '#e5e7eb',
+                color: ordersTab === 'active' ? '#fff' : '#222',
+                border: 'none',
+                borderRadius: 8,
+                padding: '0.7rem 1.5rem',
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: 'pointer',
+                transition: 'background 0.18s',
+                boxShadow: ordersTab === 'active' ? '0 2px 8px rgba(37,99,235,0.08)' : 'none',
+              }}
+            >
+              Active Orders
+            </button>
+            <button
+              onClick={() => setOrdersTab('completed')}
+              style={{
+                background: ordersTab === 'completed' ? '#2563eb' : '#e5e7eb',
+                color: ordersTab === 'completed' ? '#fff' : '#222',
+                border: 'none',
+                borderRadius: 8,
+                padding: '0.7rem 1.5rem',
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: 'pointer',
+                transition: 'background 0.18s',
+                boxShadow: ordersTab === 'completed' ? '0 2px 8px rgba(37,99,235,0.08)' : 'none',
+              }}
+            >
+              Completed Orders
+            </button>
+            <button
+              onClick={() => setOrdersTab('cancelled')}
+              style={{
+                background: ordersTab === 'cancelled' ? '#ef4444' : '#e5e7eb',
+                color: ordersTab === 'cancelled' ? '#fff' : '#222',
+                border: 'none',
+                borderRadius: 8,
+                padding: '0.7rem 1.5rem',
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: 'pointer',
+                transition: 'background 0.18s',
+                boxShadow: ordersTab === 'cancelled' ? '0 2px 8px rgba(239,68,68,0.08)' : 'none',
+              }}
+            >
+              Cancelled Orders
+            </button>
+          </div>
+        </div>
+        {/* Controls: search, status/type filter, refresh */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
           <input
             type="text"
             placeholder="Search orders..."
@@ -165,7 +242,7 @@ const AdminViewOrders = ({ onBack }) => {
             onChange={e => setStatusFilter(e.target.value)}
             style={{ padding: '0.7rem 1rem', border: '1px solid #ddd', borderRadius: 8, fontSize: 16 }}
           >
-            <option value="All">All Statuses</option>
+            <option value="All">All Status</option>
             <option value="Pending">Pending</option>
             <option value="Processing">Processing</option>
             <option value="Ready to Deliver">Ready to Deliver</option>
@@ -210,9 +287,9 @@ const AdminViewOrders = ({ onBack }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.length === 0 ? (
+                {tabFilteredOrders.length === 0 ? (
                   <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: COLORS.text1 }}>No orders found.</td></tr>
-                ) : filteredOrders.map((order, idx) => (
+                ) : tabFilteredOrders.map((order, idx) => (
                   <tr
                     key={order.id}
                     style={{ background: idx % 2 === 0 ? COLORS.primary : COLORS.secondary, transition: 'background 0.2s', height: 64, verticalAlign: 'middle' }}
@@ -231,10 +308,28 @@ const AdminViewOrders = ({ onBack }) => {
                         {order.paymentMethod === 'pickup' ? (
                           <>
                             <button
-                              style={{ background: order.status !== 'Pending' ? '#10b981' : '#d1d5db', color: order.status !== 'Pending' ? '#fff' : '#888', border: 'none', borderRadius: '0.5rem', padding: '0.5rem 0.7rem', fontWeight: 700, fontSize: '1.05rem', cursor: order.status !== 'Pending' ? 'pointer' : 'not-allowed', transition: 'background 0.18s', boxShadow: '0 1px 4px rgba(16,185,129,0.08)', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, position: 'relative' }}
-                              disabled={order.status === 'Pending'}
+                              style={{
+                                background: order.status === 'Completed' ? '#f59e42' : (order.status !== 'Pending' ? '#10b981' : '#d1d5db'),
+                                color: '#fff',
+                                border: 'none',
+                        borderRadius: '0.5rem',
+                                padding: '0.5rem 0.7rem',
+                                fontWeight: 700,
+                                fontSize: '1.05rem',
+                                cursor: order.status === 'Pending' || order.status === 'Completed' ? 'not-allowed' : 'pointer',
+                                transition: 'background 0.18s, opacity 0.18s',
+                                boxShadow: '0 1px 4px rgba(16,185,129,0.08)',
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 6,
+                                position: 'relative',
+                                opacity: 1,
+                              }}
+                              disabled={order.status === 'Pending' || order.status === 'Completed'}
                               onClick={async e => {
-                                if (order.status === 'Pending') return;
+                                if (order.status === 'Pending' || order.status === 'Completed') return;
                                 e.stopPropagation();
                                 // Mark as picked up (Completed)
                                 try {
@@ -251,23 +346,37 @@ const AdminViewOrders = ({ onBack }) => {
                                   alert('Failed to mark as picked up.');
                                 }
                               }}
-                              onMouseEnter={e => { if (order.status !== 'Pending') e.currentTarget.style.background = '#059669'; }}
-                              onMouseLeave={e => { if (order.status !== 'Pending') e.currentTarget.style.background = '#10b981'; }}
+                              onMouseEnter={e => { if (order.status !== 'Pending' && order.status !== 'Completed') e.currentTarget.style.background = '#059669'; }}
+                              onMouseLeave={e => { if (order.status !== 'Pending' && order.status !== 'Completed') e.currentTarget.style.background = '#10b981'; }}
                             >
-                              Mark as Picked Up
+                              {order.status === 'Completed' ? 'Order Picked' : 'Mark as Picked Up'}
                             </button>
                             <div style={{ height: 4 }} />
                           </>
                         ) : (
                           <>
-                            <button
-                              style={{ background: order.status !== 'Pending' ? '#2563eb' : '#d1d5db', color: order.status !== 'Pending' ? '#fff' : '#888', border: 'none', borderRadius: '0.5rem', padding: '0.5rem 0.7rem', fontWeight: 700, fontSize: '1.05rem', cursor: order.status !== 'Pending' ? 'pointer' : 'not-allowed', transition: 'background 0.18s', boxShadow: '0 1px 4px rgba(37,99,235,0.08)', width: '100%', position: 'relative' }}
-                              disabled={order.status === 'Pending'}
-                              onClick={e => { if (order.status === 'Pending') return; e.stopPropagation(); setAssigningOrder(order); setSelectedDeliveryPerson(order.deliveryPerson || null); setShowAssignModal(true); }}
-                              onMouseEnter={e => { if (order.status !== 'Pending') e.currentTarget.style.background = '#1d4ed8'; }}
-                              onMouseLeave={e => { if (order.status !== 'Pending') e.currentTarget.style.background = '#2563eb'; }}
+                        <button
+                          style={{
+                                background: order.status === 'Completed' ? '#f59e42' : (order.status !== 'Pending' ? '#2563eb' : '#d1d5db'),
+                                color: '#fff',
+                                border: 'none',
+                            borderRadius: '0.5rem',
+                                padding: '0.5rem 0.7rem',
+                                fontWeight: 700,
+                                fontSize: '1.05rem',
+                                cursor: order.status === 'Pending' || order.status === 'Completed' ? 'not-allowed' : 'pointer',
+                                transition: 'background 0.18s, opacity 0.18s',
+                                boxShadow: '0 1px 4px rgba(37,99,235,0.08)',
+                                width: '100%',
+                                position: 'relative',
+                                opacity: 1,
+                              }}
+                              disabled={order.status === 'Pending' || order.status === 'Completed'}
+                              onClick={e => { if (order.status === 'Pending' || order.status === 'Completed') return; e.stopPropagation(); setAssigningOrder(order); setSelectedDeliveryPerson(order.deliveryPerson || null); setShowAssignModal(true); }}
+                              onMouseEnter={e => { if (order.status !== 'Pending' && order.status !== 'Completed') e.currentTarget.style.background = '#1d4ed8'; }}
+                              onMouseLeave={e => { if (order.status !== 'Pending' && order.status !== 'Completed') e.currentTarget.style.background = '#2563eb'; }}
                             >
-                              Proceed to Delivery
+                              {order.status === 'Completed' ? 'Order Delivered' : 'Proceed to Delivery'}
                             </button>
                             <div style={{ height: 4 }} />
                           </>
@@ -365,38 +474,40 @@ const AdminViewOrders = ({ onBack }) => {
                 ))}
               </div>
               {/* Delete button at the bottom of the modal */}
-              <button
-                style={{
-                  marginTop: 24,
-                  background: '#ef4444',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  padding: '0.6rem 1.2rem',
-                  fontWeight: 700,
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s',
-                  width: '100%',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
-                }}
-                onClick={async () => {
-                  if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
-                  try {
-                    const apiBaseUrl = getApiBaseUrl();
-                    const response = await fetch(`${apiBaseUrl}/api/orders/${selectedOrder.id}`, {
-                      method: 'DELETE',
-                    });
-                    if (!response.ok) throw new Error('Failed to delete order');
-                    setOrders(orders => orders.filter(o => o.id !== selectedOrder.id));
-                    setShowModal(false);
-                  } catch (err) {
-                    alert('Failed to delete order.');
-                  }
-                }}
-              >
-                Delete Order
-              </button>
+              {selectedOrder.status !== 'Cancelled' && (
+                <button
+                  style={{
+                    marginTop: 24,
+                    background: '#ef4444',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.6rem 1.2rem',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    width: '100%',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+                  }}
+                  onClick={async () => {
+                    if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
+                    try {
+                      const apiBaseUrl = getApiBaseUrl();
+                      const response = await fetch(`${apiBaseUrl}/api/orders/${selectedOrder.id}`, {
+                        method: 'DELETE',
+                      });
+                      if (!response.ok) throw new Error('Failed to delete order');
+                      setOrders(orders => orders.filter(o => o.id !== selectedOrder.id));
+                      setShowModal(false);
+                    } catch (err) {
+                      alert('Failed to delete order.');
+                    }
+                  }}
+                >
+                  Delete Order
+                </button>
+              )}
             </div>
           </div>
         )}

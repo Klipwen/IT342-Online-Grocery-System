@@ -113,7 +113,7 @@ const AdminDashboard = ({ onNavigate }) => {
 
   useEffect(() => {
     const fetchPaymentCount = async () => {
-      setLoadingPayments(true);
+    setLoadingPayments(true);
       try {
         const apiBaseUrl = getApiBaseUrl();
         const response = await fetch(`${apiBaseUrl}/api/orders`);
@@ -123,7 +123,7 @@ const AdminDashboard = ({ onNavigate }) => {
       } catch (err) {
         setPaymentCount(0);
       } finally {
-        setLoadingPayments(false);
+      setLoadingPayments(false);
       }
     };
     fetchPaymentCount();
@@ -679,16 +679,16 @@ const AdminDashboard = ({ onNavigate }) => {
             >
               <Package size={18} /> Add Product
             </button>
-            <button
+            <button 
               onClick={handleAssignDelivery}
-              style={{
+              style={{ 
                 background: COLORS.button1,
-                color: COLORS.primary,
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                borderRadius: '0.75rem',
-                fontWeight: 'bold',
-                fontSize: '1.1rem',
+                color: COLORS.primary, 
+                padding: '0.75rem 1.5rem', 
+                border: 'none', 
+                borderRadius: '0.75rem', 
+                fontWeight: 'bold', 
+                fontSize: '1.1rem', 
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 display: 'flex',
@@ -732,8 +732,8 @@ const AdminDashboard = ({ onNavigate }) => {
               style={{ 
                 background: COLORS.secondary2, 
                 color: COLORS.primary, 
-                padding: '0.75rem 1.5rem',
-                border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  border: 'none',
                 borderRadius: '0.75rem', 
                 fontWeight: 'bold', 
                 fontSize: '1.1rem', 
@@ -811,7 +811,7 @@ const AdminDashboard = ({ onNavigate }) => {
               display: 'block',
             }}>
               <div style={{ maxHeight: '300px', overflowY: deliveryOrders.length > 5 ? 'auto' : 'visible' }}>
-                <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
                   <thead style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', position: 'sticky', top: 0, zIndex: 2 }}>
                     <tr>
                       {orderTableColumns.map(col => (
@@ -830,9 +830,9 @@ const AdminDashboard = ({ onNavigate }) => {
                           {col.label}
                         </th>
                       ))}
-                    </tr>
-                  </thead>
-                  <tbody>
+                  </tr>
+                </thead>
+                <tbody>
                     {loadingOrders ? (
                       <tr><td colSpan={orderTableColumns.length} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Loading orders...</td></tr>
                     ) : errorOrders ? (
@@ -855,22 +855,22 @@ const AdminDashboard = ({ onNavigate }) => {
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: orderTableColumns[1].width }}>{order.address}</td>
                           <td style={{ padding: '1rem', fontWeight: 'bold', color: '#10b981', verticalAlign: 'middle', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.2em', width: orderTableColumns[2].width }}>
                             <span style={{fontWeight:'bold',fontSize:'1.1em'}}>₱</span> {order.totalAmount?.toLocaleString()}
-                          </td>
+                    </td>
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[3].width }}>{order.paymentMethod}</td>
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[4].width }}>
                             {order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}
-                          </td>
+                    </td>
                           <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[5].width }}>
                             <button
                               style={{
                                 background: '#2563eb',
                                 color: '#fff',
-                                border: 'none',
-                                borderRadius: '0.5rem',
+                        border: 'none', 
+                        borderRadius: '0.5rem', 
                                 padding: '0.32rem 1.1rem',
                                 fontWeight: 700,
                                 fontSize: '1rem',
-                                cursor: 'pointer',
+                  cursor: 'pointer',
                                 transition: 'background 0.18s',
                                 boxShadow: '0 1px 4px rgba(37,99,235,0.08)',
                                 letterSpacing: '0.01em',
@@ -879,18 +879,18 @@ const AdminDashboard = ({ onNavigate }) => {
                                 e.stopPropagation();
                                 setSelectedOrder(order);
                                 setShowOrderModal(true);
-                              }}
+                }}
                               onMouseEnter={e => e.currentTarget.style.background = '#1d4ed8'}
                               onMouseLeave={e => e.currentTarget.style.background = '#2563eb'}
-                            >
+              >
                               Manage
-                            </button>
-                          </td>
-                        </tr>
+              </button>
+                    </td>
+                  </tr>
                       ))
                     )}
-                  </tbody>
-                </table>
+                </tbody>
+              </table>
               </div>
             </div>
 

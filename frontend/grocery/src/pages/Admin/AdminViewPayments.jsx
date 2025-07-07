@@ -20,22 +20,25 @@ const AdminViewPayments = ({ onBack }) => {
   const [error, setError] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/orders`);
+      if (!res.ok) throw new Error('Failed to fetch orders');
+      const data = await res.json();
+      setOrders(data);
+    } catch (err) {
+      setError('Could not load payments.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const res = await fetch(`${getApiBaseUrl()}/api/orders`);
-        if (!res.ok) throw new Error('Failed to fetch orders');
-        const data = await res.json();
-        setOrders(data);
-      } catch (err) {
-        setError('Could not load payments.');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrders();
   }, []);
 
@@ -43,6 +46,17 @@ const AdminViewPayments = ({ onBack }) => {
     if (!items || !Array.isArray(items) || items.length === 0) return '-';
     return items.map(item => `${item.productName || item.product_name || 'Item'} x${item.quantity || 1}`).join(', ');
   };
+
+  // Filtered payments
+  const filteredOrders = orders.filter(order => {
+    const searchText = search.toLowerCase();
+    const matchesSearch =
+      order.customerName.toLowerCase().includes(searchText) ||
+      String(order.id).includes(searchText) ||
+      order.status.toLowerCase().includes(searchText);
+    const matchesStatus = statusFilter === "All" || order.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '2rem 0' }}>
@@ -113,6 +127,32 @@ const AdminViewPayments = ({ onBack }) => {
         >
           <ArrowLeft size={32} />
         </button>
+        {/* Controls: search, status filter, refresh */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+          <input
+            type="text"
+            placeholder="Search payments..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ flex: 2, padding: '0.7rem 1rem', border: '1px solid #ddd', borderRadius: 8, fontSize: 16, minWidth: 180 }}
+          />
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            style={{ padding: '0.7rem 1rem', border: '1px solid #ddd', borderRadius: 8, fontSize: 16 }}
+          >
+            <option value="All">All Status</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Refunded">Refunded</option>
+          </select>
+          <button
+            onClick={fetchOrders}
+            style={{ background: '#111', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7rem 1.5rem', fontWeight: 600, fontSize: 16, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+          >
+            Refresh
+          </button>
+        </div>
         {/* Payments Table */}
         <div style={{ overflowX: 'auto', marginTop: 24 }}>
           {loading ? (
@@ -133,9 +173,9 @@ const AdminViewPayments = ({ onBack }) => {
                 </tr>
               </thead>
               <tbody>
-                {orders.length === 0 ? (
+                {filteredOrders.length === 0 ? (
                   <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: COLORS.text1 }}>No payments found.</td></tr>
-                ) : orders.map((order, idx) => (
+                ) : filteredOrders.map((order, idx) => (
                   <tr key={order.id} style={{ background: idx % 2 === 0 ? COLORS.primary : COLORS.secondary }}>
                     <td style={{ padding: '1rem', color: COLORS.text1, fontWeight: 600 }}>{order.id}</td>
                     <td style={{ padding: '1rem', color: COLORS.text }}>{order.customerName}</td>
