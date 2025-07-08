@@ -31,13 +31,6 @@ const AdminViewOrders = ({ onBack }) => {
   const [typeFilter, setTypeFilter] = useState('All');
   const [ordersTab, setOrdersTab] = useState('active'); // 'active', 'completed', 'cancelled'
 
-  // Function to get delivery personnel name by ID
-  const getDeliveryPersonName = (deliveryPersonId) => {
-    if (!deliveryPersonId) return '-';
-    const person = deliveryPersonnel.find(p => p.id === deliveryPersonId);
-    return person ? person.name : 'Unknown';
-  };
-
     const fetchOrders = async () => {
       setLoading(true);
     setError("");
@@ -290,13 +283,12 @@ const AdminViewOrders = ({ onBack }) => {
                   <th style={{ padding: '0.6rem 0.3rem', textAlign: 'center', color: COLORS.text, fontWeight: 700, fontSize: '0.97rem', borderBottom: `2px solid ${COLORS.border}`, background: COLORS.secondary, minWidth: 70 }}>Status</th>
                   <th style={{ padding: '0.6rem 0.3rem', textAlign: 'center', color: COLORS.text, fontWeight: 700, fontSize: '0.97rem', borderBottom: `2px solid ${COLORS.border}`, background: COLORS.secondary, minWidth: 90 }}>Date</th>
                   <th style={{ padding: '0.6rem 0.3rem', textAlign: 'center', color: COLORS.text, fontWeight: 700, fontSize: '0.97rem', borderBottom: `2px solid ${COLORS.border}`, background: COLORS.secondary, minWidth: 70 }}>Type</th>
-                  <th style={{ padding: '0.6rem 0.3rem', textAlign: 'center', color: COLORS.text, fontWeight: 700, fontSize: '0.97rem', borderBottom: `2px solid ${COLORS.border}`, background: COLORS.secondary, minWidth: 90 }}>Delivery Personnel</th>
                   <th style={{ padding: '0.6rem 0.3rem', textAlign: 'center', color: COLORS.text, fontWeight: 700, fontSize: '0.97rem', borderBottom: `2px solid ${COLORS.border}`, background: COLORS.secondary, minWidth: 110 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {tabFilteredOrders.length === 0 ? (
-                  <tr><td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: COLORS.text1 }}>No orders found.</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: COLORS.text1 }}>No orders found.</td></tr>
                 ) : tabFilteredOrders.map((order, idx) => (
                   <tr
                     key={order.id}
@@ -310,9 +302,6 @@ const AdminViewOrders = ({ onBack }) => {
                     <td style={{ padding: '0.5rem 0.3rem', color: COLORS.text1, textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap', minWidth: 90, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.97rem' }}>{order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}</td>
                     <td style={{ padding: '0.5rem 0.3rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap', minWidth: 70, maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <span style={{ background: order.paymentMethod === 'pickup' ? '#e0e7ff' : '#f0fdf4', color: order.paymentMethod === 'pickup' ? '#3730a3' : '#166534', borderRadius: '0.5rem', padding: '0.13rem 0.5rem', fontWeight: 600, fontSize: '0.97rem', display: 'inline-block', minWidth: 70, textAlign: 'center' }}>{order.paymentMethod === 'pickup' ? 'Pickup' : 'Delivery'}</span>
-                    </td>
-                    <td style={{ padding: '0.5rem 0.3rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap', minWidth: 90, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.97rem', color: COLORS.text1 }}>
-                      {getDeliveryPersonName(order.deliveryPersonId)}
                     </td>
                     <td style={{ padding: '0.5rem 0.3rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap', minWidth: 110, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'stretch', background: '#f3f4f6', borderRadius: '0.7rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '0.5rem 0.5rem', minWidth: 110 }}>
