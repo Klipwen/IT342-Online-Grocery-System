@@ -1,6 +1,5 @@
 package edu.cit.onlinegrocerysystem.model;
 
-import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -23,6 +22,12 @@ public class DeliveryOrder {
     private String remarks;
 
     /* ---- getters & setters ---- */
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
     public Long getDeliveryPersonId() { return deliveryPersonId; }
     public void setDeliveryPersonId(Long deliveryPersonId) { this.deliveryPersonId = deliveryPersonId; }
 

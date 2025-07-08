@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/delivery")
+@CrossOrigin(origins = "*")
 public class DeliveryLoginController {
 
     @Autowired

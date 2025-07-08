@@ -24,7 +24,7 @@ const DeliveryDashboard = () => {
         setLoading(true);
         setError('');
         try {
-          const res = await fetch(`http://localhost:8080/api/delivery-order/rider/${parsedDeliveryPerson.id}`);
+          const res = await fetch(`http://localhost:8080/api/orders/delivery-person/${parsedDeliveryPerson.id}`);
           if (res.ok) {
             const data = await res.json();
             setDeliveries(data);
@@ -71,9 +71,11 @@ const DeliveryDashboard = () => {
 
   const handleAccept = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/delivery-order/accept/${orderId}`, { method: 'POST' });
+      const res = await fetch(`http://localhost:8080/api/orders/${orderId}/accept-delivery`, {
+        method: 'POST'
+      });
       if (res.ok) {
-        setDeliveries(prev => prev.map(order => order.id === orderId ? { ...order, deliveryStatus: 'Accepted' } : order));
+        setDeliveries(prev => prev.map(order => order.id === orderId ? { ...order, status: 'Out for Delivery' } : order));
       } else {
         console.error('Failed to accept delivery.');
       }
@@ -84,9 +86,11 @@ const DeliveryDashboard = () => {
 
   const handleReject = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/delivery-order/reject/${orderId}`, { method: 'POST' });
+      const res = await fetch(`http://localhost:8080/api/orders/${orderId}/reject-delivery`, {
+        method: 'POST'
+      });
       if (res.ok) {
-        setDeliveries(prev => prev.map(order => order.id === orderId ? { ...order, deliveryStatus: 'Rejected' } : order));
+        setDeliveries(prev => prev.map(order => order.id === orderId ? { ...order, status: 'Ready to Deliver' } : order));
       } else {
         console.error('Failed to reject delivery.');
       }
@@ -128,9 +132,9 @@ const DeliveryDashboard = () => {
               <thead>
                 <tr style={{ background: '#f3f4f6', color: '#222' }}>
                   <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Order ID</th>
+                  <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Customer</th>
                   <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Status</th>
-                  <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Pickup Time</th>
-                  <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Delivery Time</th>
+                  <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Order Date</th>
                   <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Address</th>
                   <th style={{ padding: '12px 8px', borderBottom: '2px solid #ececec' }}>Actions</th>
                 </tr>
@@ -138,13 +142,13 @@ const DeliveryDashboard = () => {
               <tbody>
                 {deliveries.map(order => (
                   <tr key={order.id} style={{ borderBottom: '1px solid #ececec' }}>
-                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.orderId}</td>
-                    <td style={{ padding: '10px 8px', textAlign: 'center', color: order.deliveryStatus === 'Delivered' ? '#22c55e' : order.deliveryStatus === 'Failed' ? '#ef4444' : '#f59e42', fontWeight: 600 }}>{order.deliveryStatus}</td>
-                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.pickupTime ? new Date(order.pickupTime).toLocaleString() : '-'}</td>
-                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.deliveryTime ? new Date(order.deliveryTime).toLocaleString() : '-'}</td>
-                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.deliveryAddress}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.id}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.customerName}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'center', color: order.status === 'Completed' ? '#22c55e' : order.status === 'Cancelled' ? '#ef4444' : '#f59e42', fontWeight: 600 }}>{order.status}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'center' }}>{order.address}</td>
                     <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                      {order.deliveryStatus === 'Pending' ? (
+                      {order.status === 'Ready to Deliver' ? (
                         <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
                           <button onClick={() => handleAccept(order.id)} style={{ background: '#22c55e', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontWeight: 500, cursor: 'pointer' }}>Accept</button>
                           <button onClick={() => handleReject(order.id)} style={{ background: '#ef4444', color: 'white', border: 'none', borderRadius: 6, padding: '6px 12px', fontWeight: 500, cursor: 'pointer' }}>Reject</button>

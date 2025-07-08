@@ -39,6 +39,10 @@ public class OrderService {
         return orderRepository.findByUserId(userId);
     }
 
+    public List<Order> getOrdersByDeliveryPersonId(Long deliveryPersonId) {
+        return orderRepository.findByDeliveryPersonId(deliveryPersonId);
+    }
+
     public void deleteOrderById(Long id) {
         orderRepository.deleteById(id);
     }

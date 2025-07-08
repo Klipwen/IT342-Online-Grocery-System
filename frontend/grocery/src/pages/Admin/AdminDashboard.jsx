@@ -67,13 +67,21 @@ const AdminDashboard = ({ onNavigate }) => {
 
   // Define shared columns for both tables
   const orderTableColumns = [
-    { label: 'Customer', key: 'customerName', width: '16%' },
-    { label: 'Address', key: 'address', width: '22%' },
-    { label: 'Amount', key: 'totalAmount', width: '13%' },
-    { label: 'Payment', key: 'paymentMethod', width: '12%' },
+    { label: 'Customer', key: 'customerName', width: '14%' },
+    { label: 'Address', key: 'address', width: '20%' },
+    { label: 'Amount', key: 'totalAmount', width: '12%' },
+    { label: 'Payment', key: 'paymentMethod', width: '10%' },
+    { label: 'Delivery Personnel', key: 'deliveryPerson', width: '15%' },
     { label: 'Date', key: 'orderDate', width: '18%' },
-    { label: '', key: 'manage', width: '10%' },
+    { label: '', key: 'manage', width: '11%' },
   ];
+
+  // Function to get delivery personnel name by ID
+  const getDeliveryPersonName = (deliveryPersonId) => {
+    if (!deliveryPersonId) return '-';
+    const person = deliveryPersonnel.find(p => p.id === deliveryPersonId);
+    return person ? person.name : 'Unknown';
+  };
 
   useEffect(() => {
     const fetchProductCount = async () => {
@@ -858,9 +866,14 @@ const AdminDashboard = ({ onNavigate }) => {
                     </td>
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[3].width }}>{order.paymentMethod}</td>
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[4].width }}>
+                            {(order.status === 'On Route' || order.status === 'Accepted' || order.status === 'Delivered')
+                              ? getDeliveryPersonName(order.deliveryPersonId)
+                              : '-'}
+                          </td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[5].width }}>
                             {order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}
                     </td>
-                          <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[5].width }}>
+                          <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[6].width }}>
                             <button
                               style={{
                                 background: '#2563eb',
@@ -961,9 +974,12 @@ const AdminDashboard = ({ onNavigate }) => {
                           </td>
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[3].width }}>{order.paymentMethod}</td>
                           <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[4].width }}>
+                            {getDeliveryPersonName(order.deliveryPersonId)}
+                          </td>
+                          <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'middle', whiteSpace: 'nowrap', width: orderTableColumns[5].width }}>
                             {order.orderDate ? new Date(order.orderDate).toLocaleString() : '-'}
                           </td>
-                          <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[5].width }}>
+                          <td style={{ padding: '1rem', textAlign: 'center', verticalAlign: 'middle', width: orderTableColumns[6].width }}>
                             <button
                               style={{
                                 background: '#2563eb',
