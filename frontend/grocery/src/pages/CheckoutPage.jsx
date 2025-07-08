@@ -289,14 +289,6 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
           >
             Self Pick-up
           </button>
-          <button
-            type="button"
-            className={`payment-method-btn${paymentMethod === 'gcash' ? ' selected' : ''}`}
-            onClick={() => setPaymentMethod('gcash')}
-            style={{ background: paymentMethod === 'gcash' ? '#f0fdf4' : '#fff', color: paymentMethod === 'gcash' ? '#166534' : '#222', border: '1.5px solid #16a34a', borderRadius: 8, fontWeight: 600, fontSize: 15, padding: '10px 24px', cursor: 'pointer', boxShadow: paymentMethod === 'gcash' ? '0 2px 8px #bbf7d0' : 'none', transition: 'all 0.18s' }}
-          >
-            GCash
-          </button>
         </div>
         <div style={{ padding: '0 24px 24px 24px', minHeight: 40 }}>
           {paymentMethod === 'pickup' && (
@@ -309,12 +301,6 @@ const CheckoutPage = ({ cart, setCart, onClearCart, user: appUser }) => {
             <div style={{ background: '#fee2e2', color: '#ef4444', borderRadius: 8, padding: '14px 18px', marginTop: 8, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, animation: 'slideIn 0.3s' }}>
               <span style={{ fontSize: 22 }}>🚚</span>
               Your order will be delivered to your address in <b>1-2 days</b>! <span style={{ marginLeft: 8, fontSize: 15, color: '#ef4444' }}>Enjoy fast delivery!</span>
-            </div>
-          )}
-          {paymentMethod === 'gcash' && (
-            <div style={{ background: '#f0fdf4', color: '#166534', borderRadius: 8, padding: '14px 18px', marginTop: 8, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, animation: 'slideIn 0.3s' }}>
-              <span style={{ fontSize: 22 }}>💸</span>
-              Pay securely with <b>GCash</b>. You will receive payment instructions after placing your order.
             </div>
           )}
         </div>

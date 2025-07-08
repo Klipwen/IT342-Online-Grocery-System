@@ -85,7 +85,7 @@ function HomePage({ cart, setCart, onAddToCart, user }) {
           </div>
           <div className="homepage-section-title-row">
             <h2 className="homepage-section-title">Best Selling Products</h2>
-            <button className="homepage-viewall-btn">View All</button>
+            <button className="homepage-viewall-btn" onClick={() => { window.location.href = '/?route=products&filter=bestselling'; }}>View All</button>
           </div>
           <div className="homepage-product-grid">
             {products.filter(product => product.bestSelling && product.name.toLowerCase().includes(searchTerm.toLowerCase())).map(product => (

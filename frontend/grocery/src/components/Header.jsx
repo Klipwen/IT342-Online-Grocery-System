@@ -152,7 +152,6 @@ const Header = ({
                 justifyContent: 'center'
               }}>{cartCount}</span>
             </div>
-            <Heart style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={onWishlistClick} />
             <User style={{ width: '1.5rem', height: '1.5rem', color: '#4b5563', cursor: 'pointer' }} onClick={() => window.location.href = '/?route=profile'} />
             <button
               onClick={() => {
