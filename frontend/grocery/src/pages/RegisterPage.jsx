@@ -48,8 +48,16 @@ const RegisterPage = () => {
         body: JSON.stringify({ name, email, password })
       });
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        setError(data.message || 'Registration failed');
+        let errorMsg = 'Registration failed';
+        try {
+          const data = await response.json();
+          if (typeof data === 'string') {
+            errorMsg = data;
+          } else if (data && data.message) {
+            errorMsg = data.message;
+          }
+        } catch (e) {}
+        setError(errorMsg);
         setShowPrompt(true);
         setLoading(false);
         setTimeout(() => setShowPrompt(false), 2500);

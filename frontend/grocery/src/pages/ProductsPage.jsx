@@ -44,10 +44,17 @@ const ProductsPage = ({ cart, setCart, selectedCategory, onAddToCart, user }) =>
     setWishlistCount(wishlistCount > 0 ? 0 : 1);
   };
 
-  // Filter products by selectedCategory if set
-  const filteredProducts = selectedCategory
-    ? products.filter(product => product.category && product.category.toLowerCase() === selectedCategory.toLowerCase())
-    : products;
+  // Get filter from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const filter = urlParams.get('filter');
+
+  // Filter products by selectedCategory or best selling
+  let filteredProducts = products;
+  if (filter === 'bestselling') {
+    filteredProducts = products.filter(product => product.bestSelling);
+  } else if (selectedCategory) {
+    filteredProducts = products.filter(product => product.category && product.category.toLowerCase() === selectedCategory.toLowerCase());
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', overflowX: 'hidden', position: 'relative' }}>
