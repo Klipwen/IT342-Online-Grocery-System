@@ -44,7 +44,7 @@ const AdminViewDeliveries = ({ onBack }) => {
 
   // View order details
   const handleView = (order) => {
-    alert(`Order ID: ${order.id}\nCustomer: ${order.customerName}\nDelivery Person: ${getDeliveryPersonName(order.deliveryPersonId)}\nStatus: ${order.status}\nDate: ${order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}\n\nItems: ${(order.items || []).map(i => `${i.name} x${i.quantity}`).join(', ')}`);
+    alert(`Order ID: ${order.id}\nCustomer: ${order.customerName}\nDelivery Person: ${getDeliveryPersonName(order.deliveryPersonId)}\nStatus: ${order.status}\nDate: ${order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}\n\nItems: ${(order.items || []).map(i => `${i.productName} x${i.quantity}`).join(', ')}`);
   };
 
   // Update order status
@@ -192,7 +192,7 @@ const AdminViewDeliveries = ({ onBack }) => {
             <tbody>
               {deliveries
                 .filter(order => order.deliveryPersonId && [
-                  'on route', 'accepted', 'delivered', 'out for delivery', 'assigned'
+                  'on route', 'accepted', 'delivered', 'out for delivery', 'assigned', 'completed'
                 ].includes((order.status || '').toLowerCase()))
                 .map((order, idx) => (
                   <tr key={order.id} style={{ background: idx % 2 === 0 ? COLORS.primary : COLORS.secondary }}>
@@ -227,22 +227,6 @@ const AdminViewDeliveries = ({ onBack }) => {
                         onClick={() => handleView(order)}
                         disabled={updating || deleting}
                       >View</button>
-                      <button
-                        style={{
-                          background: COLORS.onroute,
-                          color: COLORS.primary,
-                          border: 'none',
-                          borderRadius: '0.5rem',
-                          padding: '0.4rem 1rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          marginRight: 8,
-                          transition: 'background 0.2s',
-                        }}
-                        title="Update delivery status"
-                        onClick={() => handleUpdate(order)}
-                        disabled={updating || deleting}
-                      >Update</button>
                       <button
                         style={{
                           background: COLORS.pending,

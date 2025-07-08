@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PATCH, RequestMethod.PUT, RequestMethod.DELETE})
 public class OrderController {
     @Autowired
     private OrderService orderService;
@@ -83,6 +85,48 @@ public class OrderController {
             return orderService.saveOrder(order);
         }
         return null;
+    }
+
+    @PostMapping("/{id}/complete-delivery")
+    public ResponseEntity<?> completeDelivery(@PathVariable Long id) {
+        try {
+            System.out.println("Received request to complete delivery for order ID: " + id);
+            Order order = orderService.getOrderById(id);
+            if (order != null) {
+                order.setStatus("Completed");
+                order.setDeliveryStatus("Completed");
+                Order saved = orderService.saveOrder(order);
+                System.out.println("Order marked as completed: " + saved.getId());
+                return ResponseEntity.ok(saved);
+            } else {
+                System.out.println("Order not found for ID: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/complete-delivery")
+    public ResponseEntity<?> patchCompleteDelivery(@PathVariable Long id) {
+        try {
+            System.out.println("[PATCH] Received request to complete delivery for order ID: " + id);
+            Order order = orderService.getOrderById(id);
+            if (order != null) {
+                order.setStatus("Completed");
+                order.setDeliveryStatus("Completed");
+                Order saved = orderService.saveOrder(order);
+                System.out.println("Order marked as completed: " + saved.getId());
+                return ResponseEntity.ok(saved);
+            } else {
+                System.out.println("Order not found for ID: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
