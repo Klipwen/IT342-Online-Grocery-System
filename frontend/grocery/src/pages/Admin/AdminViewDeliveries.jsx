@@ -18,6 +18,8 @@ const AdminViewDeliveries = ({ onBack }) => {
   const [deliveries, setDeliveries] = useState([]);
   const [deliveryPersonnel, setDeliveryPersonnel] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchDeliveries = () => {
     setLoading(true);
@@ -38,6 +40,52 @@ const AdminViewDeliveries = ({ onBack }) => {
   const getDeliveryPersonName = (id) => {
     const person = deliveryPersonnel.find(p => p.id === id);
     return person ? person.name : '-';
+  };
+
+  // View order details
+  const handleView = (order) => {
+    alert(`Order ID: ${order.id}\nCustomer: ${order.customerName}\nDelivery Person: ${getDeliveryPersonName(order.deliveryPersonId)}\nStatus: ${order.status}\nDate: ${order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}\n\nItems: ${(order.items || []).map(i => `${i.productName} x${i.quantity}`).join(', ')}`);
+  };
+
+  // Update order status
+  const handleUpdate = async (order) => {
+    const newStatus = prompt('Enter new status for this delivery:', order.status);
+    if (!newStatus || newStatus === order.status) return;
+    setUpdating(true);
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/orders/${order.id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        fetchDeliveries();
+        alert('Status updated successfully!');
+      } else {
+        alert('Failed to update status.');
+      }
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // Delete/cancel delivery
+  const handleDelete = async (order) => {
+    if (!window.confirm('Are you sure you want to cancel/delete this delivery?')) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/orders/${order.id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        fetchDeliveries();
+        alert('Delivery cancelled/deleted successfully!');
+      } else {
+        alert('Failed to cancel/delete delivery.');
+      }
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -144,7 +192,7 @@ const AdminViewDeliveries = ({ onBack }) => {
             <tbody>
               {deliveries
                 .filter(order => order.deliveryPersonId && [
-                  'on route', 'accepted', 'delivered', 'out for delivery', 'assigned'
+                  'on route', 'accepted', 'delivered', 'out for delivery', 'assigned', 'completed'
                 ].includes((order.status || '').toLowerCase()))
                 .map((order, idx) => (
                   <tr key={order.id} style={{ background: idx % 2 === 0 ? COLORS.primary : COLORS.secondary }}>
@@ -163,38 +211,37 @@ const AdminViewDeliveries = ({ onBack }) => {
                     </td>
                     <td style={{ padding: '1rem', color: COLORS.text1, textAlign: 'center' }}>{order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}</td>
                     <td style={{ padding: '1rem', textAlign: 'center' }}>
-                      <button style={{
-                        background: COLORS.secondary,
-                        color: COLORS.text,
-                        border: `1px solid ${COLORS.border}`,
-                        borderRadius: '0.5rem',
-                        padding: '0.4rem 1rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        marginRight: 8,
-                        transition: 'background 0.2s',
-                      }}>View</button>
-                      <button style={{
-                        background: COLORS.onroute,
-                        color: COLORS.primary,
-                        border: 'none',
-                        borderRadius: '0.5rem',
-                        padding: '0.4rem 1rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        marginRight: 8,
-                        transition: 'background 0.2s',
-                      }}>Update</button>
-                      <button style={{
-                        background: COLORS.pending,
-                        color: COLORS.primary,
-                        border: 'none',
-                        borderRadius: '0.5rem',
-                        padding: '0.4rem 1rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                      }}>Delete/Cancel</button>
+                      <button
+                        style={{
+                          background: COLORS.secondary,
+                          color: COLORS.text,
+                          border: `1px solid ${COLORS.border}`,
+                          borderRadius: '0.5rem',
+                          padding: '0.4rem 1rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          marginRight: 8,
+                          transition: 'background 0.2s',
+                        }}
+                        title="View delivery details"
+                        onClick={() => handleView(order)}
+                        disabled={updating || deleting}
+                      >View</button>
+                      <button
+                        style={{
+                          background: COLORS.pending,
+                          color: COLORS.primary,
+                          border: 'none',
+                          borderRadius: '0.5rem',
+                          padding: '0.4rem 1rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                        }}
+                        title="Cancel or delete this delivery"
+                        onClick={() => handleDelete(order)}
+                        disabled={updating || deleting}
+                      >Delete/Cancel</button>
                     </td>
                   </tr>
                 ))}
