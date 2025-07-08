@@ -1,33 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
-
-// Mock delivery data for initial UI
-const mockDeliveries = [
-  {
-    id: 'DEL-001',
-    orderId: 'ORD-1001',
-    deliveryPerson: 'Mark Cruz',
-    customer: 'John Doe',
-    status: 'On Route',
-    date: '2024-06-01',
-  },
-  {
-    id: 'DEL-002',
-    orderId: 'ORD-1002',
-    deliveryPerson: 'Anna Lee',
-    customer: 'Jane Smith',
-    status: 'Pending',
-    date: '2024-06-02',
-  },
-  {
-    id: 'DEL-003',
-    orderId: 'ORD-1003',
-    deliveryPerson: 'Sam Lim',
-    customer: 'Alice Lee',
-    status: 'Delivered',
-    date: '2024-06-03',
-  },
-];
+import { getApiBaseUrl } from '../../config/api';
 
 const COLORS = {
   primary: '#fff',
@@ -42,46 +15,29 @@ const COLORS = {
 };
 
 const AdminViewDeliveries = ({ onBack }) => {
-  // Header style for the new format
-  const headerStyle = {
-    width: '100%',
-    background: '#fff',
-    borderRadius: '1rem',
-    boxShadow: '0 2px 8px 0 rgb(0 0 0 / 0.07)',
-    padding: '1.5rem 2.5rem',
-    marginBottom: '2.5rem',
-    border: '1px solid #e2e8f0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '1rem',
+  const [deliveries, setDeliveries] = useState([]);
+  const [deliveryPersonnel, setDeliveryPersonnel] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchDeliveries = () => {
+    setLoading(true);
+    fetch(`${getApiBaseUrl()}/api/orders`)
+      .then(res => res.json())
+      .then(data => setDeliveries(data || []))
+      .finally(() => setLoading(false));
+    fetch(`${getApiBaseUrl()}/api/delivery`)
+      .then(res => res.json())
+      .then(data => setDeliveryPersonnel(data || []));
   };
-  const logoStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
-    fontWeight: 700,
-    fontSize: '1.25rem',
-    color: '#ef4444',
-  };
-  const titleStyle = {
-    fontWeight: 800,
-    fontSize: '2.5rem',
-    color: '#1f2937',
-    flex: 1,
-    textAlign: 'center',
-    margin: 0,
-  };
-  const logoutBtnStyle = {
-    background: '#ef4444',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '0.5rem',
-    padding: '0.75rem 2.5rem',
-    fontWeight: 700,
-    fontSize: '1.1rem',
-    cursor: 'pointer',
-    transition: 'background 0.2s',
+
+  useEffect(() => {
+    fetchDeliveries();
+  }, []);
+
+  // Helper to get delivery person name
+  const getDeliveryPersonName = (id) => {
+    const person = deliveryPersonnel.find(p => p.id === id);
+    return person ? person.name : '-';
   };
 
   return (
@@ -108,7 +64,17 @@ const AdminViewDeliveries = ({ onBack }) => {
         </div>
         <h2 style={{ fontWeight: 800, fontSize: '2.5rem', color: '#1f2937', flex: 1, textAlign: 'center', margin: 0 }}>Deliveries</h2>
         <button
-          style={logoutBtnStyle}
+          style={{
+            background: '#ef4444',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.5rem',
+            padding: '0.75rem 2.5rem',
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            transition: 'background 0.2s',
+          }}
           onClick={() => {
             sessionStorage.removeItem('isAdminAuthenticated');
             window.location.href = '/?route=login';
@@ -127,28 +93,46 @@ const AdminViewDeliveries = ({ onBack }) => {
         padding: '2.5rem',
         border: `1px solid ${COLORS.border}`,
       }}>
-        {/* Back Arrow */}
-        <button
-          onClick={onBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            marginBottom: '1.5rem',
-            marginLeft: '0.25rem',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={32} />
-        </button>
+        {/* Back Arrow and Refresh Button */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', gap: 16 }}>
+          <button
+            onClick={onBack}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              marginLeft: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            title="Back to Dashboard"
+          >
+            <ArrowLeft size={32} />
+          </button>
+          <button
+            onClick={fetchDeliveries}
+            style={{
+              background: '#2563eb',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '0.5rem',
+              padding: '0.6rem 1.5rem',
+              fontWeight: 700,
+              fontSize: '1rem',
+              cursor: 'pointer',
+              marginLeft: 12,
+              transition: 'background 0.2s',
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
         {/* Deliveries Table */}
         <div style={{ overflowX: 'auto', marginTop: 24 }}>
           <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, background: COLORS.primary, borderRadius: '1rem', boxShadow: COLORS.cardShadow }}>
             <thead style={{ background: COLORS.secondary }}>
               <tr>
-                <th style={{ padding: '1rem', textAlign: 'left', color: COLORS.text, fontWeight: 700, fontSize: '1rem', borderBottom: `2px solid ${COLORS.border}` }}>Delivery ID</th>
                 <th style={{ padding: '1rem', textAlign: 'left', color: COLORS.text, fontWeight: 700, fontSize: '1rem', borderBottom: `2px solid ${COLORS.border}` }}>Order ID</th>
                 <th style={{ padding: '1rem', textAlign: 'left', color: COLORS.text, fontWeight: 700, fontSize: '1rem', borderBottom: `2px solid ${COLORS.border}` }}>Delivery Person</th>
                 <th style={{ padding: '1rem', textAlign: 'left', color: COLORS.text, fontWeight: 700, fontSize: '1rem', borderBottom: `2px solid ${COLORS.border}` }}>Customer</th>
@@ -158,59 +142,62 @@ const AdminViewDeliveries = ({ onBack }) => {
               </tr>
             </thead>
             <tbody>
-              {mockDeliveries.map((delivery, idx) => (
-                <tr key={delivery.id} style={{ background: idx % 2 === 0 ? COLORS.primary : COLORS.secondary }}>
-                  <td style={{ padding: '1rem', color: COLORS.text1, fontWeight: 600 }}>{delivery.id}</td>
-                  <td style={{ padding: '1rem', color: COLORS.text }}>{delivery.orderId}</td>
-                  <td style={{ padding: '1rem', color: COLORS.text1 }}>{delivery.deliveryPerson}</td>
-                  <td style={{ padding: '1rem', color: COLORS.text }}>{delivery.customer}</td>
-                  <td style={{ padding: '1rem', textAlign: 'center' }}>
-                    <span style={{
-                      background: delivery.status === 'Delivered' ? '#dcfce7' : delivery.status === 'Pending' ? '#fef3c7' : '#dbeafe',
-                      color: delivery.status === 'Delivered' ? COLORS.delivered : delivery.status === 'Pending' ? COLORS.pending : COLORS.onroute,
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.95rem',
-                      fontWeight: 'bold',
-                    }}>{delivery.status}</span>
-                  </td>
-                  <td style={{ padding: '1rem', color: COLORS.text1, textAlign: 'center' }}>{delivery.date}</td>
-                  <td style={{ padding: '1rem', textAlign: 'center' }}>
-                    <button style={{
-                      background: COLORS.secondary,
-                      color: COLORS.text,
-                      border: `1px solid ${COLORS.border}`,
-                      borderRadius: '0.5rem',
-                      padding: '0.4rem 1rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      marginRight: 8,
-                      transition: 'background 0.2s',
-                    }}>View</button>
-                    <button style={{
-                      background: COLORS.onroute,
-                      color: COLORS.primary,
-                      border: 'none',
-                      borderRadius: '0.5rem',
-                      padding: '0.4rem 1rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      marginRight: 8,
-                      transition: 'background 0.2s',
-                    }}>Update</button>
-                    <button style={{
-                      background: COLORS.pending,
-                      color: COLORS.primary,
-                      border: 'none',
-                      borderRadius: '0.5rem',
-                      padding: '0.4rem 1rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'background 0.2s',
-                    }}>Delete/Cancel</button>
-                  </td>
-                </tr>
-              ))}
+              {deliveries
+                .filter(order => order.deliveryPersonId && [
+                  'on route', 'accepted', 'delivered', 'out for delivery', 'assigned'
+                ].includes((order.status || '').toLowerCase()))
+                .map((order, idx) => (
+                  <tr key={order.id} style={{ background: idx % 2 === 0 ? COLORS.primary : COLORS.secondary }}>
+                    <td style={{ padding: '1rem', color: COLORS.text1, fontWeight: 600 }}>{order.id}</td>
+                    <td style={{ padding: '1rem', color: COLORS.text1 }}>{getDeliveryPersonName(order.deliveryPersonId)}</td>
+                    <td style={{ padding: '1rem', color: COLORS.text }}>{order.customerName}</td>
+                    <td style={{ padding: '1rem', textAlign: 'center' }}>
+                      <span style={{
+                        background: order.status === 'Delivered' ? '#dcfce7' : order.status === 'Pending' ? '#fef3c7' : '#dbeafe',
+                        color: order.status === 'Delivered' ? COLORS.delivered : order.status === 'Pending' ? COLORS.pending : COLORS.onroute,
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.95rem',
+                        fontWeight: 'bold',
+                      }}>{order.status}</span>
+                    </td>
+                    <td style={{ padding: '1rem', color: COLORS.text1, textAlign: 'center' }}>{order.orderDate ? new Date(order.orderDate).toLocaleDateString() : '-'}</td>
+                    <td style={{ padding: '1rem', textAlign: 'center' }}>
+                      <button style={{
+                        background: COLORS.secondary,
+                        color: COLORS.text,
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: '0.5rem',
+                        padding: '0.4rem 1rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginRight: 8,
+                        transition: 'background 0.2s',
+                      }}>View</button>
+                      <button style={{
+                        background: COLORS.onroute,
+                        color: COLORS.primary,
+                        border: 'none',
+                        borderRadius: '0.5rem',
+                        padding: '0.4rem 1rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginRight: 8,
+                        transition: 'background 0.2s',
+                      }}>Update</button>
+                      <button style={{
+                        background: COLORS.pending,
+                        color: COLORS.primary,
+                        border: 'none',
+                        borderRadius: '0.5rem',
+                        padding: '0.4rem 1rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                      }}>Delete/Cancel</button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

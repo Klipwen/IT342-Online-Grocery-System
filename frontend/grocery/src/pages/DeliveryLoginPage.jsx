@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getApiBaseUrl } from '../config/api';
 
 const DeliveryLoginPage = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +17,8 @@ const DeliveryLoginPage = () => {
     setSuccess('');
     setShowPrompt(false);
     try {
-      const res = await fetch('/api/delivery/login', {
+      const apiBaseUrl = getApiBaseUrl();
+      const res = await fetch(`${apiBaseUrl}/api/delivery/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

@@ -36,6 +36,13 @@ public class Order {
     @Column(name = "order_date")
     private LocalDateTime orderDate = LocalDateTime.now();
 
+    // Delivery assignment fields
+    @Column(name = "delivery_person_id")
+    private Long deliveryPersonId;
+
+    @Column(name = "delivery_status")
+    private String deliveryStatus;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<OrderItem> items;
@@ -67,6 +74,12 @@ public class Order {
 
     public LocalDateTime getOrderDate() { return orderDate; }
     public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
+
+    public Long getDeliveryPersonId() { return deliveryPersonId; }
+    public void setDeliveryPersonId(Long deliveryPersonId) { this.deliveryPersonId = deliveryPersonId; }
+
+    public String getDeliveryStatus() { return deliveryStatus; }
+    public void setDeliveryStatus(String deliveryStatus) { this.deliveryStatus = deliveryStatus; }
 
     public List<OrderItem> getItems() { return items; }
     public void setItems(List<OrderItem> items) { this.items = items; }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getApiBaseUrl } from '../config/api';
 
 const DeliveryRegisterPage = () => {
   const [name, setName] = useState('');
@@ -25,7 +26,8 @@ const DeliveryRegisterPage = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch('/api/delivery/register', {
+      const apiBaseUrl = getApiBaseUrl();
+      const res = await fetch(`${apiBaseUrl}/api/delivery/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, contactNumber, password })
