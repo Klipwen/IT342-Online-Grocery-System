@@ -138,13 +138,16 @@ const AdminDashboard = ({ onNavigate }) => {
   }, []);
 
   useEffect(() => {
-    // Placeholder: simulate loading deliveries
     setLoadingDeliveries(true);
-    setTimeout(() => {
-      setDeliveryCount(42); // Replace with real API call later
-      setLoadingDeliveries(false);
-    }, 1000);
-  }, []);
+    // Count orders with paymentMethod !== 'pickup' as deliveries
+    if (orders && Array.isArray(orders)) {
+      const deliveryOrders = orders.filter(order => order.paymentMethod !== 'pickup');
+      setDeliveryCount(deliveryOrders.length);
+    } else {
+      setDeliveryCount(0);
+    }
+    setLoadingDeliveries(false);
+  }, [orders]);
 
   // Fetch delivery personnel for Delivery Status
   useEffect(() => {
